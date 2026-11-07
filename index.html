@@ -7,7 +7,7 @@
 <link rel="icon" href="icones/icone-192.png">
 <link rel="apple-touch-icon" href="icones/icone-192.png">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>window.NT_SUPABASE = {"url": "https://alxkympzfvjhrmbpuzfh.supabase.co", "anonKey": ""};</script>
+<script>window.NT_SUPABASE = {"url": "https://alxkympzfvjhrmbpuzfh.supabase.co", "anonKey": "sb_publishable_gUMCRKJfftipcrHoItN2iw_kbgPlG_J"};</script>
 <title>Neurotools</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,500&display=swap">
@@ -1014,7 +1014,7 @@ dialog .campo input{background:var(--paper)}
     document.querySelector('.lg-linha label').hidden = true;
     iniciarTracado();
     var sc = document.createElement('script');
-    sc.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
+    sc.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js';
     sc.onload = function () {
       sb = window.supabase.createClient(SUPA.url, SUPA.anonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
       sb.auth.onAuthStateChange(function (ev, s) {
