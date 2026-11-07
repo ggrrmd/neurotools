@@ -1,0 +1,1858 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Escalas, critérios diagnósticos, receituários, relatórios e CID-10 para o neurologista. Código aberto, dados de pacientes só no seu aparelho.">
+<link rel="icon" href="icones/icone-192.png">
+<link rel="apple-touch-icon" href="icones/icone-192.png">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<script>window.NT_SUPABASE = {"url": "https://alxkympzfvjhrmbpuzfh.supabase.co", "anonKey": ""};</script>
+<title>Neurotools</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,500&display=swap">
+<style>
+/* Neurotools: login, homepage com seis seções de mesmo nível, páginas de seção e ferramentas em quadros (iframes) carregados uma vez.
+   Paleta verde-pinho sobre papel claro; títulos em Newsreader, texto na fonte do sistema. */
+:root{
+  --paper:#FBFBF8; --card:#FFFFFF; --ink:#101B2D; --ink70:#4A5468; --ink45:#6F7889;
+  --rule:#DDE1E6; --pine:#1F4B3F; --pine-ink:#FBFBF8; --pine-hover:#173A31; --sage:#93B7A9;
+  --nav:#F3F5F2; --nav-hover:#E7ECE8; --nav-on:#DCE7E1; --star:#B7791F;
+  --soft:#E6EDE9; --soft-hover:#DAE5DF; --clay:#9A5B3C;
+  --warn-bg:#FBF1E4; --warn-ink:#7A4A12; --warn-rule:#E9C892;
+  --toast-bg:#101B2D; --toast-ink:#FBFBF8; --scrim:rgba(16,27,45,.38);
+  --trace:rgba(251,251,248,.22);
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --navw:272px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#11171A; --card:#182024; --ink:#E8ECEA; --ink70:#B4BDBA; --ink45:#8D9895;
+  --rule:#2A3438; --pine:#8FC3AE; --pine-ink:#11171A; --pine-hover:#A6D2C0; --sage:#5E8F7C;
+  --nav:#141B1E; --nav-hover:#1C262A; --nav-on:#22332D; --star:#E2B04A;
+  --soft:#1D2A26; --soft-hover:#243530; --clay:#D9A07F;
+  --warn-bg:#2B2216; --warn-ink:#E9C892; --warn-rule:#5C4628;
+  --toast-bg:#E8ECEA; --toast-ink:#11171A; --scrim:rgba(0,0,0,.5);
+  --trace:rgba(17,23,26,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#11171A; --card:#182024; --ink:#E8ECEA; --ink70:#B4BDBA; --ink45:#8D9895;
+  --rule:#2A3438; --pine:#8FC3AE; --pine-ink:#11171A; --pine-hover:#A6D2C0; --sage:#5E8F7C;
+  --nav:#141B1E; --nav-hover:#1C262A; --nav-on:#22332D; --star:#E2B04A;
+  --soft:#1D2A26; --soft-hover:#243530; --clay:#D9A07F;
+  --warn-bg:#2B2216; --warn-ink:#E9C892; --warn-rule:#5C4628;
+  --toast-bg:#E8ECEA; --toast-ink:#11171A; --scrim:rgba(0,0,0,.5);
+  --trace:rgba(17,23,26,.25); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--paper);color:var(--ink);font:15px/1.5 var(--sans);overflow:hidden}
+button,input{font:inherit;color:inherit}
+[hidden]{display:none!important}
+svg.ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+a{color:var(--pine)}
+
+/* ================= login ================= */
+#login{position:fixed;inset:0;z-index:80;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);background:var(--paper);overflow:auto}
+body.logado #login{display:none}
+body:not(.logado) .shell{display:none}
+.lg-arte{position:relative;background:var(--pine);color:var(--pine-ink);display:flex;flex-direction:column;justify-content:space-between;gap:40px;overflow:hidden;
+  padding-block:44px 36px;padding-left:max(40px,env(safe-area-inset-left,0px));padding-right:40px}
+.lg-arte canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.lg-arte > :not(canvas){position:relative}
+.lg-marca{display:flex;align-items:center;gap:12px;font:700 22px/1 var(--serif)}
+.lg-marca img{width:36px;height:36px;border-radius:9px}
+.lg-tese h1{font:600 clamp(32px,4.2vw,52px)/1.08 var(--serif);letter-spacing:-.015em;margin:0;max-width:15ch;text-wrap:balance}
+.lg-tese h1 em{font-style:italic;font-weight:500}
+.lg-tese p{margin:18px 0 0;max-width:44ch;font-size:15.5px;line-height:1.55;opacity:.88}
+.lg-pilares{display:flex;flex-wrap:wrap;gap:10px 22px;font-size:13px;font-weight:600;letter-spacing:.02em}
+.lg-pilares > span{display:inline-flex;align-items:center;gap:8px}
+.lg-pilares .priv{flex-basis:100%;align-items:flex-start;font-weight:400;letter-spacing:0;line-height:1.5;max-width:60ch;opacity:.92}
+.lg-pilares .priv b{font-weight:700}
+.lg-pilares .priv svg.ic{margin-top:2px}
+.lg-pilares svg.ic{width:17px;height:17px}
+.lg-form{display:flex;align-items:center;justify-content:center;padding-block:40px;padding-left:28px;padding-right:max(28px,env(safe-area-inset-right,0px))}
+.lg-caixa{width:100%;max-width:380px}
+.lg-abas{display:grid;grid-template-columns:1fr 1fr;background:var(--soft);border-radius:11px;padding:4px;margin-bottom:24px}
+.lg-abas button{border:0;background:none;border-radius:8px;padding:9px 0;font-weight:600;font-size:14px;color:var(--ink70);cursor:pointer}
+.lg-abas button[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(16,27,45,.12)}
+.lg-caixa h2{font:700 26px/1.15 var(--serif);margin:0 0 6px}
+.lg-caixa .sub{margin:0 0 20px;color:var(--ink70);font-size:14px}
+.campo{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;font-size:13px;font-weight:600;color:var(--ink70)}
+.campo input{height:44px;border:1px solid var(--rule);border-radius:10px;background:var(--card);padding:0 13px;font-size:15px;font-weight:400;color:var(--ink)}
+.campo input:focus{outline:3px solid var(--sage);outline-offset:0;border-color:var(--pine)}
+.lg-linha{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:-4px 0 18px;font-size:13px}
+.lg-linha label{display:flex;align-items:center;gap:7px;color:var(--ink70)}
+.btn-pri{width:100%;height:46px;border:0;border-radius:10px;background:var(--pine);color:var(--pine-ink);font-weight:700;font-size:15px;cursor:pointer}
+.btn-pri:hover{background:var(--pine-hover)}
+.btn-pri:focus-visible,.lg-abas button:focus-visible{outline:3px solid var(--sage);outline-offset:2px}
+.lg-erro{color:var(--clay);font-size:13px;margin:-6px 0 12px}
+.lg-pe{margin-top:22px;font-size:12px;color:var(--ink45);line-height:1.55}
+.lg-info{margin:16px 0 0;padding:12px 14px;border-radius:10px;background:var(--soft);color:var(--pine);font-size:13.5px;line-height:1.5}
+.btn-pri:disabled{cursor:wait}
+@media (max-width:860px){
+  #login{grid-template-columns:1fr;grid-auto-rows:max-content;align-content:start}
+  .lg-arte{padding-block:28px 26px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));gap:26px}
+  .lg-tese h1{font-size:32px}
+  .lg-form{padding-block:28px 40px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+}
+
+/* ================= casca ================= */
+.shell{display:grid;grid-template-columns:var(--navw) minmax(0,1fr);height:100%}
+.nav{background:var(--nav);border-right:1px solid var(--rule);display:flex;flex-direction:column;min-height:0;padding-left:env(safe-area-inset-left,0px)}
+.marca{display:flex;align-items:center;gap:11px;padding:20px 20px 14px;border:0;background:none;cursor:pointer;text-align:left;width:100%}
+.marca img{width:32px;height:32px;border-radius:8px;flex:none}
+.marca b{font:700 21px/1.1 var(--serif);letter-spacing:-.01em}
+.rolar{flex:1;overflow:auto;padding:2px 12px 12px}
+.item{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;text-align:left;cursor:pointer;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:500;color:var(--ink70);line-height:1.3}
+.item:hover{background:var(--nav-hover);color:var(--ink)}
+.item:focus-visible,.grupo-tit:focus-visible{outline:2px solid var(--sage);outline-offset:1px}
+.item.on{background:var(--pine);color:var(--pine-ink);font-weight:600}
+.item .cont{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--clay);color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center}
+.item .breve{margin-left:auto;font-size:10.5px;font-weight:600;color:var(--ink45)}
+.item.on .breve{color:var(--pine-ink)}
+.rotulo-sec{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink45);padding:14px 12px 4px}
+.grupo-tit{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;cursor:pointer;text-align:left;padding:8px 12px;border-radius:10px;color:var(--ink70);font-size:14px;font-weight:500}
+.grupo-tit:hover{background:var(--nav-hover);color:var(--ink)}
+.grupo-tit.on{background:var(--nav-on);color:var(--ink);font-weight:600}
+.grupo-tit .seta{margin-left:auto;width:14px;height:14px;color:var(--ink45);transition:transform .15s}
+.grupo.aberto .grupo-tit .seta{transform:rotate(90deg)}
+.grupo .lista{display:none;padding-bottom:4px}
+.grupo.aberto .lista{display:block}
+.grupo .item{padding:6px 10px 6px 44px;font-size:13px;font-weight:400}
+.sep-nav{height:1px;background:var(--rule);margin:10px 8px}
+.rodape-nav{padding:12px}
+.usuario{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--card);border:1px solid var(--rule)}
+.usuario .av{width:34px;height:34px;border-radius:50%;background:var(--soft);color:var(--pine);display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.usuario .q{min-width:0;flex:1}
+.usuario b{display:block;font-size:13px;line-height:1.3;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.usuario small{display:block;font-size:11.5px;color:var(--ink45);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.usuario button{border:0;background:none;color:var(--ink45);cursor:pointer;padding:6px;border-radius:8px;display:grid;place-items:center}
+.usuario button:hover{background:var(--nav-hover);color:var(--ink)}
+
+/* topo (só dentro das ferramentas; no celular sempre) */
+.area-principal{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column}
+.topo{display:flex;align-items:center;gap:10px;height:56px;flex:none;border-bottom:1px solid var(--rule);background:var(--nav);
+  padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));position:relative;z-index:20}
+.topo .bt{border:1px solid var(--rule);background:var(--card);border-radius:9px;height:38px;min-width:38px;padding:0 11px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-size:13.5px;font-weight:600;flex:none;white-space:nowrap}
+.topo .bt:focus-visible{outline:2px solid var(--sage);outline-offset:1px}
+#abrirNav{display:none}
+.titulo-topo{font:700 18px/1 var(--serif);white-space:nowrap}
+@media (min-width:861px){body.sem-ferr .topo{display:none}}
+body:not(.sem-ferr) .titulo-topo{display:none}
+.busca{position:relative;flex:1;max-width:620px}
+.busca input{width:100%;height:42px;border:1px solid var(--rule);border-radius:10px;background:var(--card);padding:0 40px 0 38px;font-size:15px}
+.busca input:focus{outline:3px solid var(--sage);outline-offset:0;border-color:var(--pine)}
+.busca .lupa{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink45);pointer-events:none}
+.busca kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);font:600 11px var(--sans);color:var(--ink45);border:1px solid var(--rule);border-radius:5px;padding:1px 6px;background:var(--paper)}
+.busca input:focus + kbd,.busca input:not(:placeholder-shown) + kbd{display:none}
+#resultados{position:absolute;left:0;right:0;top:48px;background:var(--card);border:1px solid var(--rule);border-radius:12px;box-shadow:0 14px 40px rgba(16,27,45,.18);max-height:min(70vh,520px);overflow:auto;padding:6px;z-index:30}
+.res-it{display:flex;align-items:baseline;gap:10px;width:100%;border:0;background:none;text-align:left;cursor:pointer;border-radius:8px;padding:8px 10px}
+.res-it[aria-selected="true"],.res-it:hover{background:var(--nav-on)}
+.res-it .nm{font-size:14px;color:var(--ink)}
+.res-it .ar{margin-left:auto;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pine);white-space:nowrap}
+.res-vazio{padding:14px;color:var(--ink45);font-size:14px}
+#fav{color:var(--ink45)}
+#fav[aria-pressed="true"]{color:var(--star);border-color:var(--star)}
+
+/* conteúdo das páginas */
+.conteudo{position:relative;flex:1;min-height:0}
+#inicio{position:absolute;inset:0;overflow:auto;padding-block:28px 36px;padding-left:max(16px,clamp(16px,3.2vw,40px));padding-right:max(16px,clamp(16px,3.2vw,40px))}
+#inicio:focus{outline:none}
+.wrap{max-width:1080px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}
+.pagina{flex:1}
+.trilha{font-size:12px;font-weight:600;color:var(--ink45);margin-bottom:18px}
+.trilha a{color:inherit;text-decoration:none}
+.trilha a:hover{color:var(--ink);text-decoration:underline}
+.cabeca{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}
+.boas{border-left:4px solid var(--pine);padding:2px 0 2px 16px;min-width:0}
+.boas h1{font:700 clamp(26px,3.4vw,34px)/1.15 var(--serif);margin:0;letter-spacing:-.01em;display:flex;align-items:center;gap:12px;text-wrap:balance}
+.boas h1 svg.ic{width:30px;height:30px;stroke-width:1.6;color:var(--pine)}
+.boas p{margin:6px 0 0;font-size:14.5px;color:var(--ink70);max-width:62ch}
+.busca-slot{flex:0 1 380px;min-width:240px}
+.busca-slot .busca{max-width:none}
+.favs{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:24px;padding:12px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--card)}
+.favs-tit{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink45);margin-right:4px}
+.favs-tit svg.ic{width:15px;height:15px;color:var(--star);fill:var(--star);stroke:var(--star)}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid color-mix(in srgb,var(--star) 45%,var(--rule));background:var(--card);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:13px;color:var(--ink);text-decoration:none}
+.chip:hover{border-color:var(--star)}
+.favs .dica{font-size:13px;color:var(--ink45)}
+
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.card{background:var(--soft);border-radius:14px;padding:18px 18px 16px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;gap:16px;
+  color:var(--ink);text-decoration:none;transition:background .15s,transform .15s;border:0;text-align:left;cursor:pointer;font:inherit}
+.card:hover{background:var(--soft-hover);transform:translateY(-1px)}
+.card:focus-visible,.tile:focus-visible{outline:3px solid var(--sage);outline-offset:3px}
+.card .tp{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.card h2{font:700 19px/1.25 var(--serif);margin:0}
+.card .ds{display:block;font-size:13px;color:var(--ink70);margin-top:5px;line-height:1.4}
+.card svg.ic{width:28px;height:28px;stroke-width:1.6;color:var(--pine)}
+.card .pe{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card .btn{display:inline-block;background:var(--pine);color:var(--pine-ink);font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:8px}
+.card .info{font-size:12px;font-weight:600;color:var(--ink70);text-align:right}
+.card.dest{background:var(--pine);color:var(--pine-ink)}
+.card.dest:hover{background:var(--pine-hover)}
+.card.dest svg.ic,.card.dest .ds{color:var(--pine-ink)}
+.card.dest .ds{opacity:.85}
+.card.dest .btn{background:var(--pine-ink);color:var(--pine)}
+.card.dest .info{color:var(--pine-ink);opacity:.92}
+.card.breve{cursor:default;background:transparent;border:1px dashed var(--rule)}
+.card.breve:hover{transform:none}
+.card.breve .btn{background:transparent;color:var(--ink45);border:1px solid var(--rule)}
+
+.sub-sec{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink45);margin:24px 0 10px}
+.sub-sec:first-child{margin-top:4px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tile{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--soft);border-radius:11px;padding:12px 14px;color:var(--ink);
+  text-decoration:none;font-size:14px;font-weight:500;line-height:1.3;transition:background .15s;min-width:0}
+.tile:hover{background:var(--soft-hover)}
+.tile svg.ic{width:16px;height:16px;color:var(--ink45)}
+.tile .estrela{color:var(--star);font-size:12px;margin-left:auto}
+.tile.breve{background:transparent;border:1px dashed var(--rule);color:var(--ink45);cursor:default}
+.tile.breve:hover{background:transparent}
+.tile .tag{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink45);white-space:nowrap}
+.tiles.largos{grid-template-columns:repeat(2,minmax(0,1fr))}
+.tile .tx{display:flex;flex-direction:column;gap:3px;min-width:0}
+.tile .tx small{font-size:12.5px;font-weight:400;color:var(--ink70);line-height:1.4}
+
+.ressalva{display:flex;gap:12px;align-items:flex-start;background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-rule);border-radius:12px;padding:14px 16px;margin:0 0 22px;font-size:14px;line-height:1.5}
+.ressalva svg.ic{margin-top:1px}
+.ressalva p{margin:0}
+.ressalva a{color:inherit;font-weight:700}
+.breve-box{border:1px dashed var(--rule);border-radius:14px;padding:22px;max-width:720px;color:var(--ink70);font-size:14.5px;line-height:1.6}
+.breve-box h2{font:700 19px/1.3 var(--serif);color:var(--ink);margin:0 0 8px}
+.breve-box ul{margin:8px 0 0;padding-left:20px}
+.breve-box .acoes{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+.btn-sec{border:1px solid var(--rule);background:var(--card);border-radius:9px;padding:8px 14px;font-weight:600;font-size:13.5px;cursor:pointer;color:var(--ink)}
+.btn-sec:hover{border-color:var(--sage)}
+
+.rodape{margin-top:40px;border-top:1px solid var(--rule);padding-top:14px;font-size:12px;line-height:1.6;color:var(--ink45);max-width:900px}
+.rodape b{color:var(--ink70);font-weight:600}
+
+#palco{position:absolute;inset:0;background:var(--paper)}
+#palco iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#FBFBF8}
+#carregando{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:600 14px var(--sans);color:var(--ink70);background:var(--paper)}
+#aviso{position:fixed;z-index:90;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));max-width:min(520px,calc(100% - 32px));
+  background:var(--toast-bg);color:var(--toast-ink);font:500 13.5px/1.4 var(--sans);padding:10px 14px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.veu{display:none}
+
+@media (max-width:1180px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:980px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:860px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .nav{position:fixed;z-index:40;top:0;bottom:0;left:0;width:min(310px,86vw);transform:translateX(-102%);transition:transform .2s ease;box-shadow:0 0 30px rgba(0,0,0,.18);padding-top:env(safe-area-inset-top,0px)}
+  body.gaveta .nav{transform:none}
+  .veu{display:block;position:fixed;inset:0;z-index:35;background:var(--scrim);opacity:0;pointer-events:none;transition:opacity .2s}
+  body.gaveta .veu{opacity:1;pointer-events:auto}
+  #abrirNav{display:flex}
+  .busca kbd{display:none}
+}
+@media (max-width:600px){
+  .cards,.tiles,.tiles.largos{grid-template-columns:1fr;gap:10px}
+  .card{min-height:0;padding:15px 16px}
+  .card .pe .btn{display:none}
+  .busca-slot{flex-basis:100%}
+  #inicio{padding-top:20px}
+}
+@media (prefers-reduced-motion:reduce){.nav,.veu,.grupo-tit .seta,.card{transition:none}.card:hover{transform:none}}
+
+/* ===== etapa 2: barra do paciente, miniprontuário e meus dados ===== */
+#pacBar{position:absolute;left:0;right:0;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;background:var(--card);border-bottom:1px solid var(--rule);
+  padding-block:8px;padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px))}
+#pacBar .rot{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink45)}
+#pacBar .rot svg.ic{width:16px;height:16px}
+#pacBar input{height:36px;border:1px solid var(--rule);border-radius:8px;background:var(--paper);padding:0 10px;font-size:14px;min-width:0;color:var(--ink)}
+#pacNome{flex:1 1 220px;max-width:420px}
+#pacCpf{flex:0 1 160px;font-variant-numeric:tabular-nums}
+#pacBar input:focus{outline:2px solid var(--sage);outline-offset:0;border-color:var(--pine)}
+#pacBar input.inval{border-color:var(--clay)}
+#pacBar .acoes{display:flex;gap:8px;align-items:center;margin-left:auto}
+.btn-p{height:36px;border:0;border-radius:8px;background:var(--pine);color:var(--pine-ink);font-weight:600;font-size:13.5px;padding:0 14px;cursor:pointer;white-space:nowrap}
+.btn-p:hover{background:var(--pine-hover)}
+.btn-l{height:36px;border:1px solid var(--rule);border-radius:8px;background:var(--card);font-weight:600;font-size:13px;padding:0 12px;cursor:pointer;white-space:nowrap;color:var(--ink)}
+.btn-l:hover{border-color:var(--sage)}
+.btn-p:focus-visible,.btn-l:focus-visible,.btn-perigo:focus-visible{outline:3px solid var(--sage);outline-offset:2px}
+body.com-pac #palco{top:var(--pac-h,53px)}
+dialog.nt{border:1px solid var(--rule);border-radius:14px;background:var(--card);color:var(--ink);padding:22px;width:min(560px,calc(100% - 32px));box-shadow:0 20px 60px rgba(0,0,0,.25)}
+dialog.nt::backdrop{background:var(--scrim)}
+dialog.nt h2{font:700 21px/1.2 var(--serif);margin:0 0 4px}
+dialog.nt .sub{margin:0 0 16px;color:var(--ink70);font-size:13.5px}
+.campo textarea,.campo select{border:1px solid var(--rule);border-radius:10px;background:var(--paper);padding:10px 12px;font-size:14px;font-weight:400;color:var(--ink);font-family:inherit}
+.campo textarea{resize:vertical;line-height:1.5}
+.campo select{height:44px;padding:0 10px}
+dialog .campo input{background:var(--paper)}
+.campo textarea:focus,.campo select:focus{outline:3px solid var(--sage);outline-offset:0;border-color:var(--pine)}
+.linha2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dlg-acoes{display:flex;justify-content:flex-end;gap:10px;margin-top:6px}
+.mp-busca{margin-bottom:16px;max-width:520px}
+.mp-busca input{width:100%;height:44px;border:1px solid var(--rule);border-radius:10px;background:var(--card);padding:0 13px;font-size:15px;color:var(--ink)}
+.mp-busca input:focus{outline:3px solid var(--sage);outline-offset:0;border-color:var(--pine)}
+.mp-lista{border:1px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--card);max-width:860px}
+.mp-pac{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 16px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--rule);background:none;padding:12px 16px;cursor:pointer;color:var(--ink)}
+.mp-pac:last-child{border-bottom:0}
+.mp-pac:hover{background:var(--nav-hover)}
+.mp-pac:focus-visible{outline:3px solid var(--sage);outline-offset:-3px}
+.mp-pac b{font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.mp-pac small{color:var(--ink45);font-size:12.5px;font-variant-numeric:tabular-nums}
+.mp-pac .dir{text-align:right;grid-row:span 2;align-self:center;font-size:12.5px;color:var(--ink70)}
+.vazio-box{border:1px dashed var(--rule);border-radius:12px;padding:20px 22px;color:var(--ink70);font-size:14px;line-height:1.6;max-width:720px}
+.ficha{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between;margin-bottom:22px;max-width:860px}
+.ficha h2{font:700 24px/1.2 var(--serif);margin:0}
+.ficha .cpf{font-size:13.5px;color:var(--ink70);font-variant-numeric:tabular-nums}
+.ficha .acoes{display:flex;gap:8px;flex-wrap:wrap}
+.voltar{border:0;background:none;color:var(--pine);font-weight:600;font-size:13px;cursor:pointer;padding:0;margin-bottom:14px}
+.linha-tempo{border-left:2px solid var(--rule);margin-left:6px;max-width:860px}
+.ev{position:relative;padding:0 0 20px 22px}
+.ev::before{content:"";position:absolute;left:-8px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--card);border:2px solid var(--pine)}
+.ev.rec::before{border-color:var(--warn-ink)}
+.ev .q1{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.ev time{font-size:12.5px;font-weight:700;color:var(--ink70);font-variant-numeric:tabular-nums}
+.ev .tp{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--pine)}
+.ev.rec .tp{background:var(--warn-bg);color:var(--warn-ink)}
+.ev .nm{font-weight:600;font-size:14.5px}
+.ev pre{white-space:pre-wrap;word-break:break-word;font:13px/1.55 var(--sans);color:var(--ink70);margin:6px 0 0;max-width:80ch}
+.ev .x{border:0;background:none;color:var(--ink45);font-size:12px;cursor:pointer;text-decoration:underline;padding:0;margin-left:auto}
+.ev .x.conf{color:var(--clay);font-weight:700}
+.dados-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:22px;max-width:820px}
+.num{background:var(--soft);border-radius:12px;padding:14px 16px}
+.num b{display:block;font:700 28px/1.1 var(--serif);font-variant-numeric:tabular-nums}
+.num span{font-size:12.5px;color:var(--ink70)}
+.bloco{border:1px solid var(--rule);border-radius:12px;background:var(--card);padding:16px 18px;margin-bottom:14px;max-width:820px}
+.bloco h3{font:700 17px/1.3 var(--serif);margin:0 0 6px}
+.bloco p{margin:0 0 12px;font-size:14px;color:var(--ink70);line-height:1.55;max-width:70ch}
+.bloco .acoes{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.bloco code{font-size:12.5px;background:var(--soft);padding:2px 6px;border-radius:5px;word-break:break-all}
+.bloco details{font-size:13.5px;color:var(--ink70);line-height:1.6}
+.bloco details summary{cursor:pointer;font-weight:600;color:var(--ink)}
+.bloco ul{margin:8px 0 0;padding-left:20px}
+.bloco.perigo{border-color:color-mix(in srgb,var(--clay) 45%,var(--rule))}
+.btn-perigo{height:36px;border:0;border-radius:8px;background:var(--clay);color:#fff;font-weight:700;font-size:13.5px;padding:0 14px;cursor:pointer}
+.estado{font-size:12.5px;font-weight:600;color:var(--ink70)}
+.estado.ok{color:var(--pine)}
+.chk{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink70);margin-bottom:12px}
+@media (max-width:600px){
+  .dados-grid,.linha2{grid-template-columns:1fr}
+  #pacBar .acoes{margin-left:0;width:100%}
+  #pacBar .acoes .btn-p{flex:1}
+  #pacNome{max-width:none}
+}
+/* ===== CID-10 ===== */
+.cid-grid{display:grid;grid-template-columns:minmax(240px,320px) minmax(0,1fr);gap:22px;align-items:start}
+.cid-painel{position:sticky;top:0;display:flex;flex-direction:column;gap:12px}
+.cid-busca{display:flex;align-items:center;gap:8px;border:1px solid var(--rule);border-radius:12px;background:var(--card);padding:0 12px;height:48px}
+.cid-busca:focus-within{outline:3px solid var(--sage);border-color:var(--pine)}
+.cid-busca svg.ic{color:var(--ink45);width:18px;height:18px}
+.cid-busca input{flex:1;min-width:0;border:0;background:none;font-size:16px;height:100%;outline:none;color:var(--ink)}
+.cid-filtros{display:flex;flex-wrap:wrap;gap:6px}
+.chip-f,.chip-s{border:1px solid var(--rule);background:var(--card);border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:600;color:var(--ink70);cursor:pointer}
+.chip-f[aria-pressed="true"]{background:var(--pine);border-color:var(--pine);color:var(--pine-ink)}
+.chip-s{margin:3px 2px}
+.chip-f:focus-visible,.chip-s:focus-visible,.cid-it:focus-visible{outline:3px solid var(--sage);outline-offset:1px}
+.cid-dica{margin:0;font-size:12.5px;color:var(--ink45);line-height:1.5}
+.cid-sub{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink45);margin:6px 0 4px}
+.cid-col{min-width:0;border:1px solid var(--rule);border-radius:14px;background:var(--card);overflow:hidden}
+.cid-topo{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--rule);font-size:12.5px;font-weight:600;color:var(--ink70);background:var(--nav)}
+.cid-fonte{color:var(--ink45);font-weight:500}
+.cid-res{max-height:calc(100vh - 260px);min-height:260px;overflow:auto;padding:6px}
+.cid-it{display:grid;grid-template-columns:62px minmax(0,1fr) 16px;gap:10px;align-items:baseline;width:100%;border:0;background:none;text-align:left;cursor:pointer;border-radius:8px;padding:7px 10px;color:var(--ink);font-size:14px;line-height:1.4}
+.cid-it:hover{background:var(--nav-hover)}
+.cid-it b{font-variant-numeric:tabular-nums;color:var(--pine);font-weight:700;white-space:nowrap}
+.cid-it.cat span{font-weight:600}
+.cid-it svg.ic{width:15px;height:15px;color:var(--ink45);opacity:0;align-self:center}
+.cid-it:hover svg.ic{opacity:1}
+.cid-it mark{background:color-mix(in srgb,var(--star) 28%,transparent);color:inherit;border-radius:3px;padding:0 1px}
+.cid-it.compacto{grid-template-columns:52px minmax(0,1fr);font-size:13px;padding:5px 8px}
+.cid-it.compacto span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cid-cls{font-size:11px;margin-left:2px;color:var(--clay)}
+.cid-cat{padding:10px 10px 3px;font-size:12px;color:var(--ink45)}
+.cid-cat b{color:var(--ink70)}
+.cid-vazio{padding:22px 16px;color:var(--ink70);font-size:14px;line-height:1.8}
+@media (max-width:860px){.cid-grid{grid-template-columns:1fr}.cid-painel{position:static}.cid-res{max-height:none}}
+</style>
+
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-inicio" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h5v-6h4v6h5V9.5"/></symbol>
+    <symbol id="i-cerebro" viewBox="0 0 24 24"><path d="M12 4.6C11.2 3.6 10 3 8.7 3 6.6 3 4.9 4.6 4.8 6.6 3.2 7.2 2 8.7 2 10.5c0 .9.3 1.8.8 2.5-.5.6-.8 1.5-.8 2.3 0 1.9 1.3 3.4 3.1 3.8.5 1.7 2 2.9 3.8 2.9 1.3 0 2.4-.6 3.1-1.5"/><path d="M12 4.6C12.8 3.6 14 3 15.3 3c2.1 0 3.8 1.6 3.9 3.6 1.6.6 2.8 2.1 2.8 3.9 0 .9-.3 1.8-.8 2.5.5.6.8 1.5.8 2.3 0 1.9-1.3 3.4-3.1 3.8-.5 1.7-2 2.9-3.8 2.9-1.3 0-2.4-.6-3.1-1.5"/><path d="M12 4.6v16.4"/></symbol>
+    <symbol id="i-cabeca" viewBox="0 0 24 24"><path d="M15 21v-3h2.2a1.3 1.3 0 0 0 1.3-1.3V14l1.6-.6a.6.6 0 0 0 .3-.9L18.5 10A6.5 6.5 0 0 0 5.5 9.6c0 2.1 1 3.9 2.5 5.1V21"/><path d="M11.5 6.5 10 9.5h2.5L11 12.5"/></symbol>
+    <symbol id="i-gota" viewBox="0 0 24 24"><path d="M12 3s-6.5 7.2-6.5 11.5a6.5 6.5 0 0 0 13 0C18.5 10.2 12 3 12 3Z"/><path d="M9 15a3 3 0 0 0 3 3"/></symbol>
+    <symbol id="i-neuronio" viewBox="0 0 24 24"><circle cx="7" cy="7" r="2.5"/><path d="M5.2 5.2 3 3M4.5 7.5H2M7.5 4.5 8 2"/><path d="M8.8 8.8l7.7 7.7"/><path d="M16.5 16.5 21 15M16.5 16.5 19.5 20M16.5 16.5 16 21"/></symbol>
+    <symbol id="i-movimento" viewBox="0 0 24 24"><path d="M3 12h3l2.5-6 4 13 3-9 1.5 2H21"/></symbol>
+    <symbol id="i-receita" viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 3.5V6h6V3.5"/><path d="M9 11h6M9 14.5h6M9 18h3"/></symbol>
+    <symbol id="i-raio" viewBox="0 0 24 24"><path d="M13 2.5 5 13.5h6l-1 8 8-11h-6l1-8Z"/></symbol>
+    <symbol id="i-pacientes" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></symbol>
+    <symbol id="i-relogio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-pessoa" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></symbol>
+    <symbol id="i-sair" viewBox="0 0 24 24"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M9 8l-4 4 4 4M5 12h10"/></symbol>
+    <symbol id="i-lua" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></symbol>
+    <symbol id="i-chama" viewBox="0 0 24 24"><path d="M12 21a6 6 0 0 0 6-6c0-4-3-5.5-3.5-9.5C12 7 10.5 9 10 11c-1-1-1.5-2-1.5-3C6.8 9.6 6 12.2 6 15a6 6 0 0 0 6 6Z"/></symbol>
+    <symbol id="i-estrela" viewBox="0 0 24 24"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5Z"/></symbol>
+    <symbol id="i-seta" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-regua" viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="10" rx="1.5"/><path d="M6.5 7v3.5M10.5 7v2.5M14.5 7v3.5M18 7v2.5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="m8 9 1.8 1.8L13 7.6M8 15.5l1.8 1.8L13 14.1M15.5 9.5H17M15.5 16H17"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+    <symbol id="i-copiar" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11.5" height="11.5" rx="2"/><path d="M15.5 8.5V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7.5a2 2 0 0 0 2 2h2.5"/></symbol>
+    <symbol id="i-lupa" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-cid" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.8-4.8"/><path d="M8 8.5h5M8 12h3.5"/></symbol>
+    <symbol id="i-pasta" viewBox="0 0 24 24"><path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V6.5Z"/><path d="M8 13h8"/></symbol>
+    <symbol id="i-alerta" viewBox="0 0 24 24"><path d="M12 3.5 2.5 20h19L12 3.5Z"/><path d="M12 10v4.5M12 17.2v.3"/></symbol>
+    <symbol id="i-codigo" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 4.5l-3 15"/></symbol>
+    <symbol id="i-cadeado" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-escudo" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.1 8.2 7.5 9.5 4.4-1.3 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="M9 12h6M12 9v6"/></symbol>
+    <symbol id="i-mente" viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.5"/><path d="M9 21v-3.5a3 3 0 0 1 6 0V21"/><path d="M10 9h4"/></symbol>
+  </defs>
+</svg>
+
+<!-- ================= login ================= -->
+<section id="login" aria-label="Entrar no Neurotools">
+  <div class="lg-arte">
+    <canvas id="tracado" aria-hidden="true"></canvas>
+    <div class="lg-marca"><img src="icones/icone-192.png" alt="">Neurotools</div>
+    <div class="lg-tese">
+      <h1>Eficiência e precisão <em>para o neurologista</em></h1>
+      <p>Escalas, critérios diagnósticos, receituários, modelos de relatório e fontes de consulta, tudo num só lugar.</p>
+    </div>
+    <div class="lg-pilares">
+      <span><svg class="ic" aria-hidden="true"><use href="#i-codigo"/></svg>Código aberto, licença MIT</span>
+      <span class="priv"><svg class="ic" aria-hidden="true"><use href="#i-cadeado"/></svg><span><b>Privacidade e segurança:</b> plataforma com arquitetura Local-First. Os dados clínicos são processados e armazenados localmente no dispositivo do usuário, não sendo transmitidos ou armazenados em nossos servidores.</span></span>
+    </div>
+  </div>
+  <div class="lg-form">
+    <div class="lg-caixa">
+      <div class="lg-abas" role="tablist">
+        <button type="button" role="tab" id="abaEntrar" aria-selected="true">Entrar</button>
+        <button type="button" role="tab" id="abaCriar" aria-selected="false">Criar conta</button>
+      </div>
+      <form id="fEntrar" novalidate>
+        <h2>Bem-vindo de volta</h2>
+        <p class="sub">Entre com o email cadastrado.</p>
+        <label class="campo">Email<input type="email" id="lgEmail" autocomplete="email" placeholder="voce@exemplo.com"></label>
+        <label class="campo">Senha<input type="password" id="lgSenha" autocomplete="current-password"></label>
+        <div class="lg-linha"><label><input type="checkbox" id="lgLembrar" checked> Manter conectado</label><a href="#inicio" id="lgEsqueci">Esqueci a senha</a></div>
+        <p class="lg-erro" id="lgErro" hidden></p>
+        <button class="btn-pri" type="submit">Entrar</button>
+      </form>
+      <form id="fCriar" novalidate hidden>
+        <h2>Criar conta</h2>
+        <p class="sub">Gratuito. Destinado a médicos.</p>
+        <label class="campo">Nome<input type="text" id="crNome" autocomplete="name" placeholder="Dra. Ana Souza"></label>
+        <label class="campo">Email<input type="email" id="crEmail" autocomplete="email" placeholder="voce@exemplo.com"></label>
+        <label class="campo">Senha<input type="password" id="crSenha" autocomplete="new-password" placeholder="Mínimo de 8 caracteres"></label>
+        <p class="lg-erro" id="crErro" hidden></p>
+        <button class="btn-pri" type="submit">Criar conta</button>
+      </form>
+      <form id="fNova" novalidate hidden>
+        <h2>Nova senha</h2>
+        <p class="sub">Escolha a nova senha da sua conta.</p>
+        <label class="campo">Nova senha<input type="password" id="nvSenha" autocomplete="new-password" placeholder="Mínimo de 8 caracteres"></label>
+        <p class="lg-erro" id="nvErro" hidden></p>
+        <button class="btn-pri" type="submit">Salvar senha</button>
+      </form>
+      <p class="lg-info" id="lgInfo" role="status" hidden></p>
+      <p class="lg-pe">Projeto de código aberto (licença MIT), oferecido sem garantia. As decisões clínicas cabem ao médico. <a href="privacidade.html" target="_blank" rel="noopener">Privacidade e termos de uso</a>. <span id="lgPrevia">Prévia: a conferência de senha será ativada quando o site for publicado.</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= aplicativo ================= -->
+<div class="shell">
+  <nav class="nav" id="nav" aria-label="Navegação do Neurotools">
+    <button class="marca" type="button" data-ir="inicio"><img src="icones/icone-192.png" alt=""><b>Neurotools</b></button>
+    <div class="rolar" id="navLista"></div>
+    <div class="rodape-nav">
+      <div class="usuario">
+        <span class="av" aria-hidden="true" id="uAv">?</span>
+        <span class="q"><b id="uNome">Seus dados</b><small id="uCrm">Toque para configurar</small></span>
+        <button type="button" id="sair" title="Sair" aria-label="Sair"><svg class="ic" aria-hidden="true"><use href="#i-sair"/></svg></button>
+      </div>
+    </div>
+  </nav>
+  <div class="veu" id="veu"></div>
+
+  <div class="area-principal">
+    <div class="topo">
+      <button type="button" class="bt" id="abrirNav" aria-controls="nav" aria-expanded="false" aria-label="Abrir menu">&#9776;</button>
+      <span class="titulo-topo">Neurotools</span>
+      <div class="busca" id="busca" role="combobox" aria-expanded="false" aria-owns="resultados" aria-haspopup="listbox">
+        <svg class="lupa" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Buscar escala, critério, receita ou relatório" autocomplete="off" spellcheck="false" aria-label="Buscar" aria-autocomplete="list" aria-controls="resultados">
+        <kbd>/</kbd>
+        <div id="resultados" role="listbox" hidden></div>
+      </div>
+      <button type="button" class="bt" id="fav" aria-pressed="false" aria-label="Favoritar" title="Favoritar" hidden>&#9734;</button>
+    </div>
+    <div class="conteudo">
+      <div id="inicio" tabindex="-1">
+        <div class="wrap">
+          <div class="pagina">
+            <div class="trilha" id="trilha">Início</div>
+            <div class="cabeca">
+              <header class="boas"><h1 id="pTit"></h1><p id="pSub"></p></header>
+              <div class="busca-slot" id="buscaSlot"></div>
+            </div>
+            <div id="pCorpo"></div>
+          </div>
+          <footer class="rodape" id="rodape"></footer>
+        </div>
+      </div>
+      <div id="pacBar" hidden>
+        <span class="rot"><svg class="ic" aria-hidden="true"><use href="#i-pessoa"/></svg>Paciente</span>
+        <input id="pacNome" list="pacLista" placeholder="Nome do paciente" autocomplete="off" aria-label="Nome do paciente">
+        <input id="pacCpf" inputmode="numeric" placeholder="CPF" autocomplete="off" aria-label="CPF do paciente" maxlength="14">
+        <span class="acoes"><button type="button" id="pacHist" class="btn-l" hidden>Histórico</button><button type="button" id="pacSalvar" class="btn-p">Salvar no miniprontuário</button></span>
+      </div>
+      <datalist id="pacLista"></datalist>
+      <div id="palco" hidden><div id="carregando">Carregando…</div></div>
+    </div>
+  </div>
+</div>
+<div id="aviso" role="status" aria-live="polite" hidden></div>
+<dialog class="nt" id="dlgSalvar" aria-labelledby="dsTit">
+  <form id="fSalvar" novalidate>
+    <h2 id="dsTit">Salvar no miniprontuário</h2>
+    <p class="sub" id="dsPac"></p>
+    <label class="campo">Instrumento<input id="dsInstr" autocomplete="off"></label>
+    <div class="linha2"><label class="campo">Data<input type="date" id="dsData"></label><label class="campo">Tipo<select id="dsTipo"><option>Escala</option><option>Critério</option><option>Relatório</option><option>Outro</option></select></label></div>
+    <label class="campo">Resultado<textarea id="dsRes" rows="7"></textarea></label>
+    <p class="lg-erro" id="dsErro" hidden></p>
+    <div class="dlg-acoes"><button type="button" class="btn-l" id="dsCancelar">Cancelar</button><button type="submit" class="btn-p">Salvar</button></div>
+  </form>
+</dialog>
+
+<script>
+(function () {
+  'use strict';
+  var RODAPE = '<b>Neurotools é um projeto de código aberto, sob licença MIT.</b> As informações são oferecidas como estão, sem garantia de qualquer tipo, e os autores não se responsabilizam por elas nem pelo uso que delas se fizer. Cabe ao julgamento médico conferir a acurácia de cada resultado, verificar a pertinência da sua aplicação e decidir criteriosamente o que fazer com ele. <a href="privacidade.html" target="_blank" rel="noopener">Privacidade e termos de uso</a>.';
+  document.getElementById('rodape').innerHTML = RODAPE;
+
+  // ================= armazenamento local (conveniências) =================
+  var mem = {};
+  function ler(k, padrao) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : padrao; } catch (e) { return mem[k] || padrao; } }
+  function gravar(k, v) { mem[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function apagar(k) { delete mem[k]; try { localStorage.removeItem(k); } catch (e) {} }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function ic(n) { return '<svg class="ic" aria-hidden="true"><use href="#' + n + '"/></svg>'; }
+
+  // ================= armazenamento local dos dados clínicos (IndexedDB) =================
+  // Banco "neurotools" neste navegador: "registros" (escalas, critérios e relatórios salvos)
+  // e "lme" (arquivo de pacientes do LME e das receitas). Nada disso sai do aparelho.
+  var ntLocal = (function () {
+    var dbp = null, memo = { registros: [], lme: {} }, memId = 1, ouvintes = {};
+    function abrir() {
+      if (dbp) return dbp;
+      dbp = new Promise(function (res) {
+        try {
+          var rq = indexedDB.open('neurotools', 1);
+          rq.onupgradeneeded = function () {
+            var d = rq.result;
+            if (!d.objectStoreNames.contains('registros')) d.createObjectStore('registros', { keyPath: 'id', autoIncrement: true });
+            if (!d.objectStoreNames.contains('lme')) d.createObjectStore('lme', { keyPath: 'id' });
+          };
+          rq.onsuccess = function () { res(rq.result); };
+          rq.onerror = function () { res(null); };
+          rq.onblocked = function () { res(null); };
+        } catch (e) { res(null); }
+      });
+      return dbp;
+    }
+    function memStore(nome) {
+      return {
+        add: function (o) { o = Object.assign({}, o); o.id = memId++; memo.registros.push(o); return { result: o.id }; },
+        put: function (o) { if (nome === 'lme') memo.lme[o.id] = o; else { var i = memo.registros.findIndex(function (x) { return x.id === o.id; }); if (i >= 0) memo.registros[i] = o; else memo.registros.push(o); } return { result: o.id }; },
+        delete: function (id) { if (nome === 'lme') delete memo.lme[id]; else memo.registros = memo.registros.filter(function (x) { return x.id !== id; }); return {}; },
+        clear: function () { if (nome === 'lme') memo.lme = {}; else memo.registros = []; return {}; },
+        getAll: function () { return { result: nome === 'lme' ? Object.keys(memo.lme).map(function (k) { return memo.lme[k]; }) : memo.registros.slice() }; }
+      };
+    }
+    function op(store, modo, f) {
+      return abrir().then(function (d) {
+        if (!d) { var r0 = f(memStore(store)); return r0 && r0.result; }
+        return new Promise(function (res, rej) {
+          var t = d.transaction(store, modo), r = f(t.objectStore(store));
+          t.oncomplete = function () { res(r && r.result); };
+          t.onerror = t.onabort = function () { rej(t.error || new Error('falha')); };
+        });
+      });
+    }
+    function mudou(st) { (ouvintes[st] || []).slice().forEach(function (f) { try { f(); } catch (e) {} }); }
+    var api = {
+      todos: function (st) { return op(st, 'readonly', function (s) { return s.getAll(); }).then(function (x) { return x || []; }); },
+      gravar: function (st, o) { return op(st, 'readwrite', function (s) { return (o.id == null && st === 'registros') ? s.add(o) : s.put(o); }).then(function (id) { mudou(st); return id; }); },
+      apagar: function (st, id) { return op(st, 'readwrite', function (s) { return s.delete(id); }).then(function () { mudou(st); }); },
+      limpar: function (st) { return op(st, 'readwrite', function (s) { return s.clear(); }).then(function () { mudou(st); }); },
+      ouvir: function (st, fn) { (ouvintes[st] = ouvintes[st] || []).push(fn); return function () { ouvintes[st] = (ouvintes[st] || []).filter(function (g) { return g !== fn; }); }; },
+      emMemoria: function () { return abrir().then(function (d) { return !d; }); },
+      // mesma interface que o LME usava (collection().onSnapshot / doc().set / doc().delete)
+      colecao: function () {
+        return {
+          onSnapshot: function (cb, err) {
+            function enviar() { api.todos('lme').then(function (l) { cb({ docs: l.map(function (o) { return { id: o.id, data: function () { return o.data; } }; }) }); }, function () { if (err) err({ code: 'unavailable' }); }); }
+            enviar(); return api.ouvir('lme', enviar);
+          },
+          doc: function (id) {
+            return {
+              set: function (dados) { persistir(); return api.gravar('lme', { id: id, data: JSON.parse(JSON.stringify(dados)) }); },
+              delete: function () { return api.apagar('lme', id); }
+            };
+          }
+        };
+      }
+    };
+    return api;
+  })();
+  window.ntLocal = ntLocal;
+  function persistir() { try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {} }
+
+  // utilidades de paciente
+  function soDig(s) { return String(s || '').replace(/\D/g, ''); }
+  function cpfValido(c) {
+    c = soDig(c); if (c.length !== 11 || /^(\d)\1+$/.test(c)) return false;
+    for (var t = 9; t < 11; t++) { var s = 0; for (var i = 0; i < t; i++) s += +c[i] * (t + 1 - i); if (((s * 10) % 11) % 10 !== +c[t]) return false; }
+    return true;
+  }
+  function fmtCpf(c) { c = soDig(c).slice(0, 11); if (c.length <= 3) return c; if (c.length <= 6) return c.slice(0, 3) + '.' + c.slice(3); if (c.length <= 9) return c.slice(0, 3) + '.' + c.slice(3, 6) + '.' + c.slice(6); return c.slice(0, 3) + '.' + c.slice(3, 6) + '.' + c.slice(6, 9) + '-' + c.slice(9); }
+  function chaveNome(n) { return norm(n).replace(/\s+/g, ' ').trim(); }
+  function chavePac(nome, cpf) { var d = soDig(cpf); return d.length === 11 ? 'c:' + d : 'n:' + chaveNome(nome); }
+  function brIso(br) { var m = /^(\d{2})\/(\d{2})\/(\d{4})/.exec(br || ''); return m ? m[3] + '-' + m[2] + '-' + m[1] : (br || ''); }
+  function isoBr(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : (iso || ''); }
+  function hojeIso() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  var DOENCA_LME = { alzheimer: 'Alzheimer', parkinson: 'Parkinson', epilepsia: 'Epilepsia', esquizofrenia: 'Esquizofrenia' };
+  var FASE_LME = { primeira: 'primeira liberação', renovacao: 'renovação' };
+
+  // reúne registros e arquivo do LME por paciente (CPF; sem CPF, pelo nome)
+  function carregarPacientes() {
+    return Promise.all([ntLocal.todos('registros'), ntLocal.todos('lme')]).then(function (r) {
+      var mapa = {};
+      function pac(nome, cpf) {
+        var k = chavePac(nome, cpf);
+        if (!mapa[k]) mapa[k] = { chave: k, nome: nome || '', cpf: soDig(cpf).length === 11 ? soDig(cpf) : '', eventos: [], nReg: 0 };
+        var p = mapa[k]; if (nome && (!p.nome || nome.length > p.nome.length)) p.nome = nome; return p;
+      }
+      r[0].forEach(function (g) { var p = pac(g.nome, g.cpf); p.nReg++; p.eventos.push({ fonte: 'reg', id: g.id, data: g.data, tipo: g.tipo || 'Escala', nome: g.instrumento, texto: g.resultado || '' }); });
+      r[1].forEach(function (o) {
+        var d = o.data || {}; if (!d.nome) return;
+        var P = pac(d.nome, d.cpf);
+        (d.historico || []).forEach(function (h) {
+          var rec = h.tipo === 'Receita';
+          P.eventos.push({ fonte: 'lme', data: brIso(h.data), tipo: rec ? 'Receita' : 'LME',
+            nome: rec ? (h.nRec > 1 ? h.nRec + ' receitas de controle especial' : 'Receita de controle especial') : 'LME' + (h.doenca ? ', ' + (DOENCA_LME[h.doenca] || h.doenca) : '') + (h.fase ? ' (' + (FASE_LME[h.fase] || h.fase) + ')' : ''),
+            texto: [(h.meds || []).join('; '), h.ultimaReceita ? 'Última receita datada para ' + h.ultimaReceita + '.' : ''].filter(Boolean).join('\n') });
+        });
+      });
+      // paciente salvo só pelo nome se junta ao que tem CPF e o mesmo nome
+      Object.keys(mapa).forEach(function (k) {
+        if (k.indexOf('n:') !== 0) return;
+        var alvo = Object.keys(mapa).filter(function (j) { return j.indexOf('c:') === 0 && chaveNome(mapa[j].nome) === k.slice(2); })[0];
+        if (alvo) { mapa[alvo].eventos = mapa[alvo].eventos.concat(mapa[k].eventos); mapa[alvo].nReg += mapa[k].nReg; delete mapa[k]; }
+      });
+      return Object.keys(mapa).map(function (k) {
+        var p = mapa[k]; p.eventos.sort(function (a, b) { return (b.data || '').localeCompare(a.data || '') || ((b.id || 0) - (a.id || 0)); });
+        p.ultimo = p.eventos.length ? p.eventos[0].data : ''; return p;
+      }).sort(function (a, b) { return (b.ultimo || '').localeCompare(a.ultimo || '') || a.nome.localeCompare(b.nome, 'pt-BR'); });
+    });
+  }
+  var pacientes = [];
+  function recarregarPacientes() {
+    return carregarPacientes().then(function (l) {
+      pacientes = l;
+      var dl = document.getElementById('pacLista');
+      if (dl) dl.innerHTML = l.map(function (p) { return '<option value="' + esc(p.nome) + '">' + (p.cpf ? esc(fmtCpf(p.cpf)) : '') + '</option>'; }).join('');
+      atualizarBarraHist();
+      var info = document.getElementById('infoMP'); if (info) info.textContent = l.length ? plural(l.length, 'paciente', 'pacientes') : 'Nenhum paciente ainda';
+      return l;
+    });
+  }
+  ntLocal.ouvir('registros', recarregarPacientes); ntLocal.ouvir('lme', recarregarPacientes);
+
+  // cópia única do arquivo antigo do LME (guardado na conta do Claude) para este aparelho
+  (function migrarLME() {
+    if (ler('nt.migrouLME', false)) return;
+    if (!window.claude || typeof window.claude.use !== 'function') return;
+    Promise.all([window.claude.use('db'), window.claude.use('user')]).then(function (r) {
+      var db = r[0], user = r[1]; if (!db || !user) return;
+      return user.id().then(function (uid) {
+        if (!uid) return;
+        var feito = false, des = null;
+        des = db.collection('data/users/' + uid).onSnapshot(function (snap) {
+          if (feito) return; feito = true;
+          setTimeout(function () { try { if (typeof des === 'function') des(); } catch (e) {} }, 0);
+          ntLocal.todos('lme').then(function (loc) {
+            var tem = {}; loc.forEach(function (o) { tem[o.id] = 1; });
+            var novos = snap.docs.filter(function (d) { return !tem[d.id]; });
+            return Promise.all(novos.map(function (d) { return ntLocal.gravar('lme', { id: d.id, data: JSON.parse(JSON.stringify(d.data() || {})) }); })).then(function () {
+              gravar('nt.migrouLME', true); persistir();
+              if (novos.length) avisar((novos.length === 1 ? '1 paciente do arquivo do LME foi copiado' : novos.length + ' pacientes do arquivo do LME foram copiados') + ' para este aparelho.');
+            });
+          });
+        }, function () {});
+      });
+    }).catch(function () {});
+  })();
+
+  // ================= catálogo =================
+  var AREAS = [
+    { nome: 'Cognição', slug: 'cognicao', ic: 'i-cerebro' },
+    { nome: 'Movimento', slug: 'movimento', ic: 'i-movimento' },
+    { nome: 'Epilepsia', slug: 'epilepsia', ic: 'i-raio' },
+    { nome: 'Neuromuscular', slug: 'neuromuscular', ic: 'i-neuronio' },
+    { nome: 'Cefaleia', slug: 'cefaleia', ic: 'i-cabeca' },
+    { nome: 'Sono', slug: 'sono', ic: 'i-lua' },
+    { nome: 'Dor neuropática', slug: 'dor', ic: 'i-chama' },
+    { nome: 'Vascular', slug: 'vascular', ic: 'i-gota' },
+    { nome: 'Psiquiatria', slug: 'psiquiatria', ic: 'i-mente' },
+    { nome: 'Neuroimunologia', slug: 'neuroimunologia', ic: 'i-escudo' }
+  ];
+  var areaPorNome = {}, areaPorSlug = {};
+  AREAS.forEach(function (a) { areaPorNome[a.nome] = a; areaPorSlug[a.slug] = a; });
+
+  // [id, nome, área, ferramenta, chave interna, alvo, sinônimos, ação?]
+  var ANTIGAS = [
+    ['cognitivo-zescores', 'Z-escores (norma brasileira)', 'Cognição', 'cognitivo', 'zescores', 'Z-escores', 'z escore neuropsicologica testes normas'],
+    ['cognitivo-meem', 'MEEM item a item', 'Cognição', 'cognitivo', 'meem', 'MEEM', 'mini mental mini-exame estado mental mmse'],
+    ['cognitivo-conv', 'MoCA e MEEM (conversão)', 'Cognição', 'cognitivo', 'conv', 'MoCA ↔ MEEM', 'moca montreal conversao'],
+    ['cognitivo-cdr', 'CDR', 'Cognição', 'cognitivo', 'cdr', 'CDR', 'clinical dementia rating estadiamento demencia'],
+    ['cognitivo-fast', 'FAST', 'Cognição', 'cognitivo', 'fast', 'FAST', 'functional assessment staging reisberg'],
+    ['cognitivo-pfeffer', 'Pfeffer (FAQ)', 'Cognição', 'cognitivo', 'pfeffer', 'Pfeffer (FAQ)', 'questionario atividades funcionais faq'],
+    ['cognitivo-madrs', 'MADRS', 'Cognição', 'cognitivo', 'madrs', 'MADRS', 'montgomery asberg depressao'],
+    ['cognitivo-antiamiloide', 'Terapia antiamiloide: elegibilidade', 'Cognição', 'cognitivo', 'antiamiloide', 'Terapia antiamiloide', 'lecanemabe donanemabe elegibilidade prescricao'],
+    ['parkinson-iii', 'MDS-UPDRS Parte III', 'Movimento', 'parkinson', 'iii', 0, 'updrs motor exame parkinson'],
+    ['parkinson-iv', 'MDS-UPDRS Parte IV', 'Movimento', 'parkinson', 'iv', 1, 'updrs complicacoes motoras discinesia flutuacao'],
+    ['parkinson-foslevodopa', 'Foslevodopa (conversão)', 'Movimento', 'parkinson', 'foslevodopa', 2, 'vyalev infusao subcutanea'],
+    ['parkinson-relatorio', 'Foslevodopa: relatório para o convênio', 'Movimento', 'parkinson', 'relatorio', 3, 'relatorio auditoria operadora foslevodopa vyalev'],
+    ['cognitivo-relaa', 'Terapia antiamiloide: relatório', null, 'cognitivo', 'antiamiloide', 'Terapia antiamiloide', 'relatorio antiamiloide lecanemabe donanemabe operadora nat-jus judicial'],
+    ['epilepsia-troca', 'Troca de anticrise (cronograma)', 'Epilepsia', 'epilepsia', 'troca', 'Troca de medicação', 'troca medicacao titulacao retirada anticrise'],
+    ['lme-documentos', 'LME (alto custo)', null, 'lme', 'documentos', 'lme', 'lme ceaf laudo medicamento especializado pcdt receita exames alto custo'],
+    ['lme-receita', 'Receita de controle especial', null, 'lme', 'receita', 'receita', 'receita controle especial branca c1 talonario em branco rdc 1000'],
+    ['lme-rapida', 'Prescrição rápida', null, 'lme', 'rapida', 'rapida', 'prescricao rapida receita colar lista remedios'],
+    ['lme-pacientes', 'Pacientes do LME', null, 'lme', 'pacientes', '#btnArq', 'arquivo pacientes renovar', true],
+    ['lme-medico', 'Dados do médico', null, 'lme', 'medico', '#btnCfg', 'configuracao medico crm cnes cns cartao sus endereco', true]
+  ];
+  var ESCALAS = [
+    ['aria', 'Monitoramento de ARIA', 'Cognição', 'aria-e aria-h amiloide lecanemabe donanemabe edema micro-hemorragia siderose'],
+    ['npiq', 'NPI-Q', 'Cognição', 'npi neuropsiquiatrico comportamento delirio alucinacao agitacao cuidador'],
+    ['katz', 'Katz e Lawton', 'Cognição', 'avd abvd aivd katz lawton brody funcionalidade atividades'],
+    ['iqcode', 'IQCODE', 'Cognição', 'iqcode informante declinio cognitivo jorm'],
+    ['mace', 'Mini-ACE', 'Cognição', 'mini-ace mace m-ace addenbrooke rastreio'],
+    ['niaaa', 'NIA-AA: CCL, demência e Alzheimer', 'Cognição', 'nia-aa alzheimer comprometimento cognitivo leve ccl demencia'],
+    ['lewy', 'McKeith 2017', 'Cognição', 'lewy corpos de lewy dcl mckeith'],
+    ['dftvc', 'Rascovsky 2011 (DFT variante comportamental)', 'Cognição', 'dft frontotemporal comportamental rascovsky'],
+    ['app', 'Gorno-Tempini 2011 (APP)', 'Cognição', 'afasia progressiva primaria semantica logopenica nao fluente'],
+    ['iwg', 'IWG 2024 (Dubois)', 'Cognição', 'iwg dubois alzheimer biomarcador fenotipo construto clinico biologico'],
+    ['mcilb', 'McKeith 2020 (DCL prodrômica)', 'Cognição', 'mci-lb ccl corpos de lewy prodromica'],
+    ['acp', 'Crutch 2017 (atrofia cortical posterior)', 'Cognição', 'acp pca atrofia cortical posterior benson visuoespacial'],
+    ['dvasc', 'VASCOG 2014 e NINDS-AIREN 1993', 'Cognição', 'demencia vascular comprometimento cognitivo vascular vascog ninds-airen'],
+    ['ddp', 'MDS: Emre 2007 e Litvan 2012', 'Cognição', 'demencia doenca de parkinson pdd ccl parkinson pd-mci'],
+    ['dcj', 'CDC 2018 (DCJ esporádica)', 'Cognição', 'creutzfeldt-jakob dcj prion rt-quic 14-3-3'],
+    ['hpn', 'Internacional 2005 e japonesa 2021', 'Cognição', 'hidrocefalia pressao normal hpn evans desh tap test'],
+    ['ukbb', 'UK Brain Bank (Hughes 1992)', 'Movimento', 'uk brain bank banco de cerebros londres ukpdsbb parkinson'],
+    ['dcb', 'Armstrong 2013 (degeneração corticobasal)', 'Movimento', 'degeneracao corticobasal sindrome corticobasal dcb cbs'],
+    ['te', 'MDS 2018 (tremor essencial)', 'Movimento', 'tremor essencial et plus bhatia'],
+    ['spi', 'IRLSSG 2014 (pernas inquietas)', 'Movimento', 'pernas inquietas willis ekbom rls irlssg'],
+    ['leipzig', 'Escore de Leipzig (Wilson)', 'Movimento', 'wilson leipzig ceruloplasmina kayser fleischer cobre'],
+    ['dmf', 'Gupta e Lang 2009 (funcional)', 'Movimento', 'disturbio movimento funcional psicogenico'],
+    ['tique', 'DSM-5-TR: Tourette e tiques', 'Movimento', 'tourette tique tiques'],
+    ['ledd', 'LEDD (dose equivalente de levodopa)', 'Movimento', 'ledd dose equivalente levodopa'],
+    ['c521', 'Critério 5-2-1 (Parkinson avançado)', 'Movimento', '5-2-1 parkinson avancado'],
+    ['mdspd', 'MDS 2015 (doença de Parkinson)', 'Movimento', 'mds criterios parkinson postuma'],
+    ['pspcrit', 'MDS 2017 (PSP)', 'Movimento', 'psp paralisia supranuclear progressiva hoglinger'],
+    ['psprs', 'PSPRS', 'Movimento', 'psprs escala psp golbe'],
+    ['amscrit', 'MDS 2022 (AMS)', 'Movimento', 'ams atrofia multiplos sistemas wenning'],
+    ['umsars', 'UMSARS', 'Movimento', 'umsars ams escala'],
+    ['hyse', 'Hoehn e Yahr, Schwab e England', 'Movimento', 'hoehn yahr schwab england estadiamento'],
+    ['sara', 'SARA (ataxia)', 'Movimento', 'sara ataxia'],
+    ['tetras', 'TETRAS (tremor essencial)', 'Movimento', 'tetras tremor essencial'],
+    ['twstrs', 'TWSTRS (distonia cervical)', 'Movimento', 'twstrs distonia cervical torcicolo'],
+    ['bfm', 'BFM (distonia)', 'Movimento', 'burke fahn marsden distonia'],
+    ['irls', 'IRLS (pernas inquietas)', 'Movimento', 'irls pernas inquietas willis ekbom'],
+    ['aims', 'AIMS (discinesia tardia)', 'Movimento', 'aims discinesia tardia'],
+    ['farmaco', 'ILAE 2010 (farmacorresistência)', 'Epilepsia', 'farmacorresistente refrataria ilae kwan'],
+    ['ilae14', 'ILAE 2014 (definição clínica)', 'Epilepsia', 'ilae 2014 fisher definicao epilepsia crise nao provocada resolvida'],
+    ['ilae25', 'ILAE 2025 (classificação das crises)', 'Epilepsia', 'ilae 2025 classificacao crises focal generalizada consciencia'],
+    ['eme', 'ILAE 2015 (estado de mal)', 'Epilepsia', 'estado de mal epileptico status epilepticus trinka t1 t2'],
+    ['cnep', 'ILAE 2013 (LaFrance)', 'Epilepsia', 'crise nao epileptica psicogenica pnes funcional dissociativa video-eeg'],
+    ['interacoes', 'Interações, contracepção e gestação', 'Epilepsia', 'interacoes anticrise contracepcao gestacao gravidez'],
+    ['bzd', 'Conversão de benzodiazepínicos', 'Epilepsia', 'benzodiazepinico equivalencia conversao'],
+    ['egsys', 'EGSYS (síncope cardíaca)', 'Epilepsia', 'egsys sincope'],
+    ['mgadl', 'MG-ADL', 'Neuromuscular', 'miastenia mg-adl'],
+    ['qmg', 'QMG', 'Neuromuscular', 'miastenia qmg quantitativo'],
+    ['mgfa', 'Classificação MGFA', 'Neuromuscular', 'miastenia mgfa classificacao'],
+    ['alsfrs', 'ALSFRS-R e ΔFS', 'Neuromuscular', 'ela als alsfrs progressao'],
+    ['elacrit', 'Gold Coast e El Escorial (Awaji)', 'Neuromuscular', 'ela esclerose lateral amiotrofica gold coast el escorial awaji'],
+    ['facedrops', 'FACE DROPS (paralisia facial)', 'Neuromuscular', 'paralisia facial bell lyme'],
+    ['sgb', 'NINDS 1990 e Brighton 2014', 'Neuromuscular', 'guillain-barre sgb gbs polirradiculoneuropatia aguda'],
+    ['pidc', 'EAN/PNS 2021 (PIDC)', 'Neuromuscular', 'pidc cidp polirradiculoneuropatia inflamatoria desmielinizante cronica'],
+    ['nmm', 'EFNS/PNS 2010 (NMM)', 'Neuromuscular', 'neuropatia motora multifocal nmm mmn bloqueio conducao'],
+    ['miopinf', 'EULAR/ACR 2017 (miopatias inflamatórias)', 'Neuromuscular', 'miosite dermatomiosite polimiosite miopatia inflamatoria corpusculos de inclusao'],
+    ['mcdonald', 'McDonald 2017 e revisão de 2024', 'Neuroimunologia', 'esclerose multipla em mcdonald desmielinizante'],
+    ['nmosd', 'IPND 2015 (NMOSD)', 'Neuroimunologia', 'neuromielite optica nmosd aqp4 devic'],
+    ['mogad', 'Banwell 2023 (MOGAD)', 'Neuroimunologia', 'mogad anti-mog adem'],
+    ['eai', 'Graus 2016 (encefalite autoimune)', 'Neuroimunologia', 'encefalite autoimune limbica anti-nmdar lgi1'],
+    ['midas', 'MIDAS', 'Cefaleia', 'midas incapacidade migranea enxaqueca'],
+    ['hit6', 'HIT-6', 'Cefaleia', 'hit-6 impacto cefaleia'],
+    ['mtoq', 'mTOQ-4', 'Cefaleia', 'mtoq tratamento agudo'],
+    ['ichd3', 'ICHD-3: migrânea crônica e uso excessivo de medicação', 'Cefaleia', 'ichd migranea cronica cefaleia uso excessivo medicacao enxaqueca'],
+    ['respcgrp', 'Resposta ao anti-CGRP', 'Cefaleia', 'anti-cgrp resposta erenumabe galcanezumabe fremanezumabe'],
+    ['relcgrp', 'Anti-CGRP: relatório para o convênio', 'Cefaleia', 'anti-cgrp relatorio operadora convenio'],
+    ['preempt', 'Mapa do PREEMPT (toxina botulínica)', 'Cefaleia', 'preempt toxina botulinica onabotulinum'],
+    ['migaura', 'ICHD-3: migrânea sem aura e com aura', 'Cefaleia', 'ichd migranea enxaqueca sem aura com aura hemiplegica retiniana'],
+    ['ctt', 'ICHD-3: cefaleia do tipo tensional', 'Cefaleia', 'ichd cefaleia tipo tensional ctt episodica cronica'],
+    ['salvas', 'ICHD-3: cefaleia em salvas', 'Cefaleia', 'ichd cefaleia em salvas cluster trigemino autonomica'],
+    ['ntrig', 'ICHD-3: neuralgia do trigêmeo', 'Cefaleia', 'ichd neuralgia trigemeo trigeminal dor facial'],
+    ['hii', 'Friedman 2013 e ICHD-3', 'Cefaleia', 'hii pseudotumor cerebral hipertensao intracraniana idiopatica papiledema friedman'],
+    ['cpdi', 'ICHD-3: persistente diária desde o início', 'Cefaleia', 'ichd cefaleia persistente diaria desde o inicio ndph'],
+    ['edm', 'DSM-5-TR: episódio depressivo maior', 'Psiquiatria', 'dsm depressao episodio depressivo maior transtorno depressivo'],
+    ['tag', 'DSM-5-TR: ansiedade generalizada', 'Psiquiatria', 'dsm ansiedade generalizada tag'],
+    ['delirium', 'DSM-5-TR: delirium', 'Psiquiatria', 'dsm delirium estado confusional agudo'],
+    ['narco', 'ICSD-3-TR: narcolepsia', 'Sono', 'narcolepsia cataplexia hipocretina tlms mslt'],
+    ['tcsrem', 'ICSD-3-TR: TCSREM', 'Sono', 'tcsrem rbd transtorno comportamental sono rem'],
+    ['insonia', 'ICSD-3-TR: insônia crônica', 'Sono', 'insonia cronica'],
+    ['aos', 'ICSD-3-TR: apneia obstrutiva', 'Sono', 'apneia obstrutiva sono aos saos iah'],
+    ['epworth', 'Epworth', 'Sono', 'epworth sonolencia'],
+    ['stanford', 'Stanford', 'Sono', 'stanford sonolencia'],
+    ['stopbang', 'STOP-Bang', 'Sono', 'stop-bang apneia'],
+    ['rbdsq', 'RBDSQ', 'Sono', 'rbd sono rem comportamental'],
+    ['isi', 'ISI (insônia)', 'Sono', 'isi insonia'],
+    ['dn4', 'DN4', 'Dor neuropática', 'dn4 dor neuropatica'],
+    ['lanss', 'LANSS', 'Dor neuropática', 'lanss dor neuropatica'],
+    ['nps', 'Neuropathic Pain Scale', 'Dor neuropática', 'nps dor neuropatica'],
+    ['boston', 'Boston 2.0 (2022)', 'Vascular', 'angiopatia amiloide cerebral aac caa boston microssangramento siderose'],
+    ['rcvs2', 'Escore RCVS2', 'Vascular', 'rcvs2 vasoconstricao cerebral reversivel svcr cefaleia trovoada'],
+    ['vpsnc', 'Calabrese 1988 e Birnbaum e Hellmann 2009', 'Vascular', 'vasculite primaria snc pacns angeite'],
+    ['ait', 'Definição tecidual (AHA 2009)', 'Vascular', 'ait ataque isquemico transitorio definicao tecidual'],
+    ['relir', 'Isenção de imposto de renda', null, 'imposto de renda isencao ir lei 7713 alienacao mental parkinson atestado'],
+    ['relint', 'Interdição (curatela)', null, 'interdicao curatela curador incapacidade civil codigo civil'],
+    ['relpcd', 'Pessoa com deficiência (Lei 8.989)', null, 'pcd pessoa com deficiencia isencao ipi carro veiculo'],
+    ['reltox', 'Toxina botulínica (convênio)', null, 'toxina botulinica botox dysport xeomin convenio ans distonia espasticidade'],
+    ['relatest', 'Atestado médico', null, 'atestado afastamento comparecimento'],
+    ['nihss', 'NIHSS', 'Vascular', 'nihss avc'],
+    ['hints', 'HINTS', 'Vascular', 'hints vertigem vestibular'],
+    ['ascod', 'ASCOD', 'Vascular', 'ascod fenotipo avc'],
+    ['rope', 'RoPE e PASCAL', 'Vascular', 'rope pascal forame oval patente'],
+    ['sich', 'sICH score', 'Vascular', 'sich hemorragia intracerebral'],
+    ['phases', 'PHASES (aneurisma)', 'Vascular', 'phases aneurisma ruptura'],
+    ['hunthess', 'Hunt-Hess', 'Vascular', 'hunt hess hsa'],
+    ['fisher', 'Fisher e Fisher modificada', 'Vascular', 'fisher hsa tomografia']
+  ];
+
+  // onde cada item mora no site
+  var SECAO = { 'lme-documentos': 'receituarios', 'lme-receita': 'receituarios', 'lme-rapida': 'receituarios', 'lme-pacientes': 'receituarios', 'lme-medico': 'conta',
+    'parkinson-relatorio': 'relatorios', relcgrp: 'relatorios', 'cognitivo-relaa': 'relatorios', relir: 'relatorios', relint: 'relatorios', relpcd: 'relatorios', reltox: 'relatorios', relatest: 'relatorios',
+    niaaa: 'criterios', lewy: 'criterios', dftvc: 'criterios', app: 'criterios', mdspd: 'criterios', pspcrit: 'criterios', amscrit: 'criterios', farmaco: 'criterios', elacrit: 'criterios', ichd3: 'criterios',
+    migaura: 'criterios', ctt: 'criterios', salvas: 'criterios', ntrig: 'criterios', hii: 'criterios', cpdi: 'criterios', edm: 'criterios', tag: 'criterios', delirium: 'criterios',
+    iwg: 'criterios', mcilb: 'criterios', acp: 'criterios', dvasc: 'criterios', ddp: 'criterios', dcj: 'criterios', hpn: 'criterios', ukbb: 'criterios', dcb: 'criterios', te: 'criterios', spi: 'criterios', leipzig: 'criterios', dmf: 'criterios', tique: 'criterios',
+    ilae14: 'criterios', ilae25: 'criterios', eme: 'criterios', cnep: 'criterios', narco: 'criterios', tcsrem: 'criterios', insonia: 'criterios', aos: 'criterios', boston: 'criterios', rcvs2: 'criterios', vpsnc: 'criterios', ait: 'criterios',
+    sgb: 'criterios', pidc: 'criterios', nmm: 'criterios', miopinf: 'criterios', mcdonald: 'criterios', nmosd: 'criterios', mogad: 'criterios', eai: 'criterios' };
+  var DOENCA = { niaaa: 'Doença de Alzheimer e comprometimento cognitivo leve', lewy: 'Demência com corpos de Lewy', dftvc: 'Demência frontotemporal', app: 'Afasia progressiva primária',
+    mdspd: 'Doença de Parkinson', pspcrit: 'Paralisia supranuclear progressiva', amscrit: 'Atrofia de múltiplos sistemas', farmaco: 'Epilepsia farmacorresistente',
+    elacrit: 'Esclerose lateral amiotrófica', ichd3: 'Migrânea', migaura: 'Migrânea', ctt: 'Cefaleia do tipo tensional', salvas: 'Cefaleia em salvas',
+    ntrig: 'Neuralgia do trigêmeo', hii: 'Hipertensão intracraniana idiopática', cpdi: 'Cefaleia persistente diária desde o início',
+    edm: 'Episódio depressivo maior', tag: 'Transtorno de ansiedade generalizada', delirium: 'Delirium',
+    iwg: 'Doença de Alzheimer e comprometimento cognitivo leve', mcilb: 'Demência com corpos de Lewy', acp: 'Atrofia cortical posterior', dvasc: 'Demência vascular',
+    ddp: 'Demência e CCL na doença de Parkinson', dcj: 'Doença priônica', hpn: 'Hidrocefalia de pressão normal', ukbb: 'Doença de Parkinson', dcb: 'Degeneração corticobasal',
+    te: 'Tremor essencial', spi: 'Síndrome das pernas inquietas', leipzig: 'Doença de Wilson', dmf: 'Distúrbio do movimento funcional', tique: 'Síndrome de Tourette e tiques',
+    ilae14: 'Epilepsia', ilae25: 'Classificação das crises', eme: 'Estado de mal epiléptico', cnep: 'Crises não epilépticas psicogênicas',
+    narco: 'Narcolepsia', tcsrem: 'Transtorno comportamental do sono REM', insonia: 'Insônia crônica', aos: 'Apneia obstrutiva do sono',
+    boston: 'Angiopatia amiloide cerebral', rcvs2: 'Síndrome de vasoconstrição cerebral reversível', vpsnc: 'Vasculite primária do SNC', ait: 'Ataque isquêmico transitório',
+    sgb: 'Síndrome de Guillain-Barré', pidc: 'PIDC', nmm: 'Neuropatia motora multifocal', miopinf: 'Miopatias inflamatórias',
+    mcdonald: 'Esclerose múltipla', nmosd: 'Espectro da neuromielite óptica', mogad: 'MOGAD', eai: 'Encefalite autoimune' };
+  // critérios previstos (aparecem como "em preparação")
+  var CRIT_PREVISTOS = [
+  ];
+
+  var DESC = {
+    'lme-receita': 'Modelo da RDC 1.000/2025, até seis receitas datadas mês a mês e talonário em branco.',
+    'lme-rapida': 'Cole nome, CPF e os remédios, um por linha, e a receita sai preenchida.',
+    'lme-documentos': 'Laudo, receitas e exames dos PCDTs de Parkinson, Alzheimer, epilepsia e esquizofrenia.',
+    'parkinson-relatorio': 'Justificativa para liberação da infusão subcutânea de foslevodopa e foscarbidopa.',
+    relcgrp: 'Solicitação de anticorpo anti-CGRP para profilaxia de migrânea.',
+    'cognitivo-relaa': 'Relatório em Word com literatura, para operadora, NAT-JUS ou processo judicial (na aba Terapia antiamiloide).',
+    relir: 'Lei nº 7.713/1988: alienação mental, doença de Parkinson, esclerose múltipla e outras.',
+    relint: 'Art. 4º, inciso III, do Código Civil, para processo de curatela.',
+    relpcd: 'Isenção na compra de veículo, com a condição para dirigir.',
+    reltox: 'Rol da ANS, com esquema por músculo e cálculo de ampolas.',
+    relatest: 'Afastamento ou comparecimento; CID só com autorização do paciente.'
+  };
+  var REL_PREVISTOS = [
+    ['Aposentadoria por incapacidade', 'Aguardando o modelo.']
+  ];
+  var SUBG = { mgadl: 'Miastenia', qmg: 'Miastenia', mgfa: 'Miastenia', alsfrs: 'ELA', facedrops: 'Nervos cranianos',
+    psprs: 'Parkinsonismos atípicos', umsars: 'Parkinsonismos atípicos', tetras: 'Tremor, distonia e outros', twstrs: 'Tremor, distonia e outros', bfm: 'Tremor, distonia e outros', sara: 'Tremor, distonia e outros', irls: 'Tremor, distonia e outros', aims: 'Tremor, distonia e outros',
+    ledd: 'Parkinson', c521: 'Parkinson', hyse: 'Parkinson', 'parkinson-iii': 'Parkinson', 'parkinson-iv': 'Parkinson', 'parkinson-foslevodopa': 'Parkinson',
+    respcgrp: 'Anti-CGRP e toxina', preempt: 'Anti-CGRP e toxina', midas: 'Incapacidade e resposta', hit6: 'Incapacidade e resposta', mtoq: 'Incapacidade e resposta',
+    'cognitivo-zescores': 'Testes e escalas', 'cognitivo-meem': 'Testes e escalas', 'cognitivo-conv': 'Testes e escalas', 'cognitivo-cdr': 'Testes e escalas', 'cognitivo-fast': 'Testes e escalas', 'cognitivo-pfeffer': 'Testes e escalas', 'cognitivo-madrs': 'Testes e escalas', katz: 'Testes e escalas', iqcode: 'Testes e escalas', mace: 'Testes e escalas', npiq: 'Testes e escalas',
+    'cognitivo-antiamiloide': 'Terapia antiamiloide', aria: 'Terapia antiamiloide',
+    nihss: 'AVC isquêmico', hints: 'AVC isquêmico', ascod: 'AVC isquêmico', rope: 'AVC isquêmico', sich: 'Hemorragia intracerebral', phases: 'Aneurisma e HSA', hunthess: 'Aneurisma e HSA', fisher: 'Aneurisma e HSA' };
+  var ORDEM_SUB = { 'Cognição': ['Testes e escalas', 'Terapia antiamiloide'], 'Movimento': ['Parkinson', 'Parkinsonismos atípicos', 'Tremor, distonia e outros'], 'Neuromuscular': ['Miastenia', 'ELA', 'Nervos cranianos'], 'Cefaleia': ['Incapacidade e resposta', 'Anti-CGRP e toxina'], 'Vascular': ['AVC isquêmico', 'Hemorragia intracerebral', 'Aneurisma e HSA'] };
+
+  var CAT = [], porId = {};
+  ANTIGAS.forEach(function (a) { CAT.push({ id: a[0], nome: a[1], area: a[2], tool: a[3], sub: a[4], alvo: a[5], alias: a[6], acao: !!a[7] }); });
+  ESCALAS.forEach(function (e) { CAT.push({ id: e[0], nome: e[1], area: e[2], tool: 'escalas', alias: e[3] }); });
+  CAT.forEach(function (c) { c.secao = SECAO[c.id] || 'escalas'; c.subg = SUBG[c.id] || null; c.doenca = DOENCA[c.id] || null; c.desc = DESC[c.id] || ''; porId[c.id] = c; });
+
+  var SECOES = [
+    { id: 'receituarios', nome: 'Receituários', ic: 'i-receita', ds: 'Controle especial, prescrição rápida e LME.' },
+    { id: 'escalas', nome: 'Escalas e instrumentos', ic: 'i-regua', ds: 'Testes, escalas e calculadoras por área.' },
+    { id: 'criterios', nome: 'Critérios diagnósticos', ic: 'i-check', ds: 'Critérios em uso para as principais doenças de cada área.' },
+    { id: 'relatorios', nome: 'Relatórios', ic: 'i-doc', ds: 'Modelos para convênio, perícia e atestados.' },
+    { id: 'cid', nome: 'CID-10', ic: 'i-cid', ds: 'Busca de códigos por palavra ou código.' },
+    { id: 'prontuario', nome: 'Miniprontuário', ic: 'i-pasta', ds: 'Histórico por CPF: receitas, escalas e critérios.' }
+  ];
+  var secaoPorId = {}; SECOES.forEach(function (s) { secaoPorId[s.id] = s; });
+  var ROTULO_SECAO = { receituarios: 'Receituários', escalas: 'Escalas', criterios: 'Critérios', relatorios: 'Relatórios', conta: 'Conta' };
+  function itens(secao, area) { return CAT.filter(function (c) { return c.secao === secao && (!area || c.area === area); }); }
+  function ordenada(area) {
+    var l = itens('escalas', area), os = ORDEM_SUB[area];
+    if (!os) return l;
+    return l.slice().sort(function (a, b) { var ia = os.indexOf(a.subg), ib = os.indexOf(b.subg); if (ia < 0) ia = 99; if (ib < 0) ib = 99; return ia - ib || CAT.indexOf(a) - CAT.indexOf(b); });
+  }
+  function areasCom(secao) {
+    return AREAS.filter(function (a) { return itens(secao, a.nome).length || (secao === 'criterios' && CRIT_PREVISTOS.some(function (p) { return p[0] === a.nome; })); });
+  }
+  var TOOLNOME = { cognitivo: 'Avaliação cognitiva', parkinson: 'Doença de Parkinson', lme: 'Receituários e LME', epilepsia: 'Epilepsia', escalas: 'Escalas' };
+
+  var favs = ler('nt.fav', []).filter(function (i) { return porId[i]; });
+  var recs = ler('nt.rec', []).filter(function (i) { return porId[i]; });
+  var abertas = ler('nt.abertas2', { escalas: false, criterios: false });
+
+  // ================= login =================
+  // Com NT_SUPABASE preenchido (site publicado), usa o Supabase Auth (só email, nome e senha).
+  // Sem ele (prévia no Claude), o login é apenas visual.
+  var SUPA = window.NT_SUPABASE && window.NT_SUPABASE.url && window.NT_SUPABASE.anonKey ? window.NT_SUPABASE : null;
+  var sb = null, sessao = null;
+  var abaE = document.getElementById('abaEntrar'), abaC = document.getElementById('abaCriar');
+  var fE = document.getElementById('fEntrar'), fC = document.getElementById('fCriar'), fN = document.getElementById('fNova');
+  function aba(criar) { abaE.setAttribute('aria-selected', !criar); abaC.setAttribute('aria-selected', !!criar); fE.hidden = !!criar; fC.hidden = !criar; fN.hidden = true; document.querySelector('.lg-abas').hidden = false; erro('lgErro'); erro('crErro'); info(''); }
+  abaE.addEventListener('click', function () { aba(false); });
+  abaC.addEventListener('click', function () { aba(true); });
+  function emailOk(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function erro(id, msg) { var e = document.getElementById(id); e.textContent = msg || ''; e.hidden = !msg; }
+  function info(msg) { var e = document.getElementById('lgInfo'); e.textContent = msg || ''; e.hidden = !msg; }
+  function ocupado(form, sim) { var b = form.querySelector('button[type=submit]'); b.disabled = sim; b.style.opacity = sim ? '.6' : ''; }
+  function traduzErro(e) {
+    var m = (e && (e.message || e.error_description)) || '';
+    if (/invalid login/i.test(m)) return 'Email ou senha incorretos.';
+    if (/not confirmed/i.test(m)) return 'Confirme seu email pelo link que enviamos antes de entrar.';
+    if (/already registered|already exists/i.test(m)) return 'Este email já tem conta. Use a aba Entrar.';
+    if (/password/i.test(m) && /least|short|weak/i.test(m)) return 'Escolha uma senha mais forte, com pelo menos 8 caracteres.';
+    if (/rate|too many/i.test(m)) return 'Muitas tentativas seguidas. Aguarde alguns minutos.';
+    if (/fetch|network/i.test(m)) return 'Sem conexão com o servidor de login. Verifique a internet.';
+    return 'Não foi possível concluir (' + (m || 'erro desconhecido') + ').';
+  }
+  function entrar(dados) {
+    sessao = dados;
+    document.body.classList.add('logado'); pararTracado();
+    atualizarUsuario(); ir(traduzir(location.hash), false);
+  }
+  function sairDaTela() { sessao = null; document.body.classList.remove('logado'); fecharGaveta(); aba(false); iniciarTracado(); }
+  function deUsuario(u) { return u ? { email: u.email, nome: (u.user_metadata && u.user_metadata.nome) || '' } : null; }
+
+  fE.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var em = document.getElementById('lgEmail').value.trim(), sn = document.getElementById('lgSenha').value;
+    if (!emailOk(em)) return erro('lgErro', 'Digite um email válido.');
+    if (!sn) return erro('lgErro', 'Digite a senha.');
+    erro('lgErro');
+    if (!sb) { var lembrar = document.getElementById('lgLembrar').checked, d = { email: em, nome: (ler('nt.conta', {})[em] || '') }; if (lembrar) gravar('nt.sessao', d); else { try { sessionStorage.setItem('nt.sessao', JSON.stringify(d)); } catch (x) {} } return entrar(d); }
+    ocupado(fE, true);
+    sb.auth.signInWithPassword({ email: em, password: sn }).then(function (r) {
+      ocupado(fE, false);
+      if (r.error) return erro('lgErro', traduzErro(r.error));
+      entrar(deUsuario(r.data.user));
+    });
+  });
+  fC.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var nm = document.getElementById('crNome').value.trim(), em = document.getElementById('crEmail').value.trim(), sn = document.getElementById('crSenha').value;
+    if (!nm) return erro('crErro', 'Digite seu nome.');
+    if (!emailOk(em)) return erro('crErro', 'Digite um email válido.');
+    if (sn.length < 8) return erro('crErro', 'A senha precisa ter pelo menos 8 caracteres.');
+    erro('crErro');
+    if (!sb) { var contas = ler('nt.conta', {}); contas[em] = nm; gravar('nt.conta', contas); gravar('nt.sessao', { email: em, nome: nm }); return entrar({ email: em, nome: nm }); }
+    ocupado(fC, true);
+    sb.auth.signUp({ email: em, password: sn, options: { data: { nome: nm }, emailRedirectTo: location.origin + location.pathname } }).then(function (r) {
+      ocupado(fC, false);
+      if (r.error) return erro('crErro', traduzErro(r.error));
+      if (r.data.session) return entrar(deUsuario(r.data.user));
+      aba(false); document.getElementById('lgEmail').value = em;
+      info('Conta criada. Enviamos um link de confirmação para ' + em + '. Depois de confirmar, entre com sua senha.');
+    });
+  });
+  document.getElementById('lgEsqueci').addEventListener('click', function (e) {
+    e.preventDefault();
+    var em = document.getElementById('lgEmail').value.trim();
+    if (!sb) return erro('lgErro', 'A recuperação de senha funciona no site publicado.');
+    if (!emailOk(em)) return erro('lgErro', 'Digite seu email no campo acima e toque de novo em "Esqueci a senha".');
+    erro('lgErro');
+    sb.auth.resetPasswordForEmail(em, { redirectTo: location.origin + location.pathname }).then(function (r) {
+      if (r.error) return erro('lgErro', traduzErro(r.error));
+      info('Se houver conta com ' + em + ', enviamos um link para criar uma nova senha.');
+    });
+  });
+  fN.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var sn = document.getElementById('nvSenha').value;
+    if (sn.length < 8) return erro('nvErro', 'A senha precisa ter pelo menos 8 caracteres.');
+    erro('nvErro'); ocupado(fN, true);
+    sb.auth.updateUser({ password: sn }).then(function (r) {
+      ocupado(fN, false);
+      if (r.error) return erro('nvErro', traduzErro(r.error));
+      avisar('Senha alterada.'); entrar(deUsuario(r.data.user));
+    });
+  });
+  document.getElementById('sair').addEventListener('click', function () {
+    apagar('nt.sessao'); try { sessionStorage.removeItem('nt.sessao'); } catch (e) {}
+    if (sb) sb.auth.signOut().then(sairDaTela, sairDaTela); else sairDaTela();
+  });
+  function iniciarAuth() {
+    if (!SUPA) {
+      var s0 = ler('nt.sessao', null);
+      if (!s0) { try { var ss = sessionStorage.getItem('nt.sessao'); if (ss) s0 = JSON.parse(ss); } catch (e) {} }
+      if (s0) entrar(s0); else iniciarTracado();
+      return;
+    }
+    document.getElementById('lgPrevia').hidden = true;
+    document.querySelector('.lg-linha label').hidden = true;
+    iniciarTracado();
+    var sc = document.createElement('script');
+    sc.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
+    sc.onload = function () {
+      sb = window.supabase.createClient(SUPA.url, SUPA.anonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+      sb.auth.onAuthStateChange(function (ev, s) {
+        if (ev === 'PASSWORD_RECOVERY') { document.querySelector('.lg-abas').hidden = true; fE.hidden = true; fC.hidden = true; fN.hidden = false; return; }
+        if (ev === 'SIGNED_OUT') { if (sessao) sairDaTela(); return; }
+        if (s && s.user && !sessao && fN.hidden) entrar(deUsuario(s.user));
+      });
+      sb.auth.getSession().then(function (r) { var s = r.data && r.data.session; if (s && fN.hidden) entrar(deUsuario(s.user)); });
+    };
+    sc.onerror = function () { erro('lgErro', 'Não foi possível carregar o login. Verifique a internet e recarregue a página.'); };
+    document.head.appendChild(sc);
+  }
+
+  // traçado de fundo do login: uma derivação de EEG com complexos ponta-onda
+  var raf = null;
+  function iniciarTracado() {
+    var cv = document.getElementById('tracado'), ctx = cv.getContext && cv.getContext('2d'); if (!ctx) return;
+    var reduz = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var t0 = performance.now();
+    function onda(x, k) {
+      var f = 0.018 + k * 0.004, base = Math.sin(x * f + k) * 7 + Math.sin(x * f * 2.7 + k * 3) * 4 + Math.sin(x * 0.11 + k) * 1.5;
+      var per = 260 + k * 40, p = (x + k * 90) % per;
+      if (k === 1 && p < 34) { base += p < 8 ? -p * 5 : (p < 14 ? -40 + (p - 8) * 9 : Math.sin((p - 14) / 20 * Math.PI) * 18); }
+      return base;
+    }
+    function quadro(t) {
+      var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (cv.width !== Math.round(r.width * dpr)) { cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr); }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, r.width, r.height);
+      var cor = getComputedStyle(document.documentElement).getPropertyValue('--trace').trim() || 'rgba(255,255,255,.2)';
+      var desl = reduz ? 0 : (t - t0) * 0.03, linhas = 4;
+      ctx.strokeStyle = cor; ctx.lineWidth = 1.3;
+      for (var k = 0; k < linhas; k++) {
+        var y0 = r.height * (0.52 + k * 0.1);
+        ctx.beginPath();
+        for (var x = 0; x <= r.width; x += 3) { var y = y0 + onda(x + desl, k); if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
+        ctx.stroke();
+      }
+      if (!reduz) raf = requestAnimationFrame(quadro);
+    }
+    pararTracado(); quadro(t0);
+  }
+  function pararTracado() { if (raf) cancelAnimationFrame(raf); raf = null; }
+
+  // ================= usuário e dados do médico =================
+  function cfgMedico() { return ler('lme_cfg', null); }
+  function atualizarUsuario() {
+    var c = cfgMedico() || {}, nome = c.medicoNomeCurto || (sessao && sessao.nome) || 'Seus dados';
+    var crm = [c.crm, c.rqe].filter(Boolean).join(' · ') || (sessao && sessao.email) || 'Toque para configurar';
+    document.getElementById('uNome').textContent = nome; document.getElementById('uCrm').textContent = crm;
+    var ini = nome.replace(/^(Dr\.?|Dra\.?)\s+/i, '').split(/\s+/).filter(Boolean);
+    document.getElementById('uAv').textContent = ini.length ? (ini[0][0] + (ini.length > 1 ? ini[ini.length - 1][0] : '')).toUpperCase() : '?';
+  }
+  document.querySelector('.usuario .q').addEventListener('click', function () { ir('lme-medico', true); });
+  document.querySelector('.usuario .q').style.cursor = 'pointer';
+  function saudacao() {
+    var c = cfgMedico() || {}, n = c.medicoNomeCurto || (sessao && sessao.nome) || '';
+    return n ? 'Bem-vindo, ' + n.replace(/\s+[A-Z]\.(\s+[A-Z]\.)*/g, '') : 'Bem-vindo';
+  }
+
+  // ================= elementos =================
+  var lista = document.getElementById('navLista'), palco = document.getElementById('palco'), inicio = document.getElementById('inicio');
+  var carregando = document.getElementById('carregando'), aviso = document.getElementById('aviso');
+  var q = document.getElementById('q'), resBox = document.getElementById('resultados'), favBt = document.getElementById('fav');
+  var pTit = document.getElementById('pTit'), pSub = document.getElementById('pSub'), pCorpo = document.getElementById('pCorpo'), trilha = document.getElementById('trilha');
+  var quadros = {}, prontos = {}, atual = null, vista = 'inicio', aplicando = false;
+
+  // ================= menu lateral =================
+  function montarMenu() {
+    var h = '<button class="item" type="button" data-ir="inicio">' + ic('i-inicio') + 'Início</button>';
+    if (favs.length) {
+      h += '<div class="rotulo-sec">Favoritos</div>';
+      favs.forEach(function (id) { h += '<button class="item" type="button" data-ir="' + id + '">' + ic('i-estrela') + esc(porId[id].nome) + '</button>'; });
+    }
+    h += '<div class="rotulo-sec">Seções</div>';
+    SECOES.forEach(function (s) {
+      if (s.id === 'escalas' || s.id === 'criterios') {
+        var ab = abertas[s.id] ? ' aberto' : '', pre = s.id === 'escalas' ? 'esc-' : 'crit-';
+        h += '<div class="grupo' + ab + '" data-grupo="' + s.id + '"><button class="grupo-tit" type="button" data-grupo-bt="' + s.id + '" aria-expanded="' + (ab ? 'true' : 'false') + '">' + ic(s.ic) + '<span>' + esc(s.nome) + '</span><svg class="ic seta" aria-hidden="true"><use href="#i-seta"/></svg></button><div class="lista">';
+        h += '<button class="item" type="button" data-ir="' + s.id + '">Todas as áreas</button>';
+        areasCom(s.id).forEach(function (a) { h += '<button class="item" type="button" data-ir="' + pre + a.slug + '">' + esc(a.nome) + '</button>'; });
+        h += '</div></div>';
+      } else {
+        h += '<button class="item" type="button" data-ir="' + s.id + '">' + ic(s.ic) + esc(s.nome) + (s.id === 'receituarios' ? '<span class="cont" id="navRenovar" title="Receitas a renovar" hidden></span>' : '') + (s.breve ? '<span class="breve">em breve</span>' : '') + '</button>';
+      }
+    });
+    h += '<div class="sep-nav"></div>';
+    h += '<button class="item" type="button" data-ir="dados">' + ic('i-cadeado') + 'Meus dados</button>';
+    h += '<button class="item" type="button" data-ir="lme-medico">' + ic('i-pessoa') + 'Dados do médico</button>';
+    lista.innerHTML = h;
+    marcar(); mostrarRenovar();
+  }
+  lista.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-grupo-bt]'); if (!b) return;
+    var g = b.parentNode, id = b.getAttribute('data-grupo-bt'), ab = !g.classList.contains('aberto');
+    g.classList.toggle('aberto', ab); b.setAttribute('aria-expanded', ab ? 'true' : 'false');
+    abertas[id] = ab; gravar('nt.abertas2', abertas);
+  });
+
+  // ================= páginas =================
+  function tile(c, comDesc) {
+    var fav = favs.indexOf(c.id) >= 0 ? '<span class="estrela">&#9733;</span>' : '';
+    if (comDesc && c.desc) return '<a class="tile" href="#' + c.id + '" data-ir="' + c.id + '"><span class="tx"><span>' + esc(c.nome) + '</span><small>' + esc(c.desc) + '</small></span>' + fav + ic('i-seta') + '</a>';
+    return '<a class="tile" href="#' + c.id + '" data-ir="' + c.id + '"><span>' + esc(c.nome) + '</span>' + fav + ic('i-seta') + '</a>';
+  }
+  function tileBreve(nome, desc) {
+    return '<div class="tile breve"><span class="tx"><span>' + esc(nome) + '</span>' + (desc ? '<small>' + esc(desc) + '</small>' : '') + '</span><span class="tag">em preparação</span></div>';
+  }
+  function cardHtml(o) {
+    var tag = o.breve ? 'div' : 'a', attrs = o.breve ? '' : ' href="#' + o.ir + '" data-ir="' + o.ir + '"';
+    return '<' + tag + ' class="card' + (o.dest ? ' dest' : '') + (o.breve ? ' breve' : '') + '"' + attrs + '><span class="tp"><span><h2>' + esc(o.nome) + '</h2>' + (o.ds ? '<span class="ds">' + esc(o.ds) + '</span>' : '') + '</span>' + ic(o.ic) + '</span>' +
+      '<span class="pe"><span class="btn">' + (o.breve ? 'Em preparação' : 'Acessar') + '</span><span class="info"' + (o.infoId ? ' id="' + o.infoId + '"' : '') + '>' + esc(o.info || '') + '</span></span></' + tag + '>';
+  }
+  function trilhaHtml(partes) {
+    return partes.map(function (p, i) { return i < partes.length - 1 ? '<a href="#' + p[1] + '" data-ir="' + p[1] + '">' + esc(p[0]) + '</a>' : '<span>' + esc(p[0]) + '</span>'; }).join(' &#8250; ');
+  }
+  function cabecalho(tit, icone, sub, partes) {
+    pTit.innerHTML = (icone ? ic(icone) : '') + esc(tit); pSub.textContent = sub || ''; pSub.hidden = !sub;
+    trilha.innerHTML = trilhaHtml(partes);
+  }
+  function favsHtml() {
+    return '<div class="favs"><span class="favs-tit">' + ic('i-estrela') + 'Favoritos</span>' +
+      (favs.length ? favs.map(function (id) { return '<a class="chip" href="#' + id + '" data-ir="' + id + '">' + esc(porId[id].nome) + '</a>'; }).join('') : '<span class="dica">Abra uma ferramenta e toque na estrela &#9734; ao lado da busca para fixá-la aqui.</span>') + '</div>';
+  }
+  function plural(n, s, p) { return n + ' ' + (n === 1 ? s : p); }
+
+  var PAGINAS = {
+    inicio: function () {
+      var t = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
+      cabecalho(saudacao(), null, t.charAt(0).toUpperCase() + t.slice(1), [['Início', 'inicio']]);
+      var md = cfgMedico() || {};
+      var h = (md.medicoNome || md.medicoNomeCurto ? '' : '<div class="ressalva">' + ic('i-pessoa') + '<p><b>Preencha seus dados de médico.</b> Nome, CRM, endereço e CNES entram nas receitas, no LME e nos relatórios, e ficam só neste aparelho. <a href="#lme-medico" data-ir="lme-medico">Preencher agora</a></p></div>') + favsHtml() + '<div class="cards">';
+      SECOES.forEach(function (s) {
+        var info = '';
+        if (s.id === 'receituarios') info = infoRenovar();
+        else if (s.id === 'escalas') info = plural(itens('escalas').length, 'instrumento', 'instrumentos');
+        else if (s.id === 'criterios') info = plural(itens('criterios').length, 'critério', 'critérios');
+        else if (s.id === 'relatorios') info = plural(itens('relatorios').length, 'modelo', 'modelos');
+        else if (s.id === 'cid') info = 'Tabela do DATASUS';
+        h += cardHtml({ nome: s.nome, ds: s.ds, ic: s.ic, ir: s.id, info: info, infoId: s.id === 'receituarios' ? 'infoRenovar' : (s.id === 'prontuario' ? 'infoMP' : null), dest: s.id === 'receituarios', breve: s.breve });
+      });
+      pCorpo.innerHTML = h + '</div>';
+      recarregarPacientes();
+    },
+    receituarios: function () {
+      cabecalho('Receituários', 'i-receita', 'Receitas para imprimir e assinar, e documentos do Componente Especializado (LME).', [['Início', 'inicio'], ['Receituários', 'receituarios']]);
+      var h = '<div class="ressalva">' + ic('i-alerta') + '<p>Estas receitas são geradas para <b>impressão e assinatura à mão</b>. Não são receitas eletrônicas válidas e não podem ser enviadas ao paciente por meio digital. Para prescrição digital com assinatura certificada, use plataformas como <a href="https://memed.com.br" target="_blank" rel="noopener">Memed</a> ou <a href="https://mevo.com.br" target="_blank" rel="noopener">Mevo</a>.</p></div>';
+      h += '<div class="sub-sec">Receitas</div><div class="tiles largos">' + tile(porId['lme-receita'], true) + tile(porId['lme-rapida'], true) + '</div>';
+      h += '<div class="sub-sec">Alto custo</div><div class="tiles largos">' + tile(porId['lme-documentos'], true) +
+        '<a class="tile" href="#renovar" data-ir="renovar"><span class="tx"><span>Receitas a renovar</span><small id="infoRenovar2">' + esc(infoRenovar()) + '</small></span>' + ic('i-seta') + '</a></div>';
+      h += '<p class="rodape" style="margin-top:22px;border:0;padding:0">Outras condições do Componente Especializado serão incluídas em etapas seguintes.</p>';
+      pCorpo.innerHTML = h;
+    },
+    escalas: function () {
+      cabecalho('Escalas e instrumentos', 'i-regua', 'Escolha a área.', [['Início', 'inicio'], ['Escalas e instrumentos', 'escalas']]);
+      var h = '<div class="cards">';
+      areasCom('escalas').forEach(function (a) { h += cardHtml({ nome: a.nome, ic: a.ic, ir: 'esc-' + a.slug, info: plural(itens('escalas', a.nome).length, 'instrumento', 'instrumentos') }); });
+      pCorpo.innerHTML = h + '</div>';
+    },
+    criterios: function () {
+      cabecalho('Critérios diagnósticos', 'i-check', 'Escolha a área para ver as doenças e os critérios em uso.', [['Início', 'inicio'], ['Critérios diagnósticos', 'criterios']]);
+      var h = '<div class="cards">';
+      areasCom('criterios').forEach(function (a) {
+        var doencas = {}; itens('criterios', a.nome).forEach(function (c) { doencas[c.doenca] = 1; });
+        CRIT_PREVISTOS.forEach(function (p) { if (p[0] === a.nome) doencas[p[1]] = 1; });
+        var nomes = Object.keys(doencas);
+        h += cardHtml({ nome: a.nome, ic: a.ic, ir: 'crit-' + a.slug, ds: nomes.slice(0, 3).join(', ') + (nomes.length > 3 ? '…' : ''), info: plural(nomes.length, 'doença', 'doenças') });
+      });
+      pCorpo.innerHTML = h + '</div>';
+    },
+    relatorios: function () {
+      cabecalho('Relatórios', 'i-doc', 'Modelos de relatório preenchidos a partir dos dados da consulta.', [['Início', 'inicio'], ['Relatórios', 'relatorios']]);
+      var h = '<div class="sub-sec">Disponíveis</div><div class="tiles largos">' + itens('relatorios').map(function (c) { return tile(c, true); }).join('') + '</div>';
+      h += '<div class="sub-sec">Em preparação</div><div class="tiles largos">' + REL_PREVISTOS.map(function (r) { return tileBreve(r[0], r[1]); }).join('') + '</div>';
+      pCorpo.innerHTML = h;
+    },
+    cid: function () {
+      cabecalho('CID-10', 'i-cid', 'Busque pela palavra ou pelo código e toque para copiar.', [['Início', 'inicio'], ['CID-10', 'cid']]);
+      desenharCid();
+    },
+    prontuario: function () {
+      cabecalho('Miniprontuário', 'i-pasta', 'Tudo o que foi registrado para cada paciente neste aparelho.', [['Início', 'inicio'], ['Miniprontuário', 'prontuario']]);
+      pCorpo.innerHTML = '<div id="mpCorpo"><p class="estado">Carregando…</p></div>';
+      desenharMP();
+    },
+    dados: function () {
+      cabecalho('Meus dados', 'i-cadeado', 'O que está guardado neste aparelho e como fazer cópia, levar para outro aparelho ou apagar.', [['Início', 'inicio'], ['Meus dados', 'dados']]);
+      pCorpo.innerHTML = '<p class="estado">Carregando…</p>';
+      desenharDados();
+    }
+
+  };
+  function paginaArea(secao, slug) {
+    var a = areaPorSlug[slug]; if (!a) return false;
+    if (secao === 'escalas') {
+      var l = ordenada(a.nome);
+      cabecalho(a.nome, a.ic, plural(l.length, 'instrumento', 'instrumentos'), [['Início', 'inicio'], ['Escalas e instrumentos', 'escalas'], [a.nome, 'esc-' + slug]]);
+      var h = '', sg = '__', aberto = false, semSub = l.every(function (c) { return !c.subg; });
+      l.forEach(function (c) {
+        if (c.subg !== sg) { if (aberto) h += '</div>'; h += (semSub ? '' : '<div class="sub-sec">' + esc(c.subg || 'Geral') + '</div>') + '<div class="tiles">'; aberto = true; sg = c.subg; }
+        h += tile(c);
+      });
+      pCorpo.innerHTML = h + (aberto ? '</div>' : '');
+    } else {
+      var grupos = {}, ordem = [];
+      itens('criterios', a.nome).forEach(function (c) { if (!grupos[c.doenca]) { grupos[c.doenca] = []; ordem.push(c.doenca); } grupos[c.doenca].push(tile(c)); });
+      CRIT_PREVISTOS.forEach(function (p) { if (p[0] !== a.nome) return; if (!grupos[p[1]]) { grupos[p[1]] = []; ordem.push(p[1]); } grupos[p[1]].push(tileBreve(p[2])); });
+      cabecalho(a.nome, a.ic, 'Critérios diagnósticos por doença.', [['Início', 'inicio'], ['Critérios diagnósticos', 'criterios'], [a.nome, 'crit-' + slug]]);
+      pCorpo.innerHTML = ordem.map(function (d) { return '<div class="sub-sec">' + esc(d) + '</div><div class="tiles">' + grupos[d].join('') + '</div>'; }).join('');
+    }
+    return true;
+  }
+
+
+
+  // ================= CID-10 (tabela oficial do DATASUS, carregada sob demanda) =================
+  var CID = null, cidCarregando = null, cidQ = '', cidFiltro = 'todos', cidLim = 300;
+  function carregarCid() {
+    if (CID) return Promise.resolve(CID);
+    if (cidCarregando) return cidCarregando;
+    cidCarregando = fetch('cid10.json').then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (j) {
+      j.itens.forEach(function (e) { e[3] = norm(e[1]); e[4] = e[0].replace('.', '').toLowerCase(); });
+      CID = j; return j;
+    }).catch(function (e) { cidCarregando = null; throw e; });
+    return cidCarregando;
+  }
+  function cidFiltra(e) {
+    var l = e[0].charAt(0);
+    if (cidFiltro === 'g') return l === 'G';
+    if (cidFiltro === 'f') return l === 'F';
+    if (cidFiltro === 'gf') return l === 'G' || l === 'F';
+    return true;
+  }
+  var CID_SIN = { avc: 'acidente vascular cerebral', ela: 'neuronio motor', em: 'esclerose multipla', hsa: 'hemorragia subaracnoide', tce: 'traumatismo intracraniano', dp: 'doenca de parkinson', da: 'doenca de alzheimer', spi: 'pernas inquietas', ait: 'isquemica cerebral transitoria', sgb: 'guillain-barre' };
+  function cidExpandir(q) { var n0 = norm(q).trim(); if (CID_SIN[n0]) return CID_SIN[n0]; return n0.replace(/\bmigranea\b/g, 'enxaqueca').replace(/\bcefaleia\b/g, 'cefaleia').replace(/\bavc\b/g, 'acidente vascular cerebral'); }
+  function cidBuscar(q) {
+    var tk = cidExpandir(q).split(/[\s,;]+/).filter(Boolean); if (!tk.length) return [];
+    var cod = q.trim().replace(/\./g, '').toLowerCase();
+    var out = [];
+    CID.itens.forEach(function (e) {
+      if (!cidFiltra(e)) return;
+      var s = 0;
+      if (/^[a-z]\d{0,3}$/i.test(cod) && e[4].indexOf(cod) === 0) s = 100 - e[4].length;
+      else {
+        for (var i = 0; i < tk.length; i++) {
+          var w = tk[i], p = e[3].indexOf(w);
+          if (p < 0) return;
+          s += (p === 0 || e[3].charAt(p - 1) === ' ') ? 3 : 1;
+        }
+      }
+      if (s) out.push([e, s]);
+    });
+    return out.sort(function (a, b) { return a[0][0].localeCompare(b[0][0]); }).map(function (x) { return x[0]; });
+  }
+  function marcarTermos(txt, base, q) {
+    var tk = cidExpandir(q).split(/[\s,;]+/).filter(function (w) { return w.length > 1; }), faixas = [];
+    tk.forEach(function (w) { var p = base.indexOf(w); while (p >= 0) { faixas.push([p, p + w.length]); p = base.indexOf(w, p + w.length); } });
+    if (!faixas.length) return esc(txt);
+    faixas.sort(function (a, b) { return a[0] - b[0]; });
+    var h = '', pos = 0;
+    faixas.forEach(function (f) { if (f[0] < pos) return; h += esc(txt.slice(pos, f[0])) + '<mark>' + esc(txt.slice(f[0], f[1])) + '</mark>'; pos = f[1]; });
+    return h + esc(txt.slice(pos));
+  }
+  function cidRecentes() { return ler('nt.cidRec', []); }
+  function cidCopiar(cod, desc) {
+    var t = cod + ' ' + desc;
+    function ok() { avisar('Copiado: ' + t); var r = cidRecentes().filter(function (x) { return x[0] !== cod; }); r.unshift([cod, desc]); gravar('nt.cidRec', r.slice(0, 12)); desenharCidLateral(); }
+    try { navigator.clipboard.writeText(t).then(ok, function () { copiarSel(t); ok(); }); } catch (e) { copiarSel(t); ok(); }
+  }
+  function copiarSel(t) { var ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} ta.remove(); }
+  function desenharCidLateral() {
+    var box = document.getElementById('cidRec'); if (!box) return;
+    var r = cidRecentes();
+    box.innerHTML = r.length ? '<div class="cid-sub">Copiados recentemente</div>' + r.map(function (x) { return '<button type="button" class="cid-it compacto" data-cid="' + esc(x[0]) + '" data-desc="' + esc(x[1]) + '"><b>' + esc(x[0]) + '</b><span>' + esc(x[1]) + '</span></button>'; }).join('') : '';
+  }
+  var SUGESTOES_CID = ['Parkinson', 'Alzheimer', 'demência', 'epilepsia', 'enxaqueca', 'esclerose múltipla', 'distonia', 'neuropatia', 'miastenia', 'infarto cerebral'];
+  function desenharCidRes() {
+    var res = document.getElementById('cidRes'), cont = document.getElementById('cidCont'); if (!res) return;
+    var q = cidQ.trim();
+    if (!q) { cont.textContent = CID ? CID.itens.length.toLocaleString('pt-BR') + ' códigos' : ''; res.innerHTML = '<div class="cid-vazio">Digite uma palavra ou um código. Exemplos: ' + SUGESTOES_CID.map(function (s) { return '<button type="button" class="chip-s" data-sug="' + esc(s) + '">' + esc(s) + '</button>'; }).join(' ') + '</div>'; return; }
+    var l = cidBuscar(q);
+    cont.textContent = l.length ? (l.length === 1 ? '1 código' : l.length.toLocaleString('pt-BR') + ' códigos') + (l.length > cidLim ? ', mostrando ' + cidLim : '') : '';
+    if (!l.length) { res.innerHTML = '<div class="cid-vazio">Nenhum código contém "' + esc(q) + '"' + (cidFiltro !== 'todos' ? ' neste filtro. <button type="button" class="chip-s" data-filtro="todos">Buscar em todos os capítulos</button>' : '.') + '</div>'; return; }
+    var h = '', catAtual = '';
+    l.slice(0, cidLim).forEach(function (e) {
+      var cat = e[0].slice(0, 3);
+      if (e[0].length > 3 && cat !== catAtual) {
+        var pai = CID.itens.filter(function (x) { return x[0] === cat; })[0];
+        if (pai && l.indexOf(pai) < 0) h += '<div class="cid-cat"><b>' + esc(cat) + '</b> ' + esc(pai[1]) + '</div>';
+      }
+      catAtual = cat;
+      var cls = e[2] === '+' ? '<span class="cid-cls" title="Código de etiologia (cruz)">†</span>' : e[2] === '*' ? '<span class="cid-cls" title="Código de manifestação (asterisco)">*</span>' : '';
+      h += '<button type="button" class="cid-it' + (e[0].length === 3 ? ' cat' : '') + '" data-cid="' + esc(e[0]) + '" data-desc="' + esc(e[1]) + '" title="Copiar"><b>' + esc(e[0]) + cls + '</b><span>' + marcarTermos(e[1], e[3], q) + '</span><svg class="ic" aria-hidden="true"><use href="#i-copiar"/></svg></button>';
+    });
+    res.innerHTML = h;
+  }
+  function desenharCid() {
+    pCorpo.innerHTML = '<div class="cid-grid"><div class="cid-painel">' +
+      '<label class="cid-busca"><svg class="ic" aria-hidden="true"><use href="#i-lupa"/></svg><input id="cidQ" type="search" placeholder="Palavra ou código (ex.: parkinson, G40)" autocomplete="off" spellcheck="false" aria-label="Buscar na CID-10" value="' + esc(cidQ) + '"></label>' +
+      '<div class="cid-filtros" role="group" aria-label="Filtrar capítulos">' + [['todos', 'Todos'], ['g', 'Sistema nervoso (G)'], ['f', 'Transtornos mentais (F)'], ['gf', 'G e F']].map(function (f) { return '<button type="button" class="chip-f" data-filtro="' + f[0] + '" aria-pressed="' + (cidFiltro === f[0]) + '">' + f[1] + '</button>'; }).join('') + '</div>' +
+      '<p class="cid-dica">Toque num código para copiar o código e a descrição. Várias palavras são buscadas juntas, sem diferença de acentos.</p>' +
+      '<div id="cidRec"></div></div>' +
+      '<div class="cid-col"><div class="cid-topo"><span id="cidCont"></span><span class="cid-fonte">CID-10 do DATASUS, versão 2008</span></div><div class="cid-res" id="cidRes"><div class="cid-vazio">Carregando a tabela…</div></div></div></div>';
+    desenharCidLateral();
+    var inp = document.getElementById('cidQ'), t = null;
+    inp.addEventListener('input', function () { cidQ = inp.value; clearTimeout(t); t = setTimeout(desenharCidRes, 120); });
+    carregarCid().then(function () { if (vista === 'cid') desenharCidRes(); }, function () { var r = document.getElementById('cidRes'); if (r) r.innerHTML = '<div class="cid-vazio">Não foi possível carregar a tabela da CID-10. Recarregue a página.</div>'; });
+    setTimeout(function () { try { inp.focus({ preventScroll: true }); } catch (e) {} }, 50);
+  }
+  pCorpo.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-cid],[data-filtro],[data-sug]'); if (!b || vista !== 'cid') return;
+    if (b.hasAttribute('data-cid')) cidCopiar(b.getAttribute('data-cid'), b.getAttribute('data-desc'));
+    else if (b.hasAttribute('data-filtro')) { cidFiltro = b.getAttribute('data-filtro'); [].forEach.call(document.querySelectorAll('.chip-f'), function (x) { x.setAttribute('aria-pressed', String(x.getAttribute('data-filtro') === cidFiltro)); }); desenharCidRes(); }
+    else if (b.hasAttribute('data-sug')) { cidQ = b.getAttribute('data-sug'); var i = document.getElementById('cidQ'); if (i) i.value = cidQ; desenharCidRes(); }
+  });
+
+  // ================= miniprontuário =================
+  var mpSel = null, mpBusca = '';
+  function eventoHtml(ev) {
+    var rec = ev.tipo === 'Receita' || ev.tipo === 'LME';
+    return '<div class="ev' + (rec ? ' rec' : '') + '"><div class="q1"><time>' + esc(isoBr(ev.data)) + '</time><span class="tp">' + esc(ev.tipo) + '</span><span class="nm">' + esc(ev.nome) + '</span>' +
+      (ev.fonte === 'reg' ? '<button type="button" class="x" data-acao="apagar-ev" data-id="' + ev.id + '">apagar</button>' : '') + '</div>' +
+      (ev.texto ? '<pre>' + esc(ev.texto) + '</pre>' : '') + '</div>';
+  }
+  function desenharMP() {
+    var alvo = document.getElementById('mpCorpo'); if (!alvo) return;
+    recarregarPacientes().then(function (l) {
+      if (vista !== 'prontuario') return;
+      var p = mpSel ? l.filter(function (x) { return x.chave === mpSel; })[0] : null;
+      if (p) {
+        alvo.innerHTML = '<button type="button" class="voltar" data-acao="mp-todos">&#8249; Todos os pacientes</button>' +
+          '<div class="ficha"><div><h2>' + esc(p.nome || 'Paciente sem nome') + '</h2><div class="cpf">' + (p.cpf ? 'CPF ' + esc(fmtCpf(p.cpf)) : 'Sem CPF registrado') + ' · ' + plural(p.eventos.length, 'registro', 'registros') + '</div></div>' +
+          '<div class="acoes"><button type="button" class="btn-l" data-acao="mp-usar">Usar na barra do paciente</button>' +
+          (p.nReg ? '<button type="button" class="btn-l" data-acao="mp-apagar-pac">Apagar escalas e critérios deste paciente</button>' : '') + '</div></div>' +
+          (p.eventos.length ? '<div class="linha-tempo">' + p.eventos.map(eventoHtml).join('') + '</div>' : '<div class="vazio-box">Nenhum registro.</div>') +
+          '<p class="rodape" style="border:0;padding:0;margin-top:8px">Receitas e LMEs vêm do arquivo de pacientes do LME e são editados por lá.</p>';
+        return;
+      }
+      mpSel = null;
+      var q = norm(mpBusca).trim(), qd = soDig(mpBusca);
+      var f = l.filter(function (x) { return !q || norm(x.nome).indexOf(q) >= 0 || (qd && x.cpf.indexOf(qd) >= 0); });
+      var h = '<div class="mp-busca"><input id="mpQ" type="search" placeholder="Buscar por nome ou CPF" autocomplete="off" aria-label="Buscar paciente" value="' + esc(mpBusca) + '"></div>';
+      if (!l.length) h += '<div class="vazio-box"><b>Nenhum paciente registrado ainda.</b><br>Abra uma escala ou um critério, preencha Nome e CPF na barra do paciente e toque em <b>Salvar no miniprontuário</b>. Receitas e LMEs emitidos pelo Neurotools entram aqui automaticamente.</div>';
+      else if (!f.length) h += '<div class="vazio-box">Nenhum paciente encontrado para "' + esc(mpBusca) + '".</div>';
+      else h += '<div class="mp-lista">' + f.map(function (x) {
+        return '<button type="button" class="mp-pac" data-acao="mp-abrir" data-chave="' + esc(x.chave) + '"><b>' + esc(x.nome || 'Sem nome') + '</b><span class="dir">' + plural(x.eventos.length, 'registro', 'registros') + '</span><small>' + (x.cpf ? 'CPF ' + esc(fmtCpf(x.cpf)) : 'sem CPF') + (x.ultimo ? ' · último em ' + esc(isoBr(x.ultimo)) : '') + '</small></button>';
+      }).join('') + '</div>';
+      alvo.innerHTML = h;
+      var inp = document.getElementById('mpQ');
+      if (inp && mpBusca) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+      if (inp) inp.addEventListener('input', function () { mpBusca = inp.value; desenharMP(); });
+    });
+  }
+
+  // ================= meus dados =================
+  var apagarTudoPronto = false;
+  function desenharDados() {
+    Promise.all([recarregarPacientes(), ntLocal.todos('registros'), ntLocal.todos('lme'), ntLocal.emMemoria(),
+      (navigator.storage && navigator.storage.persisted) ? navigator.storage.persisted().catch(function () { return null; }) : Promise.resolve(null)]).then(function (r) {
+      if (vista !== 'dados') return;
+      var pacs = r[0], regs = r[1], lme = r[2], memoria = r[3], persist = r[4], med = cfgMedico();
+      var h = '<div class="dados-grid"><div class="num"><b>' + pacs.length + '</b><span>pacientes no miniprontuário</span></div>' +
+        '<div class="num"><b>' + regs.length + '</b><span>escalas, critérios e relatórios salvos</span></div>' +
+        '<div class="num"><b>' + lme.length + '</b><span>pacientes no arquivo do LME e das receitas</span></div></div>';
+      h += '<div class="bloco"><h3>Onde ficam os dados</h3><p>Tudo fica no armazenamento interno deste navegador, neste aparelho. Nada é enviado aos servidores do Neurotools. ' +
+        'Cada navegador e cada aparelho têm o seu próprio armazenamento: o que você salva no computador não aparece no iPad, a menos que leve uma cópia de segurança.</p>' +
+        (memoria ? '<p class="estado" style="color:var(--clay)">Este navegador bloqueou o armazenamento do site (janela anônima ou dados do site bloqueados). O que for salvo agora se perde ao fechar a página.</p>' :
+          '<p class="estado' + (persist ? ' ok' : '') + '">' + (persist ? 'Armazenamento persistente ativado: o navegador não apaga estes dados sozinho.' : 'O navegador pode apagar estes dados se faltar espaço no aparelho, ou se você limpar os dados de navegação. Faça cópias de segurança.') + '</p>') +
+        '<details><summary>Onde isso fica no disco</summary><p style="margin:8px 0 0">O navegador guarda os dados num banco próprio (IndexedDB, chamado <code>neurotools</code>), dentro da pasta do perfil. É um formato binário que não abre como planilha; para ver ou levar os dados, use os botões de exportar abaixo. Exemplos de pasta:</p><ul>' +
+        '<li>Chrome no Mac: <code>~/Library/Application Support/Google/Chrome/Default/IndexedDB/</code></li>' +
+        '<li>Chrome no Windows: <code>%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\IndexedDB\\</code></li>' +
+        '<li>Safari, Firefox e Edge: dentro da pasta do perfil do navegador.</li></ul></details></div>';
+      h += '<div class="bloco"><h3>Cópia de segurança e outro aparelho</h3><p>O arquivo de cópia leva os registros do miniprontuário, o arquivo do LME e os dados do médico. Para usar em outro aparelho, abra o Neurotools lá e importe o arquivo. A importação junta os dados, sem apagar o que já existe.</p>' +
+        '<div class="acoes"><button type="button" class="btn-p" data-acao="exportar">Exportar cópia (.json)</button><button type="button" class="btn-l" data-acao="exportar-csv">Exportar planilha (.csv)</button>' +
+        '<button type="button" class="btn-l" data-acao="importar">Importar cópia</button><input type="file" id="arqImportar" accept=".json,application/json" hidden></div></div>';
+      h += '<div class="bloco"><h3>Dados do médico</h3><p>' + (med && med.medicoNome ? esc(med.medicoNome) + (med.crm ? ' · ' + esc(med.crm) : '') + (med.cnes ? ' · CNES ' + esc(med.cnes) : '') + '. Ficam só neste aparelho e são usados nas receitas e no LME.' : 'Ainda não preenchidos neste aparelho.') + '</p>' +
+        '<div class="acoes"><button type="button" class="btn-l" data-ir="lme-medico">Editar dados do médico</button></div></div>';
+      h += '<div class="bloco perigo"><h3>Apagar tudo</h3><p>Remove deste aparelho todos os registros do miniprontuário e o arquivo do LME. Não há como desfazer; exporte uma cópia antes se quiser guardar.</p>' +
+        '<label class="chk"><input type="checkbox" id="apagarMed"> Apagar também os dados do médico</label>' +
+        '<div class="acoes">' + (apagarTudoPronto ? '<button type="button" class="btn-perigo" data-acao="apagar-tudo-sim">Apagar definitivamente</button><button type="button" class="btn-l" data-acao="apagar-tudo-nao">Cancelar</button>' : '<button type="button" class="btn-l" data-acao="apagar-tudo">Apagar todos os dados deste aparelho</button>') + '</div></div>';
+      pCorpo.innerHTML = h;
+      document.getElementById('arqImportar').addEventListener('change', importar);
+    });
+  }
+  function nomeArq(ext) { return 'neurotools-' + hojeIso() + '.' + ext; }
+  function exportar(csv) {
+    Promise.all([ntLocal.todos('registros'), ntLocal.todos('lme')]).then(function (r) {
+      var blob;
+      if (csv) {
+        var q = function (v) { v = String(v == null ? '' : v); return /[";\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+        var linhas = [['Data', 'Paciente', 'CPF', 'Tipo', 'Instrumento', 'Resultado'].join(';')];
+        r[0].slice().sort(function (a, b) { return (a.data || '').localeCompare(b.data || ''); }).forEach(function (g) { linhas.push([isoBr(g.data), g.nome, g.cpf ? fmtCpf(g.cpf) : '', g.tipo, g.instrumento, g.resultado].map(q).join(';')); });
+        r[1].forEach(function (o) { var d = o.data || {}; (d.historico || []).forEach(function (h) { linhas.push([h.data, d.nome, d.cpf ? fmtCpf(d.cpf) : '', h.tipo, h.tipo === 'LME' ? 'LME ' + (DOENCA_LME[h.doenca] || h.doenca || '') : 'Receita de controle especial', (h.meds || []).join('; ')].map(q).join(';')); }); });
+        blob = new Blob(['﻿' + linhas.join('\r\n')], { type: 'text/csv' });
+      } else {
+        blob = new Blob([JSON.stringify({ app: 'neurotools', versao: 1, exportadoEm: new Date().toISOString(), registros: r[0], lme: r[1], medico: cfgMedico() }, null, 1)], { type: 'application/json' });
+      }
+      window.auxNeuroHost.salvar(nomeArq(csv ? 'csv' : 'json'), blob);
+    });
+  }
+  function importar(e) {
+    var arq = e.target.files && e.target.files[0]; if (!arq) return;
+    var fr = new FileReader();
+    fr.onload = function () {
+      var j; try { j = JSON.parse(fr.result); } catch (x) { avisar('Este arquivo não é uma cópia do Neurotools.'); return; }
+      if (!j || j.app !== 'neurotools') { avisar('Este arquivo não é uma cópia do Neurotools.'); return; }
+      Promise.all([ntLocal.todos('registros'), ntLocal.todos('lme')]).then(function (r) {
+        var ja = {}; r[0].forEach(function (g) { ja[g.criadoEm + '|' + g.instrumento + '|' + g.cpf + '|' + g.nome] = 1; });
+        var lmeLoc = {}; r[1].forEach(function (o) { lmeLoc[o.id] = o; });
+        var novosR = (j.registros || []).filter(function (g) { return g && !ja[g.criadoEm + '|' + g.instrumento + '|' + g.cpf + '|' + g.nome]; });
+        var novosL = (j.lme || []).filter(function (o) { if (!o || !o.id) return false; var l = lmeLoc[o.id]; return !l || String((o.data || {}).atualizadoEm || '') > String((l.data || {}).atualizadoEm || ''); });
+        var ps = novosR.map(function (g) { var c = Object.assign({}, g); delete c.id; return ntLocal.gravar('registros', c); })
+          .concat(novosL.map(function (o) { return ntLocal.gravar('lme', { id: o.id, data: o.data }); }));
+        if (j.medico && !cfgMedico()) gravar('lme_cfg', j.medico);
+        Promise.all(ps).then(function () { persistir(); avisar('Importados: ' + plural(novosR.length, 'registro', 'registros') + ' e ' + plural(novosL.length, 'paciente do LME', 'pacientes do LME') + '.'); atualizarUsuario(); if (vista === 'dados') desenharDados(); });
+      });
+    };
+    fr.readAsText(arq);
+  }
+
+  // ações das páginas (miniprontuário e meus dados)
+  var confirmaEv = null;
+  pCorpo.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-acao]'); if (!b) return;
+    var a = b.getAttribute('data-acao');
+    if (a === 'mp-abrir') { mpSel = b.getAttribute('data-chave'); desenharMP(); inicio.scrollTop = 0; }
+    else if (a === 'mp-todos') { mpSel = null; desenharMP(); }
+    else if (a === 'mp-usar') { var p = pacientes.filter(function (x) { return x.chave === mpSel; })[0]; if (p) { pacNome.value = p.nome; pacCpf.value = p.cpf ? fmtCpf(p.cpf) : ''; guardarPac(); atualizarBarraHist(); avisar(p.nome + ' está na barra do paciente. Abra uma escala ou critério para registrar.'); } }
+    else if (a === 'apagar-ev') {
+      var id = +b.getAttribute('data-id');
+      if (confirmaEv !== id) { confirmaEv = id; b.textContent = 'confirmar exclusão'; b.classList.add('conf'); return; }
+      confirmaEv = null; ntLocal.apagar('registros', id).then(function () { avisar('Registro apagado.'); desenharMP(); });
+    }
+    else if (a === 'mp-apagar-pac') {
+      if (b.getAttribute('data-conf') !== '1') { b.setAttribute('data-conf', '1'); b.textContent = 'Confirmar: apagar escalas e critérios'; b.className = 'btn-perigo'; return; }
+      var alvoP = pacientes.filter(function (x) { return x.chave === mpSel; })[0]; if (!alvoP) return;
+      Promise.all(alvoP.eventos.filter(function (ev) { return ev.fonte === 'reg'; }).map(function (ev) { return ntLocal.apagar('registros', ev.id); })).then(function () { avisar('Registros apagados.'); mpSel = null; desenharMP(); });
+    }
+    else if (a === 'exportar') exportar(false);
+    else if (a === 'exportar-csv') exportar(true);
+    else if (a === 'importar') document.getElementById('arqImportar').click();
+    else if (a === 'apagar-tudo') { apagarTudoPronto = true; desenharDados(); }
+    else if (a === 'apagar-tudo-nao') { apagarTudoPronto = false; desenharDados(); }
+    else if (a === 'apagar-tudo-sim') {
+      var med = document.getElementById('apagarMed').checked;
+      Promise.all([ntLocal.limpar('registros'), ntLocal.limpar('lme')]).then(function () {
+        if (med) apagar('lme_cfg');
+        try { sessionStorage.removeItem('nt.pac'); } catch (x) {}
+        pacNome.value = ''; pacCpf.value = ''; apagarTudoPronto = false;
+        avisar('Todos os dados foram apagados deste aparelho.'); atualizarUsuario(); desenharDados();
+      });
+    }
+  });
+
+  // ================= barra do paciente e salvamento no miniprontuário =================
+  var pacBar = document.getElementById('pacBar'), pacNome = document.getElementById('pacNome'), pacCpf = document.getElementById('pacCpf');
+  var pacHist = document.getElementById('pacHist');
+  (function () { try { var p = JSON.parse(sessionStorage.getItem('nt.pac') || 'null'); if (p) { pacNome.value = p.nome || ''; pacCpf.value = p.cpf || ''; } } catch (e) {} })();
+  function guardarPac() { try { sessionStorage.setItem('nt.pac', JSON.stringify({ nome: pacNome.value.trim(), cpf: pacCpf.value.trim() })); } catch (e) {} }
+  function pacienteDaBarra() {
+    var k = chavePac(pacNome.value, pacCpf.value);
+    return pacientes.filter(function (p) { return p.chave === k || (k.indexOf('n:') === 0 && chaveNome(p.nome) === k.slice(2)); })[0] || null;
+  }
+  function atualizarBarraHist() {
+    var p = (pacNome.value.trim() || pacCpf.value.trim()) ? pacienteDaBarra() : null;
+    pacHist.hidden = !p; if (p) pacHist.textContent = 'Histórico (' + p.eventos.length + ')';
+    var d = soDig(pacCpf.value); pacCpf.classList.toggle('inval', d.length === 11 && !cpfValido(d));
+  }
+  pacCpf.addEventListener('input', function () { var pos = pacCpf.value.length; pacCpf.value = fmtCpf(pacCpf.value); guardarPac(); atualizarBarraHist(); });
+  pacNome.addEventListener('input', function () {
+    var p = pacientes.filter(function (x) { return x.nome === pacNome.value; })[0];
+    if (p && p.cpf && !soDig(pacCpf.value)) pacCpf.value = fmtCpf(p.cpf);
+    guardarPac(); atualizarBarraHist();
+  });
+  pacHist.addEventListener('click', function () { var p = pacienteDaBarra(); if (p) { mpSel = p.chave; ir('prontuario', true); } });
+  function medirBarra() { if (!pacBar.hidden) document.documentElement.style.setProperty('--pac-h', pacBar.offsetHeight + 'px'); }
+  window.addEventListener('resize', medirBarra);
+  function mostrarBarra() {
+    var mostra = !!(atual && ['escalas', 'criterios', 'relatorios'].indexOf(atual.secao) >= 0);
+    pacBar.hidden = !mostra; document.body.classList.toggle('com-pac', mostra); if (mostra) medirBarra();
+  }
+
+  // texto do resultado: a barra de resultado das escalas, ou o último "Copiar" feito na ferramenta
+  var ultimaCopia = null;
+  function ganchoCopia(tool) {
+    var f = quadros[tool]; if (!f) return;
+    try {
+      var w = f.contentWindow, d = f.contentDocument, cb = w.navigator.clipboard;
+      if (cb && cb.writeText && !cb.__nt) {
+        var orig = cb.writeText.bind(cb);
+        cb.writeText = function (t) { ultimaCopia = { id: atual && atual.id, texto: String(t), t: Date.now() }; return orig(t); };
+        cb.__nt = 1;
+      }
+      d.addEventListener('copy', function () {
+        var a = d.activeElement, t = '';
+        try { t = (a && /TEXTAREA|INPUT/.test(a.tagName)) ? a.value.substring(a.selectionStart, a.selectionEnd) : w.getSelection().toString(); } catch (e) {}
+        if (t) ultimaCopia = { id: atual && atual.id, texto: t, t: Date.now() };
+      }, true);
+    } catch (e) {}
+  }
+  function capturarResultado() {
+    var c = atual; if (!c) return '';
+    if (c.tool === 'escalas') {
+      try {
+        var r = quadros.escalas.contentWindow.NT.res[c.id];
+        if (r && r.r && r.r.copia) return typeof r.r.copia === 'function' ? String(r.r.copia()) : String(r.r.copia);
+      } catch (e) {}
+    }
+    if (ultimaCopia && ultimaCopia.id === c.id && Date.now() - ultimaCopia.t < 3600e3) return ultimaCopia.texto;
+    return '';
+  }
+  var dlg = document.getElementById('dlgSalvar'), fS = document.getElementById('fSalvar');
+  var TIPO_SECAO = { escalas: 'Escala', criterios: 'Critério', relatorios: 'Relatório' };
+  document.getElementById('pacSalvar').addEventListener('click', function () {
+    if (!atual) return;
+    var nome = pacNome.value.trim(), cpf = soDig(pacCpf.value);
+    document.getElementById('dsPac').textContent = nome ? nome + (cpf ? ' · CPF ' + fmtCpf(cpf) : ' · sem CPF') : 'Preencha o nome do paciente na barra acima do instrumento.';
+    document.getElementById('dsInstr').value = atual.nome;
+    document.getElementById('dsData').value = hojeIso();
+    document.getElementById('dsTipo').value = TIPO_SECAO[atual.secao] || 'Outro';
+    var res = capturarResultado(), ta = document.getElementById('dsRes');
+    ta.value = res;
+    ta.placeholder = res ? '' : 'Toque em "Copiar para o prontuário" na ferramenta e abra esta janela de novo, ou escreva aqui o escore e a interpretação.';
+    erroDs(nome ? (cpf && !cpfValido(cpf) ? 'O CPF não confere. Corrija na barra do paciente ou apague para salvar só pelo nome.' : '') : 'Falta o nome do paciente.');
+    try { dlg.showModal(); } catch (e) { dlg.setAttribute('open', ''); }
+    setTimeout(function () { (res ? document.getElementById('dsData') : ta).focus(); }, 30);
+  });
+  function erroDs(m) { var e = document.getElementById('dsErro'); e.textContent = m || ''; e.hidden = !m; }
+  document.getElementById('dsCancelar').addEventListener('click', function () { dlg.close(); });
+  fS.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var nome = pacNome.value.trim(), cpf = soDig(pacCpf.value);
+    if (!nome) return erroDs('Falta o nome do paciente. Feche esta janela e preencha a barra do paciente.');
+    if (cpf && !cpfValido(cpf)) return erroDs('O CPF não confere. Corrija na barra do paciente ou apague para salvar só pelo nome.');
+    var instr = document.getElementById('dsInstr').value.trim(); if (!instr) return erroDs('Informe o nome do instrumento.');
+    var reg = { cpf: cpf, nome: nome, tipo: document.getElementById('dsTipo').value, instrumento: instr, itemId: atual ? atual.id : '',
+      data: document.getElementById('dsData').value || hojeIso(), resultado: document.getElementById('dsRes').value.trim(), criadoEm: new Date().toISOString() };
+    ntLocal.gravar('registros', reg).then(function () { persistir(); dlg.close(); avisar('Salvo no miniprontuário de ' + nome + '.'); }, function () { erroDs('Não foi possível salvar neste navegador. Verifique se o armazenamento do site não está bloqueado.'); });
+  });
+
+  // ================= referências das ferramentas que não as mostram por instrumento =================
+  var R = {
+    folstein: 'Folstein MF, Folstein SE, McHugh PR. "Mini-mental state": a practical method for grading the cognitive state of patients for the clinician. J Psychiatr Res. 1975;12(3):189-98.',
+    brucki: 'Brucki SMD, Nitrini R, Caramelli P, Bertolucci PHF, Okamoto IH. Sugestões para o uso do mini-exame do estado mental no Brasil. Arq Neuropsiquiatr. 2003;61(3B):777-81.',
+    cerad: 'Bertolucci PHF, Okamoto IH, Brucki SMD, Siviero MO, Toniolo Neto J, Ramos LR. Applicability of the CERAD neuropsychological battery to Brazilian elderly. Arq Neuropsiquiatr. 2001;59(3A):532-6.',
+    takada: 'Takada LT, Caramelli P, Radanovic M, Anghinah R, Hartmann APBJ, Guariglia CC, et al. Comparison between two tests of delayed recall for the diagnosis of dementia. Arq Neuropsiquiatr. 2006;64(1):35-40.',
+    fluencia: 'Brucki SMD, Rocha MSG. Category fluency test: effects of age, gender and education on total scores, clustering and switching in Brazilian Portuguese-speaking subjects. Braz J Med Biol Res. 2004;37(12):1771-7.',
+    relogio: 'Fabrício AT, Aprahamian I, Yassuda MS. Qualitative analysis of the Clock Drawing Test by educational level and cognitive profile. Arq Neuropsiquiatr. 2014;72(4):289-95.',
+    fab: 'Beato R, Amaral-Carvalho V, Guimarães HC, Tumas V, Souza CP, Oliveira GN, et al. Frontal Assessment Battery in a Brazilian sample of healthy controls: normative data. Arq Neuropsiquiatr. 2012;70(4):278-80.',
+    moca: 'Apolinario D, Brucki SMD, Ferretti REL, Farfel JM, Magaldi RM, Busse AL, et al. Estimating the instruction effect and setting cut-off scores for the MoCA: education-adjusted norms. Int J Geriatr Psychiatry. 2018;33(7):893-9.',
+    roalf: 'Roalf DR, Moberg PJ, Xie SX, Wolk DA, Moelter ST, Arnold SE. Comparative accuracies of two common screening instruments for classification of Alzheimer\'s disease, mild cognitive impairment, and healthy aging. Alzheimers Dement. 2013;9(5):529-37.',
+    morris: 'Morris JC. The Clinical Dementia Rating (CDR): current version and scoring rules. Neurology. 1993;43(11):2412-4.',
+    sclan: 'Sclan SG, Reisberg B. Functional Assessment Staging (FAST) in Alzheimer\'s disease: reliability, validity, and ordinality. Int Psychogeriatr. 1992;4 Suppl 1:55-69.',
+    pfeffer: 'Pfeffer RI, Kurosaki TT, Harrah CH Jr, Chance JM, Filos S. Measurement of functional activities in older adults in the community. J Gerontol. 1982;37(3):323-9.',
+    madrs: 'Montgomery SA, Åsberg M. A new depression scale designed to be sensitive to change. Br J Psychiatry. 1979;134(4):382-9.',
+    lecanemabe: 'van Dyck CH, Swanson CJ, Aisen P, Bateman RJ, Chen C, Gee M, et al. Lecanemab in early Alzheimer\'s disease. N Engl J Med. 2023;388(1):9-21.',
+    donanemabe: 'Sims JR, Zimmer JA, Evans CD, Lu M, Ardayfio P, Sparks J, et al. Donanemab in early symptomatic Alzheimer disease: the TRAILBLAZER-ALZ 2 randomized clinical trial. JAMA. 2023;330(6):512-27.',
+    aur: 'Cummings J, Apostolova L, Rabinovici GD, Atri A, Aisen P, Greenberg S, et al. Lecanemab: appropriate use recommendations. J Prev Alzheimers Dis. 2023;10(3):362-77.',
+    updrs: 'Goetz CG, Tilley BC, Shaftman SR, Stebbins GT, Fahn S, Martinez-Martin P, et al. Movement Disorder Society-sponsored revision of the Unified Parkinson\'s Disease Rating Scale (MDS-UPDRS): scale presentation and clinimetric testing results. Mov Disord. 2008;23(15):2129-70.',
+    soileau: 'Soileau MJ, Aldred J, Budur K, Fisseha N, Fung VS, Jeong A, et al. Safety and efficacy of continuous subcutaneous foslevodopa-foscarbidopa in patients with advanced Parkinson\'s disease: a randomised, double-blind, active-controlled, phase 3 trial. Lancet Neurol. 2022;21(12):1099-109.',
+    aldred: 'Aldred J, Freire-Alvarez E, Amelin AV, Antonini A, Bergmans B, Bergquist F, et al. Continuous subcutaneous foslevodopa/foscarbidopa in Parkinson\'s disease: safety and efficacy results from a 12-month, single-arm, open-label, phase 3 study. Neurol Ther. 2023;12(6):1937-58.',
+    kanner: 'Kanner AM, Bicchi MM. Antiseizure medications for adults with epilepsy: a review. JAMA. 2022;327(13):1269-81.'
+  };
+  var REFS = {
+    'cognitivo-zescores': ['cerad', 'takada', 'fluencia', 'relogio', 'fab', 'moca'], 'cognitivo-meem': ['folstein', 'brucki'], 'cognitivo-conv': ['roalf'],
+    'cognitivo-cdr': ['morris'], 'cognitivo-fast': ['sclan'], 'cognitivo-pfeffer': ['pfeffer'], 'cognitivo-madrs': ['madrs'],
+    'cognitivo-antiamiloide': ['lecanemabe', 'donanemabe', 'aur'], 'parkinson-iii': ['updrs'], 'parkinson-iv': ['updrs'],
+    'parkinson-foslevodopa': ['soileau', 'aldred'], 'parkinson-relatorio': ['soileau', 'aldred'], 'epilepsia-troca': ['kanner']
+  };
+  function atualizarRefs() {
+    if (!atual || atual.tool === 'escalas' || atual.tool === 'lme') return;
+    var d = docDe(atual.tool); if (!d || !d.body) return;
+    var box = d.getElementById('nt-refs'), lista = REFS[atual.id];
+    if (!lista) { if (box) box.remove(); return; }
+    if (!box) { box = d.createElement('section'); box.id = 'nt-refs'; var pe = d.getElementById('nt-rodape'); d.body.insertBefore(box, pe || null); }
+    box.innerHTML = '<h2>Referências</h2><ol>' + lista.map(function (k) { return '<li>' + esc(R[k]) + '</li>'; }).join('') + '</ol>';
+  }
+
+  // ================= receitas a renovar (arquivo do LME, agora local) =================
+  var renovar = null;
+  function infoRenovar() { if (renovar === null) return 'Arquivo de pacientes do LME'; if (!renovar) return 'Nenhuma receita a renovar'; return plural(renovar, 'paciente com receita a renovar', 'pacientes com receitas a renovar'); }
+  function mostrarRenovar() {
+    var b = document.getElementById('navRenovar'); if (b) { b.hidden = !renovar; b.textContent = renovar || ''; }
+    ['infoRenovar', 'infoRenovar2'].forEach(function (id) { var c = document.getElementById(id); if (c) c.textContent = infoRenovar(); });
+  }
+  function contarRenovar() {
+    function vencida(br) { if (!br) return false; var hj = new Date(); hj.setHours(0, 0, 0, 0); var p = String(br).split('/').map(Number); return new Date(p[2], p[1] - 1, p[0]) <= hj; }
+    ntLocal.todos('lme').then(function (l) {
+      var n = 0;
+      l.forEach(function (o) { var p = o.data || {}, lme = p.lme || {}; if (Object.keys(lme).some(function (k) { return vencida(lme[k] && lme[k].ultimaReceita); }) || (p.receita && vencida(p.receita.ultimaReceita))) n++; });
+      renovar = n; mostrarRenovar();
+    });
+  }
+  ntLocal.ouvir('lme', contarRenovar);
+
+  // ================= busca =================
+  function norm(s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  CAT.forEach(function (c) { c._n = norm(c.nome + ' ' + (c.doenca || '')); c._a = norm(c.alias + ' ' + (c.area || '') + ' ' + (c.subg || '') + ' ' + ROTULO_SECAO[c.secao]); });
+  var sel = 0, achados = [];
+  function buscar(t) {
+    var tk = norm(t).split(/\s+/).filter(Boolean); if (!tk.length) return [];
+    return CAT.map(function (c) {
+      var s = 0;
+      for (var i = 0; i < tk.length; i++) {
+        var w = tk[i];
+        if (c._n.indexOf(w) === 0 || c._n.indexOf(' ' + w) >= 0) s += 6; else if (c._n.indexOf(w) >= 0) s += 4;
+        else if (c._a.indexOf(' ' + w) >= 0 || c._a.indexOf(w) === 0) s += 2; else if (c._a.indexOf(w) >= 0) s += 1; else return null;
+      }
+      if (favs.indexOf(c.id) >= 0) s += 0.5;
+      return { c: c, s: s };
+    }).filter(Boolean).sort(function (a, b) { return b.s - a.s; }).slice(0, 12).map(function (x) { return x.c; });
+  }
+  function mostrarRes() {
+    var t = q.value.trim();
+    if (!t) { fecharBusca(); return; }
+    achados = buscar(t); sel = 0;
+    resBox.innerHTML = achados.length ? achados.map(function (c, i) { return '<button type="button" class="res-it" role="option" aria-selected="' + (i === 0) + '" data-ir="' + c.id + '"><span class="nm">' + esc(c.nome) + '</span><span class="ar">' + esc(ROTULO_SECAO[c.secao]) + '</span></button>'; }).join('') : '<div class="res-vazio">Nada encontrado para "' + esc(t) + '".</div>';
+    resBox.hidden = false; q.parentNode.setAttribute('aria-expanded', 'true');
+  }
+  function moverSel(d) {
+    if (!achados.length) return; sel = (sel + d + achados.length) % achados.length;
+    [].forEach.call(resBox.querySelectorAll('.res-it'), function (b, i) { b.setAttribute('aria-selected', i === sel ? 'true' : 'false'); if (i === sel) b.scrollIntoView({ block: 'nearest' }); });
+  }
+  function fecharBusca() { resBox.hidden = true; q.parentNode.setAttribute('aria-expanded', 'false'); }
+  q.addEventListener('input', mostrarRes);
+  q.addEventListener('focus', function () { if (q.value.trim()) mostrarRes(); });
+  q.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); moverSel(1); } else if (e.key === 'ArrowUp') { e.preventDefault(); moverSel(-1); }
+    else if (e.key === 'Enter') { if (achados[sel]) { e.preventDefault(); escolher(achados[sel].id); } }
+    else if (e.key === 'Escape') { q.value = ''; fecharBusca(); q.blur(); }
+  });
+  function escolher(id) { q.value = ''; fecharBusca(); q.blur(); ir(id, true); }
+  document.addEventListener('click', function (e) { if (!e.target.closest('.busca')) fecharBusca(); });
+  document.addEventListener('keydown', function (e) {
+    if (!document.body.classList.contains('logado')) return;
+    var tag = (document.activeElement && document.activeElement.tagName) || '';
+    if ((e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(tag)) || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) { e.preventDefault(); fecharGaveta(); q.focus(); q.select(); }
+    if (e.key === 'Escape') fecharGaveta();
+  });
+  var buscaEl = document.getElementById('busca');
+  function posicionarBusca() {
+    var slot = document.getElementById('buscaSlot');
+    if (!atual) { if (buscaEl.parentNode !== slot) slot.appendChild(buscaEl); }
+    else if (buscaEl.parentNode !== favBt.parentNode) favBt.parentNode.insertBefore(buscaEl, favBt);
+    document.body.classList.toggle('sem-ferr', !atual);
+  }
+
+  // ================= favoritos e recentes =================
+  favBt.addEventListener('click', function () {
+    if (!atual) return;
+    var i = favs.indexOf(atual.id);
+    if (i >= 0) { favs.splice(i, 1); avisar('Removido dos favoritos.'); } else { favs.push(atual.id); avisar('Adicionado aos favoritos.'); }
+    gravar('nt.fav', favs); montarMenu(); marcarFav();
+  });
+  function marcarFav() { var on = atual && favs.indexOf(atual.id) >= 0; favBt.hidden = !atual; favBt.setAttribute('aria-pressed', on ? 'true' : 'false'); favBt.innerHTML = on ? '&#9733;' : '&#9734;'; favBt.title = on ? 'Remover dos favoritos' : 'Favoritar'; }
+  function registrarRecente(id) { recs = [id].concat(recs.filter(function (x) { return x !== id; })).slice(0, 12); gravar('nt.rec', recs); }
+
+  // ================= avisos e ponte com as ferramentas =================
+  var timer = null;
+  function avisar(msg) { aviso.textContent = msg; aviso.hidden = false; clearTimeout(timer); timer = setTimeout(function () { aviso.hidden = true; }, 3800); }
+  var downloads = (window.claude && window.claude.use) ? window.claude.use('downloads').catch(function () { return null; }) : Promise.resolve(null);
+  window.auxNeuroHost = {
+    salvar: function (nome, blob) {
+      downloads.then(function (d) {
+        if (!d) { try { var u = URL.createObjectURL(blob), lk = document.createElement('a'); lk.href = u; lk.download = nome; document.body.appendChild(lk); lk.click(); setTimeout(function () { URL.revokeObjectURL(u); lk.remove(); }, 1500); avisar('Arquivo salvo: ' + nome); } catch (x) { avisar('Não foi possível salvar o arquivo neste navegador.'); } return; }
+        var dados; try { dados = structuredClone(blob); } catch (x) { dados = blob; }
+        return d.save({ filename: nome, data: dados }).then(function () { avisar('Arquivo salvo: ' + nome); }, function (e) {
+          var c = e && e.code;
+          if (c === 'declined') return;
+          if (c === 'rate_limited') avisar('Já existe um pedido de salvamento aberto. Responda a ele e tente de novo.');
+          else if (c === 'rejected_extension' || c === 'extension_not_enabled') avisar('Este tipo de arquivo não pode ser salvo aqui.');
+          else avisar('Não foi possível salvar o arquivo (' + (c || (e && e.message) || 'erro desconhecido') + ').');
+        });
+      });
+    },
+    aviso: avisar,
+    voltar: function () { ir('inicio', true); }
+  };
+
+  // ================= marcação =================
+  function secaoDaVista() {
+    if (atual) return atual.secao;
+    if (vista.indexOf('esc-') === 0) return 'escalas';
+    if (vista.indexOf('crit-') === 0) return 'criterios';
+    return vista;
+  }
+  function marcar() {
+    var sec = secaoDaVista();
+    lista.parentNode.querySelectorAll('.item[data-ir]').forEach(function (b) {
+      var d = b.getAttribute('data-ir');
+      var on = atual ? d === atual.id : (d === vista || (d === sec && ['receituarios', 'relatorios', 'cid', 'prontuario', 'dados', 'inicio'].indexOf(d) >= 0));
+      if (atual && atual.secao === 'receituarios' && d === 'receituarios' && favs.indexOf(atual.id) < 0) on = true;
+      if (atual && atual.secao === 'relatorios' && d === 'relatorios' && favs.indexOf(atual.id) < 0) on = true;
+      b.classList.toggle('on', !!on);
+      if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
+    lista.querySelectorAll('.grupo-tit').forEach(function (g) { g.classList.toggle('on', g.getAttribute('data-grupo-bt') === sec); });
+    var tit = atual ? atual.nome : (secaoPorId[vista] ? secaoPorId[vista].nome : (vista === 'dados' ? 'Meus dados' : (pTit.textContent || '')));
+    document.title = vista === 'inicio' && !atual ? 'Neurotools' : tit + ' · Neurotools';
+    marcarFav();
+  }
+  function registrar(push) {
+    var h = '#' + (atual ? atual.id : vista);
+    try { if (push) history.pushState({ id: atual ? atual.id : vista }, '', h); else history.replaceState({ id: atual ? atual.id : vista }, '', h); } catch (e) {}
+  }
+
+  // ================= dentro das ferramentas =================
+  function docDe(tool) { try { return quadros[tool] && quadros[tool].contentDocument; } catch (e) { return null; } }
+  function esperar(tool, achar, cb) {
+    var t0 = Date.now();
+    (function tentar() {
+      var d = prontos[tool] && docDe(tool), e = d && achar(d);
+      if (e) return cb(e, d);
+      if (Date.now() - t0 > 6000) return;
+      setTimeout(tentar, 60);
+    })();
+  }
+  function abrirSub(c) {
+    var tool = c.tool;
+    if (tool === 'escalas') { var w = quadros.escalas && quadros.escalas.contentWindow; if (w && w.NT) w.NT.abrir(c.id); return; }
+    if (tool === 'cognitivo' || tool === 'epilepsia') esperar(tool, function (d) { return [].filter.call(d.querySelectorAll('.tabs .tab'), function (b) { return b.textContent.trim() === c.alvo; })[0]; }, function (e) { e.click(); });
+    else if (tool === 'parkinson') esperar(tool, function (d) { return d.querySelectorAll('.tab[role="tab"]')[c.alvo]; }, function (e) { e.click(); });
+    else if (tool === 'lme') {
+      if (c.acao) { esperar(tool, function (d) { return d.querySelector(c.alvo); }, function (e) { e.click(); }); return; }
+      esperar(tool, function (d) { return d.getElementById('modoRec'); }, function (rec, d) {
+        var querRec = c.alvo === 'receita' || c.alvo === 'rapida';
+        if (querRec && rec.hidden) d.getElementById('irReceita').click();
+        if (!querRec && !rec.hidden) d.getElementById('voltarLME').click();
+        var w = d.defaultView;
+        if (c.alvo === 'rapida') { var t = d.getElementById('rRapida'); if (t) { t.scrollIntoView({ block: 'center' }); try { t.focus({ preventScroll: true }); } catch (x) {} } }
+        else if (c.alvo === 'receita') { var n = d.getElementById('rNome'); if (n) { n.closest('section').scrollIntoView({ block: 'start' }); } }
+        else w.scrollTo(0, 0);
+      });
+    }
+  }
+  function subAtual(tool) {
+    var d = docDe(tool); if (!d) return null;
+    var cands = CAT.filter(function (c) { return c.tool === tool && !c.acao; });
+    if (tool === 'cognitivo' || tool === 'epilepsia') { var a = d.querySelector('.tabs .tab.active'); if (!a) return null; var tx = a.textContent.trim(); return cands.filter(function (c) { return c.alvo === tx; })[0] || null; }
+    if (tool === 'parkinson') { var tabs = d.querySelectorAll('.tab[role="tab"]'); for (var i = 0; i < tabs.length; i++) if (tabs[i].getAttribute('aria-selected') === 'true') return cands.filter(function (c) { return c.alvo === i; })[0] || null; return null; }
+    if (tool === 'lme') { var r = d.getElementById('modoRec'); if (!r) return null; if (r.hidden) return porId['lme-documentos']; return (atual && atual.id === 'lme-rapida') ? atual : porId['lme-receita']; }
+    return null;
+  }
+  function vigiar(tool) {
+    if (tool === 'escalas') return;
+    var d = docDe(tool); if (!d) return;
+    d.addEventListener('click', function () {
+      setTimeout(function () {
+        if (aplicando || !atual || atual.tool !== tool) return;
+        var s = subAtual(tool);
+        if (s && s.id !== atual.id) { atual = s; registrarRecente(s.id); marcar(); registrar(true); atualizarRefs(); }
+      }, 80);
+    }, true);
+  }
+  // rodapé MIT e de responsabilidade também dentro de cada ferramenta
+  function injetarRodape(d) {
+    if (!d || !d.body || d.getElementById('nt-rodape')) return;
+    var st = d.createElement('style');
+    st.textContent = '#nt-rodape{max-width:980px;margin:36px auto 0;padding:14px 16px 28px;border-top:1px solid rgba(127,127,127,.3);font:12px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;opacity:.72}#nt-rodape b{font-weight:600}#nt-refs{max-width:980px;margin:32px auto 0;padding:0 16px;font:12.5px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}#nt-refs h2{font-size:13px;margin:0 0 6px;letter-spacing:.04em;text-transform:uppercase;opacity:.75}#nt-refs ol{margin:0;padding-left:20px}#nt-refs li{margin-bottom:4px}';
+    d.head.appendChild(st);
+    var f = d.createElement('footer'); f.id = 'nt-rodape'; f.innerHTML = RODAPE; d.body.appendChild(f);
+  }
+
+  // ================= navegação =================
+  function carregar(tool, depois) {
+    if (quadros[tool]) { if (prontos[tool]) depois(); else quadros[tool].__depois = depois; return; }
+    carregando.hidden = false; carregando.textContent = 'Carregando ' + TOOLNOME[tool] + '…';
+    fetch(tool + '.html').then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (html) {
+      var f = document.createElement('iframe');
+      f.title = TOOLNOME[tool]; f.setAttribute('allow', 'clipboard-write');
+      f.hidden = !(atual && atual.tool === tool); f.__depois = depois;
+      f.addEventListener('load', function () {
+        prontos[tool] = true; vigiar(tool); injetarRodape(docDe(tool)); ganchoCopia(tool);
+        if (atual && atual.tool === tool) carregando.hidden = true;
+        var fn = f.__depois; f.__depois = null; if (fn) fn();
+      });
+      f.srcdoc = html; palco.appendChild(f); quadros[tool] = f;
+    }).catch(function () { carregando.textContent = 'Não foi possível abrir ' + TOOLNOME[tool] + '. Tente de novo pelo menu.'; });
+  }
+  function mostrarPagina(id) {
+    var ok = false;
+    if (PAGINAS[id]) { PAGINAS[id](); ok = true; }
+    else if (id.indexOf('esc-') === 0) ok = paginaArea('escalas', id.slice(4));
+    else if (id.indexOf('crit-') === 0) ok = paginaArea('criterios', id.slice(5));
+    if (!ok) { id = 'inicio'; PAGINAS.inicio(); }
+    return id;
+  }
+  function ir(id, push) {
+    fecharGaveta();
+    if (id === 'renovar') { abrirRenovar(push); return; }
+    var c = porId[id];
+    if (!c) {
+      atual = null; vista = mostrarPagina(id || 'inicio');
+      document.getElementById('buscaSlot').hidden = (vista === 'cid');
+      palco.hidden = true; inicio.hidden = false;
+      posicionarBusca(); mostrarBarra(); marcar(); registrar(push); inicio.scrollTop = 0; return;
+    }
+    if (!c.acao) { atual = c; registrarRecente(c.id); }
+    else if (!atual || atual.tool !== c.tool) atual = porId[c.tool === 'lme' ? 'lme-documentos' : c.id];
+    inicio.hidden = true; palco.hidden = false;
+    Object.keys(quadros).forEach(function (k) { quadros[k].hidden = (k !== c.tool); });
+    carregando.hidden = !!prontos[c.tool];
+    posicionarBusca(); mostrarBarra(); marcar();
+    if (!c.acao) registrar(push);
+    carregar(c.tool, function () { aplicando = true; abrirSub(c); atualizarRefs(); setTimeout(function () { aplicando = false; atualizarUsuario(); atualizarRefs(); }, 400); });
+  }
+  function abrirRenovar(push) {
+    ir('lme-pacientes', push);
+    esperar('lme', function (d) { var dl = d.getElementById('dlgArq'), f = d.getElementById('arqFiltro'); return dl && dl.open && f; }, function (f) { f.value = 'renovar'; f.dispatchEvent(new Event('change', { bubbles: true })); });
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-ir]'); if (!b) return;
+    e.preventDefault();
+    var id = b.getAttribute('data-ir');
+    if (id === 'prontuario') mpSel = null;
+    if (b.classList.contains('res-it')) escolher(id); else ir(id, true);
+  });
+  window.addEventListener('popstate', function (e) { if (!document.body.classList.contains('logado')) return; ir(traduzir((e.state && e.state.id) || location.hash), false); });
+  // os dados do médico são editados na ferramenta do LME; atualiza o cartão ao voltar
+  window.addEventListener('focus', atualizarUsuario);
+
+  var botaoNav = document.getElementById('abrirNav');
+  function fecharGaveta() { document.body.classList.remove('gaveta'); botaoNav.setAttribute('aria-expanded', 'false'); }
+  botaoNav.addEventListener('click', function () { var a = document.body.classList.toggle('gaveta'); botaoNav.setAttribute('aria-expanded', a ? 'true' : 'false'); });
+  document.getElementById('veu').addEventListener('click', fecharGaveta);
+
+  // endereços antigos continuam funcionando
+  function traduzir(h) {
+    h = (h || '').replace(/^#/, ''); try { h = decodeURIComponent(h); } catch (e) {}
+    if (h.indexOf('area-') === 0) { var a = areaPorNome[h.slice(5)]; if (a) return (a.nome === 'Alto custo' ? 'receituarios' : 'esc-' + a.slug); if (h === 'area-Alto custo' || h === 'area-Receitas') return 'receituarios'; }
+    var antigos = { 'cefaleia': 'midas', 'cefaleia-midas': 'midas', 'cefaleia-hit6': 'hit6', 'cognitivo': 'cognitivo-zescores', 'parkinson': 'parkinson-iii', 'lme': 'lme-documentos', 'epilepsia': 'epilepsia-troca' };
+    return antigos[h] || h || 'inicio';
+  }
+
+  montarMenu(); atualizarUsuario(); contarRenovar(); recarregarPacientes();
+  iniciarAuth();
+})();
+</script>
+
+</body>
+</html>
