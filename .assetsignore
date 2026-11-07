@@ -5,3 +5,5 @@ wrangler.jsonc
 .assetsignore
 .gitignore
 README.md
+CHANGELOG.md
+docs

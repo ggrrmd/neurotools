@@ -449,7 +449,7 @@ dialog .campo input{background:var(--paper)}
         <button class="btn-pri" type="submit">Salvar senha</button>
       </form>
       <p class="lg-info" id="lgInfo" role="status" hidden></p>
-      <p class="lg-pe">Projeto de código aberto (licença MIT), oferecido sem garantia. As decisões clínicas cabem ao médico. <a href="privacidade.html" target="_blank" rel="noopener">Privacidade e termos de uso</a>. <span id="lgPrevia">Prévia: a conferência de senha será ativada quando o site for publicado.</span></p>
+      <p class="lg-pe">Versão 1.0.0. Projeto de código aberto (licença MIT), oferecido sem garantia. As decisões clínicas cabem ao médico. <a href="privacidade.html" target="_blank" rel="noopener">Privacidade e termos de uso</a>. <span id="lgPrevia">Prévia: a conferência de senha será ativada quando o site for publicado.</span></p>
     </div>
   </div>
 </section>
@@ -522,7 +522,8 @@ dialog .campo input{background:var(--paper)}
 <script>
 (function () {
   'use strict';
-  var RODAPE = '<b>Neurotools é um projeto de código aberto, sob licença MIT.</b> As informações são oferecidas como estão, sem garantia de qualquer tipo, e os autores não se responsabilizam por elas nem pelo uso que delas se fizer. Cabe ao julgamento médico conferir a acurácia de cada resultado, verificar a pertinência da sua aplicação e decidir criteriosamente o que fazer com ele. <a href="privacidade.html" target="_blank" rel="noopener">Privacidade e termos de uso</a>.';
+  var NT_VERSAO = '1.0.0';
+  var RODAPE = '<b>Neurotools ' + NT_VERSAO + ' é um projeto de código aberto, sob licença MIT.</b> As informações são oferecidas como estão, sem garantia de qualquer tipo, e os autores não se responsabilizam por elas nem pelo uso que delas se fizer. Cabe ao julgamento médico conferir a acurácia de cada resultado, verificar a pertinência da sua aplicação e decidir criteriosamente o que fazer com ele. <a href="privacidade.html" target="_blank" rel="noopener">Privacidade e termos de uso</a>.';
   document.getElementById('rodape').innerHTML = RODAPE;
 
   // ================= armazenamento local (conveniências) =================
