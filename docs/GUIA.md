@@ -30,12 +30,12 @@ Este guia serve para quem for alterar o site (inclusive uma nova conversa com o 
 
 ## Configuração externa
 
-- **Supabase**: projeto `alxkympzfvjhrmbpuzfh`; a chave publishable fica em `window.NT_SUPABASE` no `index.html` (é pública por natureza). Site URL e Redirect URLs apontam para o endereço do site. Modelos de email em português em Authentication > Emails.
+- **Supabase**: projeto `alxkympzfvjhrmbpuzfh`; a chave publishable fica em `window.NT_SUPABASE` no `index.html` (é pública por natureza). Site URL e Redirect URLs apontam para o endereço do site. Emails enviados pelo Resend (SMTP smtp.resend.com, remetente Neurotools <nao-responda@neurotools.com.br>, domínio verificado; plano gratuito de 100 emails/dia). Modelos de email em português em Authentication > Emails. Contato do projeto: neurotools.contato@gmail.com.
+- **DNS (Cloudflare)**: DMARC em `p=none` desde 08/11/2026; endurecer para `p=quarantine` depois de algumas semanas sem problemas de entrega.
 - **Cloudflare**: Workers & Pages > neurotools.
 
 ## Pendências conhecidas
 
-- Serviço de email próprio (SMTP) no Supabase antes de abrir para muitos usuários.
 - Revisão de direitos autorais das escalas (MDS-UPDRS, HIT-6, ISI, IRLS, Epworth, NPI-Q, TETRAS, TWSTRS, UMSARS, PSPRS, Mini-ACE e textos de DSM-5-TR, ICSD-3-TR e ICHD-3).
 - Conferir no original: lista de tipos de crise da ILAE 2025, regra de narcolepsia tipo 1 na ICSD-3-TR, categorias da neuropatia motora multifocal, regra de PIDC possível com critérios de apoio, detalhes da revisão de 2024 dos critérios de McDonald.
 - Relatório de aposentadoria por incapacidade (aguardando modelo).
