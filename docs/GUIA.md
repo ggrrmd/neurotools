@@ -4,7 +4,7 @@ Este guia serve para quem for alterar o site (inclusive uma nova conversa com o 
 
 ## Onde está cada coisa
 
-- **Código-fonte e site publicado são o mesmo repositório**: github.com/ggrrmd/neurotools, branch `main`. Não há etapa de build: cada push publica sozinho no Cloudflare (Worker com assets estáticos, configurado em `wrangler.jsonc`) em https://neurotools.ggrr-md.workers.dev.
+- **Código-fonte e site publicado são o mesmo repositório**: github.com/ggrrmd/neurotools, branch `main`. Não há etapa de build: cada push publica sozinho no Cloudflare (Worker com assets estáticos, configurado em `wrangler.jsonc`). Endereço oficial: https://neurotools.com.br (domínio no Registro.br, DNS no Cloudflare); o endereço https://neurotools.ggrr-md.workers.dev continua ativo.
 - `.assetsignore` lista o que não vai para o site (README, CHANGELOG, docs, arquivos técnicos).
 
 | Arquivo | O que tem |
@@ -35,7 +35,6 @@ Este guia serve para quem for alterar o site (inclusive uma nova conversa com o 
 
 ## Pendências conhecidas
 
-- Domínio próprio (comprar no Registro.br e ligar em Settings > Domains & Routes).
 - Serviço de email próprio (SMTP) no Supabase antes de abrir para muitos usuários.
 - Revisão de direitos autorais das escalas (MDS-UPDRS, HIT-6, ISI, IRLS, Epworth, NPI-Q, TETRAS, TWSTRS, UMSARS, PSPRS, Mini-ACE e textos de DSM-5-TR, ICSD-3-TR e ICHD-3).
 - Conferir no original: lista de tipos de crise da ILAE 2025, regra de narcolepsia tipo 1 na ICSD-3-TR, categorias da neuropatia motora multifocal, regra de PIDC possível com critérios de apoio, detalhes da revisão de 2024 dos critérios de McDonald.
