@@ -524,7 +524,7 @@ dialog .campo input{background:var(--paper)}
 <script>
 (function () {
   'use strict';
-  var NT_VERSAO = '1.1.0';
+  var NT_VERSAO = '1.1.1';
   var RODAPE = '<b>Neurotools ' + NT_VERSAO + ' é um projeto de código aberto, sob licença MIT.</b> Cabe ao julgamento médico conferir a acurácia das informações obtidas e decidir criteriosamente o que fazer com elas. <a href="privacidade.html" target="_blank" rel="noopener">Privacidade e termos de uso</a>.';
   document.getElementById('rodape').innerHTML = RODAPE;
 
@@ -577,7 +577,7 @@ dialog .campo input{background:var(--paper)}
         });
       });
     }
-    function mudou(st) { (ouvintes[st] || []).slice().forEach(function (f) { try { f(); } catch (e) {} }); }
+    function mudou(st) { try { localStorage.setItem('nt.ultimaAlteracao', JSON.stringify(new Date().toISOString())); } catch (e) {} (ouvintes[st] || []).slice().forEach(function (f) { try { f(); } catch (e) {} }); }
     var api = {
       todos: function (st) { return op(st, 'readonly', function (s) { return s.getAll(); }).then(function (x) { return x || []; }); },
       gravar: function (st, o) { return op(st, 'readwrite', function (s) { return (o.id == null && st === 'registros') ? s.add(o) : s.put(o); }).then(function (id) { mudou(st); return id; }); },
@@ -1154,7 +1154,7 @@ dialog .campo input{background:var(--paper)}
       var t = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
       cabecalho(saudacao(), null, t.charAt(0).toUpperCase() + t.slice(1), [['Início', 'inicio']]);
       var md = cfgMedico() || {};
-      var h = (md.medicoNome || md.medicoNomeCurto ? '' : '<div class="ressalva">' + ic('i-pessoa') + '<p><b>Preencha seus dados de médico</b> para fazer receitas, LME e relatórios. Os dados ficam apenas neste navegador. <a href="#lme-medico" data-ir="lme-medico">Preencher agora</a></p></div>') + favsHtml() + '<div class="cards">';
+      var h = '<div id="avisoCopia"></div>' + (md.medicoNome || md.medicoNomeCurto ? '' : '<div class="ressalva">' + ic('i-pessoa') + '<p><b>Preencha seus dados de médico</b> para fazer receitas, LME e relatórios. Os dados ficam apenas neste navegador. <a href="#lme-medico" data-ir="lme-medico">Preencher agora</a></p></div>') + favsHtml() + '<div class="cards">';
       SECOES.forEach(function (s) {
         var info = '';
         if (s.id === 'receituarios') info = infoRenovar();
@@ -1165,7 +1165,7 @@ dialog .campo input{background:var(--paper)}
         h += cardHtml({ nome: s.nome, ds: s.ds, ic: s.ic, ir: s.id, info: info, infoId: s.id === 'receituarios' ? 'infoRenovar' : (s.id === 'prontuario' ? 'infoMP' : null), dest: s.id === 'receituarios', breve: s.breve });
       });
       pCorpo.innerHTML = h + '</div>';
-      recarregarPacientes();
+      recarregarPacientes(); avisoCopia();
     },
     receituarios: function () {
       cabecalho('Receituários', 'i-receita', 'Receitas para imprimir e assinar, e documentos do Componente Especializado (LME).', [['Início', 'inicio'], ['Receituários', 'receituarios']]);
@@ -1393,7 +1393,9 @@ dialog .campo input{background:var(--paper)}
         '<li>Chrome no Mac: <code>~/Library/Application Support/Google/Chrome/Default/IndexedDB/</code></li>' +
         '<li>Chrome no Windows: <code>%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\IndexedDB\\</code></li>' +
         '<li>Safari, Firefox e Edge: dentro da pasta do perfil do navegador.</li></ul></details></div>';
-      h += '<div class="bloco"><h3>Cópia de segurança e outro navegador</h3><p>O arquivo de cópia leva os registros do miniprontuário, o arquivo do LME e os dados do médico. Para usar em outro navegador ou aparelho, abra o Neurotools lá e importe o arquivo. A importação junta os dados, sem apagar o que já existe.</p>' +
+      var bk = estadoCopia(regs.length + lme.length > 0);
+      h += '<div class="bloco"><h3>Cópia de segurança e outro navegador</h3><p>O arquivo de cópia leva os registros do miniprontuário, o arquivo do LME e os dados do médico. Recomendamos uma cópia por semana, guardada fora do navegador (pasta do computador ou nuvem). Para usar em outro navegador ou aparelho, abra o Neurotools lá e importe o arquivo. A importação junta os dados, sem apagar o que já existe.</p>' +
+        '<p class="estado' + (bk.aviso ? '' : (bk.data ? ' ok' : '')) + '"' + (bk.aviso ? ' style="color:var(--clay)"' : '') + '>' + esc(bk.texto) + '</p>' +
         '<div class="acoes"><button type="button" class="btn-p" data-acao="exportar">Exportar cópia (.json)</button><button type="button" class="btn-l" data-acao="exportar-csv">Exportar planilha (.csv)</button>' +
         '<button type="button" class="btn-l" data-acao="importar">Importar cópia</button><input type="file" id="arqImportar" accept=".json,application/json" hidden></div></div>';
       h += '<div class="bloco"><h3>Dados do médico</h3><p>' + (med && med.medicoNome ? esc(med.medicoNome) + (med.crm ? ' · ' + esc(rotulo('CRM', med.crm)) : '') + (med.cnes ? ' · CNES ' + esc(med.cnes) : '') + '. Ficam só neste navegador e são usados nas receitas, no LME e nos relatórios.' : 'Ainda não preenchidos neste navegador.') + '</p>' +
@@ -1406,6 +1408,27 @@ dialog .campo input{background:var(--paper)}
     });
   }
   function nomeArq(ext) { return 'neurotools-' + hojeIso() + '.' + ext; }
+  // ================= lembrete de cópia de segurança (semanal) =================
+  var DIAS_COPIA = 7;
+  function estadoCopia(temDados) {
+    var c = ler('nt.ultimaCopia', null), alt = ler('nt.ultimaAlteracao', null);
+    var dc = c ? new Date(c) : null, dias = dc ? Math.floor((Date.now() - dc.getTime()) / 864e5) : null;
+    var novidades = !dc || (alt && new Date(alt) > dc);   // algo foi salvo depois da última cópia
+    var aviso = !!temDados && novidades && (!dc || dias >= DIAS_COPIA);
+    var quando = dc ? dc.toLocaleDateString('pt-BR') + (dias === 0 ? ' (hoje)' : dias === 1 ? ' (ontem)' : ' (há ' + dias + ' dias)') : '';
+    var texto = !dc ? 'Nenhuma cópia de segurança feita neste navegador.' : 'Última cópia de segurança: ' + quando + '.';
+    if (aviso) texto += dc ? ' Há dados novos desde então; faça uma cópia nova.' : ' Faça a primeira cópia.';
+    else if (dc && novidades) texto += ' Há dados novos desde então.';
+    return { data: dc, dias: dias, aviso: aviso, texto: texto };
+  }
+  function avisoCopia() {
+    var el = document.getElementById('avisoCopia'); if (!el) return;
+    Promise.all([ntLocal.todos('registros'), ntLocal.todos('lme')]).then(function (r) {
+      var bk = estadoCopia(r[0].length + r[1].length > 0), el2 = document.getElementById('avisoCopia'); if (!el2) return;
+      if (!bk.aviso) { el2.innerHTML = ''; return; }
+      el2.innerHTML = '<div class="ressalva">' + ic('i-cadeado') + '<p><b>' + (bk.data ? 'Sua última cópia de segurança tem ' + bk.dias + ' dias.' : 'Você ainda não fez uma cópia de segurança.') + '</b> Os dados ficam só neste navegador; recomendamos exportar uma cópia por semana. <a href="#dados" data-ir="dados">Fazer cópia agora</a></p></div>';
+    });
+  }
   function exportar(csv) {
     Promise.all([ntLocal.todos('registros'), ntLocal.todos('lme')]).then(function (r) {
       var blob;
@@ -1418,7 +1441,8 @@ dialog .campo input{background:var(--paper)}
       } else {
         blob = new Blob([JSON.stringify({ app: 'neurotools', versao: 1, exportadoEm: new Date().toISOString(), registros: r[0], lme: r[1], medico: cfgMedico() }, null, 1)], { type: 'application/json' });
       }
-      window.auxNeuroHost.salvar(nomeArq(csv ? 'csv' : 'json'), blob);
+      // só a cópia .json conta como cópia de segurança (é a que pode ser importada de volta)
+      window.auxNeuroHost.salvar(nomeArq(csv ? 'csv' : 'json'), blob, csv ? null : function () { gravar('nt.ultimaCopia', new Date().toISOString()); if (vista === 'dados') desenharDados(); });
     });
   }
   function importar(e) {
@@ -1685,11 +1709,11 @@ dialog .campo input{background:var(--paper)}
   function avisar(msg) { aviso.textContent = msg; aviso.hidden = false; clearTimeout(timer); timer = setTimeout(function () { aviso.hidden = true; }, 3800); }
   var downloads = (window.claude && window.claude.use) ? window.claude.use('downloads').catch(function () { return null; }) : Promise.resolve(null);
   window.auxNeuroHost = {
-    salvar: function (nome, blob) {
+    salvar: function (nome, blob, aoSalvar) {
       downloads.then(function (d) {
-        if (!d) { try { var u = URL.createObjectURL(blob), lk = document.createElement('a'); lk.href = u; lk.download = nome; document.body.appendChild(lk); lk.click(); setTimeout(function () { URL.revokeObjectURL(u); lk.remove(); }, 1500); avisar('Arquivo salvo: ' + nome); } catch (x) { avisar('Não foi possível salvar o arquivo neste navegador.'); } return; }
+        if (!d) { try { var u = URL.createObjectURL(blob), lk = document.createElement('a'); lk.href = u; lk.download = nome; document.body.appendChild(lk); lk.click(); setTimeout(function () { URL.revokeObjectURL(u); lk.remove(); }, 1500); avisar('Arquivo salvo: ' + nome); if (aoSalvar) aoSalvar(); } catch (x) { avisar('Não foi possível salvar o arquivo neste navegador.'); } return; }
         var dados; try { dados = structuredClone(blob); } catch (x) { dados = blob; }
-        return d.save({ filename: nome, data: dados }).then(function () { avisar('Arquivo salvo: ' + nome); }, function (e) {
+        return d.save({ filename: nome, data: dados }).then(function () { avisar('Arquivo salvo: ' + nome); if (aoSalvar) aoSalvar(); }, function (e) {
           var c = e && e.code;
           if (c === 'declined') return;
           if (c === 'rate_limited') avisar('Já existe um pedido de salvamento aberto. Responda a ele e tente de novo.');

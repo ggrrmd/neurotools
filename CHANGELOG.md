@@ -2,6 +2,10 @@
 
 Numeração: **1.x** para entregas com novidades (novas escalas, critérios, relatórios ou seções); **1.x.y** para correções pequenas; **2.0** reservado para mudança grande de estrutura.
 
+## 1.1.1 (9 de novembro de 2026)
+
+- Lembrete semanal de cópia de segurança: a página Meus dados mostra a data da última cópia (.json), e a página inicial avisa quando há dados novos e a última cópia tem 7 dias ou mais (ou nunca foi feita).
+
 ## 1.1.0 (9 de novembro de 2026)
 
 - LME: seis novos PCDTs (distonia e espasmo hemifacial, dor crônica, esclerose lateral amiotrófica, espasticidade, miastenia gravis e osteoporose), com CID, medicamentos, exames e termo de esclarecimento de cada protocolo; condições em ordem alfabética.
