@@ -434,7 +434,7 @@ dialog.wide { max-width: 860px; }
     <input type="text" id="arqBusca" placeholder="Buscar por nome ou nome da mãe" autocomplete="off">
     <select id="arqFiltro" style="width:auto;margin-top:0">
       <option value="">Todos</option><option value="renovar">Receitas vencidas</option>
-      <option value="alzheimer">Alzheimer</option><option value="parkinson">Parkinson</option><option value="epilepsia">Epilepsia</option><option value="esquizofrenia">Esquizofrenia</option><option value="receita">Receita avulsa</option>
+      <option value="alzheimer">Alzheimer</option><option value="distonia">Distonia</option><option value="dor">Dor crônica</option><option value="epilepsia">Epilepsia</option><option value="ela">ELA</option><option value="espasticidade">Espasticidade</option><option value="esquizofrenia">Esquizofrenia</option><option value="miastenia">Miastenia</option><option value="osteoporose">Osteoporose</option><option value="parkinson">Parkinson</option><option value="receita">Receita avulsa</option>
     </select>
     <button class="btn ghost" type="button" id="arqExport">Exportar planilha</button>
   </div>
@@ -500,6 +500,54 @@ const DEFAULT_CFG = {
 };
 
 const DOENCAS = {
+  distonia: {
+    nome: "Distonia e espasmo hemifacial",
+    cids: [["G24.3", "Torcicolo espasmódico"], ["G24.4", "Distonia orofacial idiopática"], ["G24.5", "Blefaroespasmo"], ["G24.8", "Outras distonias"], ["G51.3", "Espasmo hemifacial clônico"], ["G51.8", "Outros transtornos do nervo facial"]],
+    cidPadrao: "G24.3",
+    diagnostico: "Distonia focal",
+    pcdt: "PCDT Distonias e Espasmo Hemifacial (Portaria Conjunta SAS/SCTIE/MS nº 1/2017)",
+    anamnese: () => "Contrações musculares involuntárias e sustentadas, com posturas anormais, dor e prejuízo funcional. Indicada toxina botulínica tipo A, em intervalos mínimos de 3 meses."
+  },
+  dor: {
+    nome: "Dor crônica",
+    cids: [["R52.1", "Dor crônica intratável"], ["R52.2", "Outra dor crônica"]],
+    cidPadrao: "R52.1",
+    diagnostico: "Dor crônica",
+    pcdt: "PCDT Dor Crônica (Portaria Conjunta SAES/SAPS/SECTICS nº 1/2024)",
+    anamnese: () => "Dor crônica com mais de 3 meses de duração, com prejuízo funcional e resposta insuficiente a analgésicos comuns."
+  },
+  ela: {
+    nome: "Esclerose lateral amiotrófica",
+    cids: [["G12.2", "Doença do neurônio motor"]],
+    cidPadrao: "G12.2",
+    diagnostico: "Esclerose lateral amiotrófica",
+    pcdt: "PCDT Esclerose Lateral Amiotrófica (Portaria Conjunta SAES/SCTIE/MS nº 13/2020)",
+    anamnese: () => "Fraqueza muscular progressiva com sinais de comprometimento dos neurônios motores superior e inferior, confirmada por eletroneuromiografia (critérios de El Escorial revisados)."
+  },
+  espasticidade: {
+    nome: "Espasticidade",
+    cids: [["G04.1", "Paraplegia espástica tropical"], ["G80.0", "Paralisia cerebral espástica"], ["G80.1", "Diplegia espástica"], ["G80.2", "Hemiplegia infantil"], ["G81.1", "Hemiplegia espástica"], ["G82.1", "Paraplegia espástica"], ["G82.4", "Tetraplegia espástica"], ["I69.0", "Sequelas de hemorragia subaracnoide"], ["I69.1", "Sequelas de hemorragia intracerebral"], ["I69.2", "Sequelas de outras hemorragias intracranianas não traumáticas"], ["I69.3", "Sequelas de infarto cerebral"], ["I69.4", "Sequelas de AVC não especificado como hemorrágico ou isquêmico"], ["I69.8", "Sequelas de outras doenças cerebrovasculares"], ["T90.5", "Sequelas de traumatismo intracraniano"], ["T90.8", "Sequelas de outros traumatismos especificados da cabeça"]],
+    cidPadrao: "I69.3",
+    diagnostico: "Espasticidade",
+    pcdt: "PCDT Espasticidade (Portaria Conjunta SAES/SCTIE/MS nº 5/2022)",
+    anamnese: () => "Espasticidade focal ou segmentar (Ashworth modificada grau __), com comprometimento funcional e dor, em programa de reabilitação. Indicada toxina botulínica tipo A."
+  },
+  miastenia: {
+    nome: "Miastenia gravis",
+    cids: [["G70.0", "Miastenia gravis"], ["G70.2", "Miastenia congênita e do desenvolvimento"]],
+    cidPadrao: "G70.0",
+    diagnostico: "Miastenia gravis",
+    pcdt: "PCDT Miastenia Gravis (Portaria Conjunta SAES/SCTIE/MS nº 11/2022)",
+    anamnese: () => "Fraqueza muscular flutuante com fatigabilidade, confirmada por anticorpo antirreceptor de acetilcolina ou por eletroneuromiografia com estimulação repetitiva."
+  },
+  osteoporose: {
+    nome: "Osteoporose",
+    cids: [["M80.0", "Osteoporose pós-menopáusica com fratura patológica"], ["M80.1", "Osteoporose pós-ooforectomia com fratura patológica"], ["M80.2", "Osteoporose de desuso com fratura patológica"], ["M80.3", "Osteoporose por má absorção pós-cirúrgica com fratura patológica"], ["M80.4", "Osteoporose induzida por drogas com fratura patológica"], ["M80.5", "Osteoporose idiopática com fratura patológica"], ["M80.8", "Outras osteoporoses com fratura patológica"], ["M81.0", "Osteoporose pós-menopáusica"], ["M81.1", "Osteoporose pós-ooforectomia"], ["M81.2", "Osteoporose de desuso"], ["M81.3", "Osteoporose devida à má absorção pós-cirúrgica"], ["M81.4", "Osteoporose induzida por drogas"], ["M81.5", "Osteoporose idiopática"], ["M81.6", "Osteoporose localizada"], ["M81.8", "Outras osteoporoses"], ["M82.0", "Osteoporose na mielomatose múltipla"], ["M82.1", "Osteoporose em distúrbios endócrinos"], ["M82.8", "Osteoporose em outras doenças classificadas em outra parte"], ["M85.8", "Outros transtornos especificados da densidade e da estrutura óssea"]],
+    cidPadrao: "M81.0",
+    diagnostico: "Osteoporose",
+    pcdt: "PCDT Osteoporose (Portaria Conjunta SAES/SECTICS nº 22/2025)",
+    anamnese: () => "Osteoporose confirmada por densitometria (T-escore menor ou igual a -2,5) ou por fratura por fragilidade."
+  },
   alzheimer: {
     nome: "Doença de Alzheimer",
     cids: [["G30.1", "Doença de Alzheimer de início tardio"], ["G30.0", "Doença de Alzheimer de início precoce"], ["G30.8", "Outras formas de doença de Alzheimer"], ["G30.9", "Doença de Alzheimer não especificada"]],
@@ -539,6 +587,61 @@ function fmtCdr(v) { if (v === undefined || v === null || v === "") return "__";
 // forma: cp (comprimido), cap (cápsula), sol (solução oral), ad (adesivo), amp (ampola)
 // ceaf: true = dispensado pelo Componente Especializado (vai ao LME por padrão)
 const CATALOGO = {
+  distonia: [
+    { id: "tba100", nome: "Toxina botulínica tipo A", apres: "100 U frasco-ampola", forma: "out", un: ["frasco-ampola", "frascos-ampola"], via: "intramuscular", qtd: 1, cada: 3, ceaf: true, ctrl: false, poso: "Aplicar por via intramuscular, nos músculos definidos no plano de aplicação, a cada 3 meses (intervalo mínimo entre aplicações)." },
+    { id: "tba500", nome: "Toxina botulínica tipo A", apres: "500 U frasco-ampola", forma: "out", un: ["frasco-ampola", "frascos-ampola"], via: "intramuscular", qtd: 1, cada: 3, ceaf: true, ctrl: false, poso: "Aplicar por via intramuscular, nos músculos definidos no plano de aplicação, a cada 3 meses (intervalo mínimo entre aplicações)." }
+  ],
+  dor: [
+    { id: "gabd300", nome: "Gabapentina", apres: "300 mg cápsula", forma: "cap", ceaf: true, dose: 1, freq: 3 },
+    { id: "gabd400", nome: "Gabapentina", apres: "400 mg cápsula", forma: "cap", ceaf: true, dose: 1, freq: 3 },
+    { id: "cod30", nome: "Codeína", apres: "30 mg comprimido", forma: "cp", ceaf: true, dose: 1, freq: 4, aviso: "Codeína (lista A2 da Portaria SVS/MS nº 344/1998): confira se a apresentação dispensa a Notificação de Receita A." },
+    { id: "cod60", nome: "Codeína", apres: "60 mg comprimido", forma: "cp", ceaf: true, dose: 1, freq: 4, aviso: "Codeína (lista A2 da Portaria SVS/MS nº 344/1998): confira se a apresentação dispensa a Notificação de Receita A." },
+    { id: "codsol", nome: "Codeína", apres: "3 mg/mL solução oral (frasco 120 mL)", forma: "sol", frasco: 120, ceaf: true, dose: 10, freq: 4, aviso: "Codeína (lista A2 da Portaria SVS/MS nº 344/1998): confira se a apresentação dispensa a Notificação de Receita A." },
+    { id: "met5", nome: "Metadona", apres: "5 mg comprimido", forma: "cp", ceaf: true, dose: 1, freq: 3, notifA: true },
+    { id: "met10", nome: "Metadona", apres: "10 mg comprimido", forma: "cp", ceaf: true, dose: 1, freq: 3, notifA: true },
+    { id: "mor10", nome: "Morfina", apres: "10 mg comprimido", forma: "cp", ceaf: true, dose: 1, freq: 6, notifA: true },
+    { id: "mor30", nome: "Morfina", apres: "30 mg comprimido", forma: "cp", ceaf: true, dose: 1, freq: 6, notifA: true },
+    { id: "morlp30", nome: "Morfina", apres: "30 mg cápsula de liberação prolongada", forma: "cap", ceaf: true, dose: 1, freq: 2, notifA: true },
+    { id: "morlp60", nome: "Morfina", apres: "60 mg cápsula de liberação prolongada", forma: "cap", ceaf: true, dose: 1, freq: 2, notifA: true },
+    { id: "morlp100", nome: "Morfina", apres: "100 mg cápsula de liberação prolongada", forma: "cap", ceaf: true, dose: 1, freq: 2, notifA: true },
+    { id: "morsol", nome: "Morfina", apres: "10 mg/mL solução oral (frasco 60 mL)", forma: "sol", frasco: 60, ceaf: true, dose: 1, freq: 6, notifA: true },
+    { id: "ami25", nome: "Amitriptilina", apres: "25 mg comprimido", forma: "cp", ceaf: false, dose: 1, freq: 1, hor: "noite" },
+    { id: "nor25", nome: "Nortriptilina", apres: "25 mg cápsula", forma: "cap", ceaf: false, dose: 1, freq: 1, hor: "noite" },
+    { id: "cbzd200", nome: "Carbamazepina", apres: "200 mg comprimido", forma: "cp", ceaf: false, dose: 1, freq: 2 },
+    { id: "dip500", nome: "Dipirona", apres: "500 mg comprimido", forma: "cp", ceaf: false, ctrl: false, dose: 1, freq: 4 },
+    { id: "par500", nome: "Paracetamol", apres: "500 mg comprimido", forma: "cp", ceaf: false, ctrl: false, dose: 1, freq: 4 }
+  ],
+  ela: [
+    { id: "ril50", nome: "Riluzol", apres: "50 mg comprimido", forma: "cp", ceaf: true, ctrl: false, dose: 1, freq: 2, extra: "1 hora antes ou 2 horas após as refeições" }
+  ],
+  espasticidade: [
+    { id: "etba100", nome: "Toxina botulínica tipo A", apres: "100 U frasco-ampola", forma: "out", un: ["frasco-ampola", "frascos-ampola"], via: "intramuscular", qtd: 1, cada: 3, ceaf: true, ctrl: false, poso: "Aplicar por via intramuscular, nos músculos definidos no plano de aplicação, a cada 3 meses (intervalo mínimo entre aplicações)." },
+    { id: "etba500", nome: "Toxina botulínica tipo A", apres: "500 U frasco-ampola", forma: "out", un: ["frasco-ampola", "frascos-ampola"], via: "intramuscular", qtd: 1, cada: 3, ceaf: true, ctrl: false, poso: "Aplicar por via intramuscular, nos músculos definidos no plano de aplicação, a cada 3 meses (intervalo mínimo entre aplicações)." }
+  ],
+  miastenia: [
+    { id: "pir60", nome: "Piridostigmina", apres: "60 mg comprimido", forma: "cp", ceaf: true, ctrl: false, dose: 1, freq: 4 },
+    { id: "aza50", nome: "Azatioprina", apres: "50 mg comprimido", forma: "cp", ceaf: true, ctrl: false, dose: 1, freq: 1, hor: "manha" },
+    { id: "csa10", nome: "Ciclosporina", apres: "10 mg cápsula", forma: "cap", ceaf: true, ctrl: false, dose: 1, freq: 2 },
+    { id: "csa25", nome: "Ciclosporina", apres: "25 mg cápsula", forma: "cap", ceaf: true, ctrl: false, dose: 1, freq: 2 },
+    { id: "csa50", nome: "Ciclosporina", apres: "50 mg cápsula", forma: "cap", ceaf: true, ctrl: false, dose: 1, freq: 2 },
+    { id: "csa100", nome: "Ciclosporina", apres: "100 mg cápsula", forma: "cap", ceaf: true, ctrl: false, dose: 1, freq: 2 },
+    { id: "csasol", nome: "Ciclosporina", apres: "100 mg/mL solução oral (frasco 50 mL)", forma: "sol", frasco: 50, ceaf: true, ctrl: false, dose: 1, freq: 2 },
+    { id: "igiv5", nome: "Imunoglobulina humana", apres: "5 g frasco-ampola", forma: "out", un: ["frasco-ampola", "frascos-ampola"], via: "intravenoso", qtd: 1, ceaf: true, ctrl: false, poso: "Administrar por via intravenosa, dose total de até 2 g/kg, dividida em 2 a 5 dias, conforme prescrição.", aviso: "Ajuste a quantidade de frascos ao peso do paciente e à dose total prescrita." },
+    { id: "pred20", nome: "Prednisona", apres: "20 mg comprimido", forma: "cp", ceaf: false, ctrl: false, dose: 1, freq: 1, hor: "manha" },
+    { id: "pred5", nome: "Prednisona", apres: "5 mg comprimido", forma: "cp", ceaf: false, ctrl: false, dose: 1, freq: 1, hor: "manha" }
+  ],
+  osteoporose: [
+    { id: "ris35", nome: "Risedronato sódico", apres: "35 mg comprimido", forma: "out", un: ["comprimido", "comprimidos"], via: "oral", qtd: 4, ceaf: true, ctrl: false, poso: "Tomar 1 comprimido uma vez por semana, em jejum, com um copo de água, pelo menos 30 minutos antes da primeira refeição e de outros medicamentos. Permanecer sentado ou em pé por 30 minutos após a tomada." },
+    { id: "ral60", nome: "Raloxifeno", apres: "60 mg comprimido", forma: "cp", ceaf: true, ctrl: false, dose: 1, freq: 1 },
+    { id: "ctri025", nome: "Calcitriol", apres: "0,25 mcg cápsula", forma: "cap", ceaf: true, ctrl: false, dose: 1, freq: 2 },
+    { id: "ctn200", nome: "Calcitonina", apres: "200 UI/dose solução nasal (frasco)", forma: "out", un: ["frasco", "frascos"], via: "nasal", qtd: 1, ceaf: true, ctrl: false, poso: "Aplicar 400 UI por dia por via intranasal (1 dose de 200 UI em cada narina, 1 vez ao dia).", aviso: "Confira o número de doses por frasco para acertar a quantidade mensal." },
+    { id: "zol5", nome: "Ácido zoledrônico", apres: "5 mg/100 mL solução para infusão (frasco)", forma: "out", un: ["frasco", "frascos"], via: "intravenoso", qtd: 1, cada: 12, ceaf: true, ctrl: false, poso: "Aplicar 5 mg por via intravenosa, em infusão de no mínimo 15 minutos, uma vez ao ano." },
+    { id: "pam60", nome: "Pamidronato", apres: "60 mg pó para solução injetável (frasco-ampola)", forma: "out", un: ["frasco-ampola", "frascos-ampola"], via: "intravenoso", qtd: 1, cada: 3, ceaf: true, ctrl: false, poso: "Aplicar 60 mg por via intravenosa, diluídos em 500 mL de soro fisiológico, em infusão de no mínimo 2 horas, a cada 3 meses." },
+    { id: "romo", nome: "Romosozumabe", apres: "90 mg/mL solução injetável (seringa preenchida)", forma: "out", un: ["seringa preenchida", "seringas preenchidas"], via: "subcutâneo", qtd: 2, ceaf: true, ctrl: false, poso: "Aplicar 210 mg por via subcutânea uma vez por mês, por 12 meses, com suplementação de cálcio e vitamina D." },
+    { id: "ale70", nome: "Alendronato de sódio", apres: "70 mg comprimido", forma: "out", un: ["comprimido", "comprimidos"], via: "oral", qtd: 4, ceaf: false, ctrl: false, poso: "Tomar 1 comprimido uma vez por semana, em jejum, com um copo de água (200 mL), pelo menos 30 minutos antes da primeira refeição e de outros medicamentos. Permanecer sentado ou em pé por 30 a 60 minutos após a tomada." },
+    { id: "cacd", nome: "Carbonato de cálcio + colecalciferol", apres: "1.250 mg + 400 UI comprimido", forma: "cp", ceaf: false, ctrl: false, dose: 1, freq: 2, ter: ["Carbonato de cálcio", "Colecalciferol (vitamina D)"] },
+    { id: "cac", nome: "Carbonato de cálcio", apres: "1.250 mg comprimido (500 mg de cálcio elementar)", forma: "cp", ceaf: false, ctrl: false, dose: 1, freq: 2 }
+  ],
   alzheimer: [
     { id: "donep5", nome: "Donepezila", apres: "5 mg comprimido", forma: "cp", ceaf: true, dose: 1, freq: 1, hor: "noite" },
     { id: "donep10", nome: "Donepezila", apres: "10 mg comprimido", forma: "cp", ceaf: true, dose: 1, freq: 1, hor: "noite" },
@@ -638,6 +741,37 @@ const HORARIOS = {
 
 // Exames por doença e fase. Cada item: [texto, marcadoPorPadrao]
 const EXAMES = {
+  distonia: { primeira: [], renovacao: [] },
+  dor: {
+    primeira: [
+      ["Hemograma completo", false], ["Creatinina", false], ["Ureia", false], ["TGO (AST)", false], ["TGP (ALT)", false],
+      ["Sódio", false], ["Potássio", false], ["Colesterol total e frações", false], ["Triglicerídeos", false]
+    ],
+    renovacao: [
+      ["Hemograma completo", false], ["Creatinina", false], ["Ureia", false], ["TGO (AST)", false], ["TGP (ALT)", false],
+      ["Sódio", false], ["Potássio", false], ["Colesterol total e frações", false], ["Triglicerídeos", false]
+    ]
+  },
+  ela: {
+    primeira: [["Hemograma completo com plaquetas", true], ["TGO (AST)", true], ["TGP (ALT)", true], ["Eletroneuromiografia", false]],
+    renovacao: [["Hemograma completo com plaquetas", true], ["TGO (AST)", true], ["TGP (ALT)", true]]
+  },
+  espasticidade: { primeira: [], renovacao: [] },
+  miastenia: {
+    primeira: [
+      ["Dosagem de anticorpo antirreceptor de acetilcolina", true], ["Eletroneuromiografia com estimulação repetitiva", true],
+      ["Dosagem de anticorpo anti-MuSK", false], ["Tomografia computadorizada de tórax (avaliação do timo)", false]
+    ],
+    renovacao: []
+  },
+  osteoporose: {
+    primeira: [
+      ["Densitometria óssea (coluna lombar e fêmur)", true], ["Cálcio", true], ["Fósforo", true], ["Creatinina", true], ["Fosfatase alcalina", true],
+      ["25-hidroxivitamina D", true], ["Paratormônio (PTH)", true], ["Albumina", false], ["Hemograma completo", false], ["VHS", false],
+      ["TSH", false], ["T4 livre", false], ["Calciúria de 24 horas", false], ["Radiografia de coluna torácica e lombar (perfil)", false]
+    ],
+    renovacao: [["Densitometria óssea (coluna lombar e fêmur)", false], ["Cálcio", false], ["25-hidroxivitamina D", false], ["Creatinina", false]]
+  },
   alzheimer: {
     primeira: [
       ["Hemograma completo", true], ["Sódio", true], ["Potássio", true], ["Cálcio", true], ["Glicemia de jejum", true],
@@ -675,11 +809,127 @@ const EXAMES = {
 const EXAMES_POR_FARMACO = [
   { match: /^Clozapina/, exame: "Hemograma completo com contagem diferencial (controle de clozapina)" },
   { match: /^Entacapona/, exame: "TGO (AST) e TGP (ALT) (controle de entacapona)" },
-  { match: /^Vigabatrina/, exame: "Campimetria visual computadorizada (controle de vigabatrina)" }
+  { match: /^Vigabatrina/, exame: "Campimetria visual computadorizada (controle de vigabatrina)" },
+  { match: /^Azatioprina/, exame: "Hemograma completo, TGO (AST) e TGP (ALT) (controle de azatioprina)" },
+  { match: /^Ciclosporina/, exame: "Creatinina e dosagem sérica de ciclosporina (controle de ciclosporina)" },
+  { match: /^Imunoglobulina/, exame: "Creatinina e dosagem de IgA sérica (antes da imunoglobulina)" },
+  { match: /^Prednisona/, exame: "Glicemia de jejum (controle de prednisona)" },
+  { match: /^(Ácido zoledrônico|Pamidronato)/, exame: "Creatinina e cálcio (antes do bisfosfonato intravenoso)" },
+  { match: /^Romosozumabe/, exame: "Cálcio (antes do romosozumabe)" }
 ];
 
 // ===== Termos de Esclarecimento e Responsabilidade (texto conforme PCDT) =====
 const TER = {
+  distonia: {
+    titulo: "TOXINA BOTULÍNICA TIPO A",
+    doenca: "a distonia e do espasmo hemifacial",
+    farmacosFrase: "toxina botulínica tipo A",
+    indicados: "indicada",
+    beneficios: ["Diminuição da frequência e intensidade dos espasmos (contração involuntária do músculo);", "Diminuição da dor ou do desconforto ocasionados pelas contrações;", "Melhora da atividade funcional e da qualidade de vida."],
+    riscosIntro: "Fui também claramente informado(a) a respeito das seguintes contraindicações, potenciais efeitos adversos e riscos:",
+    riscos: [
+      "Não se sabe ao certo os riscos do uso deste medicamento na gravidez; portanto, caso engravide, devo avisar imediatamente ao meu médico.",
+      "O principal efeito desagradável é dor no local de aplicação da injeção.",
+      "Os efeitos adversos variam de acordo com o local de aplicação. Os mais relatados nas distonias são tontura, fraqueza geral, cansaço, sonolência, mal-estar geral, dificuldade para engolir, náusea, boca seca, dor de cabeça e irritabilidade; no blefaroespasmo (espasmo de pálpebra) e no espasmo hemifacial, são irritação nos olhos, lacrimejamento, relaxamento e inchaço da pálpebra, visão turva e tonturas."
+    ],
+    extra: "Conforme a marca comercial utilizada, a dose da toxina botulínica pode ser ajustada, e devo procurar orientação do médico ou farmacêutico em caso de dúvida.",
+    opcoes: ["Toxina botulínica tipo A"]
+  },
+  dor: {
+    titulo: "ÁCIDO ACETILSALICÍLICO, ÁCIDO VALPROICO OU VALPROATO DE SÓDIO, CARBAMAZEPINA, AMITRIPTILINA, CLOMIPRAMINA, METADONA, NORTRIPTILINA, DIPIRONA, FENITOÍNA, CODEÍNA, GABAPENTINA, IBUPROFENO, NAPROXENO, PARACETAMOL, OMEPRAZOL E MORFINA",
+    doenca: "a dor crônica",
+    farmacosFrase: "ácido acetilsalicílico, ácido valproico ou valproato de sódio, carbamazepina, cloridrato de amitriptilina, cloridrato de clomipramina, cloridrato de metadona, cloridrato de nortriptilina, dipirona, fenitoína, fosfato de codeína, gabapentina, ibuprofeno, naproxeno, paracetamol, omeprazol e sulfato de morfina",
+    beneficios: ["Alívio da dor;", "Melhora da qualidade de vida."],
+    riscosIntro: "Fui também claramente informado(a) a respeito das seguintes contraindicações, potenciais eventos adversos e riscos de uso do medicamento:",
+    riscos: [
+      "Ácido acetilsalicílico: contraindicado em história de asma induzida por salicilatos, úlceras gastrintestinais agudas, diátese hemorrágica, insuficiência renal, hepática ou cardíaca graves e no último trimestre da gravidez. Eventos adversos mais comuns: dor abdominal, azia, náusea, vômitos, úlcera e perfuração gastroduodenal, hemorragia gastrintestinal, tontura, zumbido, aumento do risco de sangramento e reações alérgicas.",
+      "Ácido valproico ou valproato de sódio: contraindicado em doença ou disfunção hepática significativa, doenças mitocondriais por mutação da POLG, distúrbio do ciclo da ureia, porfiria e gravidez (alto potencial teratogênico). Eventos adversos mais comuns: sonolência, cansaço, tremor, alterações da função do fígado, diminuição das plaquetas, ganho de peso e queda de cabelos.",
+      "Carbamazepina: contraindicada em bloqueio atrioventricular, depressão da medula óssea, porfirias hepáticas e uso com inibidores da MAO. Eventos adversos mais comuns: vermelhidão da pele, sonolência, ganho de peso, diarreia, náusea, vômitos, problemas para caminhar, mudanças de humor, tremor, transtorno de memória, visão dupla e impotência.",
+      "Amitriptilina: contraindicada com inibidores da MAO, com cisaprida, na recuperação aguda de infarto do miocárdio e na gravidez. Eventos adversos mais comuns: sonolência, fraqueza ou cansaço, tontura, zumbido, dor de cabeça, boca seca, prisão de ventre, ganho de peso, taquicardia ou crises hipertensivas e alteração no paladar.",
+      "Clomipramina: contraindicada com inibidores da MAO (até 14 dias antes ou depois), infarto do miocárdio recente e síndrome congênita do QT prolongado. Eventos adversos mais comuns: taquicardia, palpitações, hipotensão ortostática, sonolência, cansaço, tontura, aumento do apetite, boca seca, constipação, visão borrada, tremores, dor de cabeça, náusea, transpiração, ganho de peso e dificuldades sexuais.",
+      "Metadona: contraindicada em insuficiência respiratória grave. Eventos adversos mais comuns: dificuldade para respirar, delírio, tontura, náusea, vômitos e suor excessivo.",
+      "Nortriptilina: contraindicada com inibidores da MAO (até 14 dias antes ou depois) e na recuperação aguda de infarto do miocárdio. Eventos adversos mais comuns: hipotensão ortostática, taquicardia, boca seca, confusão mental, ansiedade, insônia, tremores, convulsões, visão embaçada, dificuldade para urinar, náusea, constipação ou diarreia, sonolência, dor de cabeça e arritmias.",
+      "Dipirona: contraindicada em doenças da medula óssea ou do sistema hematopoiético, broncoespasmo ou reações anafilactoides a analgésicos, porfiria hepática aguda intermitente, deficiência de G6PD, gravidez, lactação e em menores de 3 meses ou com menos de 5 kg. Eventos adversos mais comuns: dor no estômago ou intestino, má digestão, diarreia, urina avermelhada, arritmia, urticária, reações alérgicas e queda da pressão arterial.",
+      "Fenitoína: contraindicada em pacientes com reações intensas a ela ou a outras hidantoínas. Eventos adversos mais comuns: incoordenação, sonolência, aumento do volume e sangramento das gengivas e crescimento de pelos no corpo e na face.",
+      "Codeína: contraindicada em diarreia associada a colite pseudomembranosa ou causada por envenenamento e em dependência de drogas (incluindo alcoolismo). Eventos adversos mais comuns: sonolência, constipação, náusea e vômitos nas primeiras doses, reações alérgicas, dificuldade de respirar, confusão mental, visão dupla ou nublada, boca seca, perda de apetite e dificuldade para urinar.",
+      "Gabapentina: contraindicada em hipersensibilidade ao fármaco e na gravidez. Eventos adversos mais comuns: aumento do apetite, ganho de peso, tontura, incoordenação, dor de cabeça, tremor, cansaço, náusea e comportamento agressivo (em crianças).",
+      "Ibuprofeno: contraindicado em úlcera péptica ativa ou sangramento gastrintestinal, com bebidas alcoólicas, em menores de 6 meses e no terceiro trimestre da gravidez. Eventos adversos mais comuns: tontura, rash cutâneo, dor epigástrica e náuseas.",
+      "Naproxeno: contraindicado em hipersensibilidade ao naproxeno, asma, rinite, pólipos nasais ou urticária por ácido acetilsalicílico ou outros anti-inflamatórios, insuficiência cardíaca grave, sangramento ou úlcera péptica ativos ou recorrentes e depuração de creatinina inferior a 30 mL/min.",
+      "Omeprazol: dor de cabeça, diarreia, prisão de ventre, dor abdominal, náusea, vômitos, flatulência, alergia, alterações no sangue, diminuição do sódio e do magnésio, insônia, agitação, alteração no paladar, vertigem, alteração na visão e boca seca.",
+      "Paracetamol: contraindicado em hipersensibilidade ao fármaco. Eventos adversos mais comuns: náusea, vômitos, prisão de ventre, coceira ou vermelhidão no corpo e reações alérgicas.",
+      "Morfina: contraindicada na gravidez, insuficiência respiratória, hipertensão intracraniana e insuficiência renal e hepática. Eventos adversos mais comuns: sedação (pode durar de 3 a 5 dias), náusea, vômitos, dificuldade de respirar, constipação, confusão mental nos primeiros dias e retenção urinária."
+    ],
+    extra: "Todos os anticonvulsivantes têm um risco pequeno de provocar problemas para o feto se usados durante a gestação; pacientes que pretendem engravidar ou que estão gestantes devem procurar o seu médico. Não se sabe ainda ao certo os riscos do uso de codeína, morfina, metadona, omeprazol e gabapentina na gravidez; portanto, caso engravide, devo avisar imediatamente o médico.",
+    opcoes: ["Ácido acetilsalicílico", "Ácido valproico ou valproato de sódio", "Amitriptilina", "Carbamazepina", "Clomipramina", "Codeína", "Dipirona", "Fenitoína", "Gabapentina", "Ibuprofeno", "Metadona", "Morfina", "Naproxeno", "Nortriptilina", "Omeprazol", "Paracetamol"]
+  },
+  ela: {
+    titulo: "RILUZOL",
+    doenca: "a esclerose lateral amiotrófica",
+    farmacosFrase: "riluzol",
+    indicados: "indicado",
+    beneficios: ["Leve melhora de sintomas da doença;", "Aumento da sobrevida."],
+    riscosIntro: "Fui também claramente informado(a) a respeito das seguintes contraindicações, potenciais efeitos adversos e riscos:",
+    riscos: [
+      "Não se sabe ao certo os riscos do uso deste medicamento na gravidez; portanto, caso engravide, devo avisar imediatamente ao meu médico.",
+      "Os efeitos adversos incluem fraqueza, sono, náuseas, vômitos, diarreia, dor na barriga, formigamentos, alteração nas enzimas do fígado, dor de cabeça, aumento dos batimentos do coração, diminuição das células brancas (diminuição das defesas) e vermelhas (anemia) do sangue.",
+      "Contraindicado em pacientes com hipersensibilidade ao riluzol ou aos componentes da fórmula e naqueles com problemas no fígado."
+    ],
+    opcoes: ["Riluzol"]
+  },
+  espasticidade: {
+    titulo: "TOXINA BOTULÍNICA TIPO A",
+    doenca: "a espasticidade",
+    farmacosFrase: "toxina botulínica tipo A",
+    indicados: "indicada",
+    beneficios: ["Melhora da atividade funcional (locomoção, atividades da vida diária);", "Prevenção de contratura e deformidades nas articulações (juntas);", "Diminuição da dor;", "Facilitação no uso de órteses e na realização dos cuidados de higiene;", "Diminuição da frequência e gravidade dos espasmos;", "Redução do uso de medicamentos antiespásticos;", "Redução do número de procedimentos de reabilitação."],
+    riscosIntro: "Fui também claramente informado(a) a respeito das contraindicações, dos potenciais efeitos adversos e dos riscos a seguir:",
+    riscos: [
+      "Não se sabe ao certo os riscos do uso deste medicamento na gravidez; portanto, caso engravide, devo avisar imediatamente ao meu médico.",
+      "O principal efeito desagradável é dor no local de aplicação da injeção.",
+      "Os efeitos adversos são pouco frequentes. Estima-se que a cada 100 pacientes que recebem o medicamento, apenas três terão algum tipo de reação. Já foram relatados fraqueza, náusea, disfagia, coceira, dor de cabeça, alergias na pele, mal-estar geral, febre e dor no corpo."
+    ],
+    extra: "Fui também informado(a) que este medicamento não tem por objetivo curar a doença que originou a espasticidade. Conforme a marca comercial utilizada, a dose da toxina botulínica pode ser ajustada, e devo procurar orientação do médico ou farmacêutico em caso de dúvida.",
+    opcoes: ["Toxina botulínica tipo A"]
+  },
+  miastenia: {
+    titulo: "AZATIOPRINA, CICLOFOSFAMIDA, CICLOSPORINA, IMUNOGLOBULINA, PIRIDOSTIGMINA E PREDNISONA",
+    doenca: "a miastenia gravis",
+    farmacosFrase: "azatioprina, ciclofosfamida, ciclosporina, imunoglobulina, piridostigmina e prednisona",
+    beneficios: ["Remissão da doença;", "Melhora da força muscular e fadiga;", "Melhora da função respiratória;", "Redução do tempo de internação;", "Prevenção de crises miastênicas."],
+    riscosIntro: "Fui também informado(a) a respeito das seguintes contraindicações, potenciais efeitos adversos e riscos:",
+    riscos: [
+      "Azatioprina e ciclofosfamida: medicamentos classificados como fator de risco D para gestantes (há riscos para o feto durante a gravidez, porém o benefício pode ser maior que o risco). O uso deve ser discutido com seu médico.",
+      "Ciclosporina, imunoglobulina e piridostigmina: medicamentos classificados como fator de risco C para gestantes (o risco para o feto não pode ser descartado, mas um benefício potencial pode ser maior que os riscos). Caso engravide, devo avisar imediatamente ao meu médico.",
+      "Prednisona: medicamento classificado como fator de risco B para gestantes (deve ser prescrito com cautela). Caso engravide, devo avisar imediatamente ao meu médico.",
+      "Efeitos adversos da azatioprina: diminuição das células brancas, vermelhas e plaquetas do sangue, náusea, vômitos, diarreia, dor abdominal, fezes com sangue, problemas no fígado, febre, calafrios, diminuição de apetite, vermelhidão de pele, queda de cabelo, aftas, dores nas juntas, problemas nos olhos (retinopatia), falta de ar e pressão baixa.",
+      "Efeitos adversos da ciclosporina: problemas nos rins e no fígado, tremores, aumento de pelos no corpo, hipertensão, crescimento da gengiva, aumento do colesterol e dos triglicerídeos, formigamentos, dor no peito, batimentos rápidos do coração, convulsões, confusão, ansiedade, depressão, fraqueza, dores de cabeça, náusea, vômitos, perda de apetite, sangramentos, inflamação do pâncreas, diminuição das células brancas do sangue, linfoma, toxicidade para os músculos e problemas respiratórios, entre outros.",
+      "Efeitos adversos da imunoglobulina humana: dor de cabeça, calafrios, febre, reações no local de aplicação (dor, coceira e vermelhidão), aumento de creatinina e ureia no sangue e problemas graves nos rins.",
+      "Efeitos adversos da piridostigmina: náusea, vômitos, diarreia, cólicas abdominais, aumento do peristaltismo e das secreções brônquicas, diminuição dos batimentos cardíacos (bradicardia), miose e fraqueza muscular, entre outros.",
+      "Efeitos adversos da prednisona: retenção de líquidos, aumento da pressão arterial, problemas no coração, fraqueza nos músculos, osteoporose, úlceras estomacais, pancreatite, dificuldade de cicatrização de feridas, pele fina e frágil, irregularidades na menstruação e manifestação de diabetes melito.",
+      "Medicamentos podem ser contraindicados em casos de hipersensibilidade (alergia) aos fármacos ou aos componentes da fórmula."
+    ],
+    opcoes: ["Azatioprina", "Ciclofosfamida", "Ciclosporina", "Imunoglobulina humana", "Piridostigmina", "Prednisona"]
+  },
+  osteoporose: {
+    titulo: "ÁCIDO ZOLEDRÔNICO, ALENDRONATO, CALCITONINA, CALCITRIOL, CARBONATO DE CÁLCIO, COLECALCIFEROL, PAMIDRONATO, RALOXIFENO, RISEDRONATO E ROMOSOZUMABE",
+    doenca: "a osteoporose",
+    farmacosFrase: "ácido zoledrônico, alendronato, calcitonina, calcitriol, carbonato de cálcio, colecalciferol, pamidronato, raloxifeno, risedronato e romosozumabe",
+    beneficios: ["Redução de fraturas osteoporóticas;", "Redução das complicações relacionadas a fraturas."],
+    riscosIntro: "Fui também claramente informado(a) a respeito das seguintes contraindicações, potenciais efeitos adversos e riscos:",
+    riscos: [
+      "Os bisfosfonatos orais (alendronato e risedronato) não devem ser usados por quem não consegue ficar sentado ou de pé por 30 minutos após a ingestão com água; a função dos rins deve ser avaliada antes e durante o tratamento; são contraindicados em quem tem cálcio baixo no sangue, na gravidez e na amamentação; caso engravide, devo avisar imediatamente o médico.",
+      "O raloxifeno é contraindicado em quem tem risco de trombose ou embolia; não se pode usar estrógenos ao mesmo tempo. Os estrógenos conjugados são contraindicados em quem tem risco de câncer de mama, de trombose ou de isquemia.",
+      "Calcitriol: náuseas, vômitos, sede aumentada e urina aumentada (por hipercalcemia); menos comuns: dor de cabeça, dor abdominal e manchas na pele.",
+      "Bisfosfonatos orais (alendronato e risedronato): dores abdominais, náusea, diarreia, gases, dor no estômago, depressão, tonturas, insônia, ansiedade, dores nos músculos, câimbras, formigamentos, aumento da pressão arterial, dor no peito, falta de ar, vermelhidão e coceira na pele e infecções em geral.",
+      "Ácido zoledrônico: dores de cabeça, musculares e nas juntas, febre, cansaço, fraqueza, sonolência ou insônia, náuseas, perda do apetite, aumento dos batimentos do coração e da pressão arterial, tonturas, formigamentos, prisão de ventre, aftas, dor no local da aplicação e diminuição das células do sangue (células brancas e plaquetas).",
+      "Raloxifeno: câimbras nas pernas, fogachos, formação de coágulos nas veias profundas das pernas, inchaço, náusea, vômitos, dores abdominais e dor de cabeça.",
+      "Calcitonina: náusea, diarreia, prisão de ventre, gases, dor no estômago, perda de apetite, calorões, aumento da pressão arterial, dor no peito, falta de ar, tonturas, aumento do volume de urina, infecções, sangramento e irritação nasal, crostas no nariz, espirros, reações alérgicas, vermelhidão na pele e fraqueza.",
+      "Pamidronato: febre, cansaço, sonolência ou insônia, náusea, perda do apetite, aumento dos batimentos do coração e da pressão arterial, prisão de ventre, aftas, dor no local da aplicação e diminuição das células do sangue (células brancas e plaquetas).",
+      "Romosozumabe: pode causar hipocalcemia transitória, sendo necessário corrigi-la antes de iniciar o tratamento e suplementar cálcio e vitamina D. Muito comumente: infecção viral do trato respiratório superior e dor nas juntas. Comumente: reações de hipersensibilidade (erupções cutâneas, dermatite ou urticária), dor de cabeça, tosse, dor no pescoço, espasmos musculares, inchaço nas pernas e reações no local da injeção.",
+      "Contraindicação em caso de hipersensibilidade (alergia) aos fármacos ou aos componentes da fórmula; o risco da ocorrência de eventos adversos aumenta com a superdosagem."
+    ],
+    opcoes: ["Ácido zoledrônico", "Alendronato de sódio", "Calcitonina", "Calcitriol", "Carbonato de cálcio", "Colecalciferol (vitamina D)", "Estrogênios conjugados", "Pamidronato", "Raloxifeno", "Risedronato sódico", "Romosozumabe"]
+  },
   alzheimer: {
     titulo: "DONEPEZILA, GALANTAMINA, MEMANTINA E RIVASTIGMINA",
     doenca: "a Doença de Alzheimer",
@@ -927,6 +1177,9 @@ window.DATA = { DEFAULT_CFG, DOENCAS, CATALOGO, HORARIOS, EXAMES, EXAMES_POR_FAR
     return "";
   }
 
+  // "CRM: 107200  |  RQE: 35373  |  Neurologia"
+  function regMedico(cfg) { return [cfg.crm, cfg.rqe, cfg.especialidade].filter(Boolean).join("  |  "); }
+
   function assinaturaBloco(d, cfg, opts = {}) {
     d.gap(opts.gap == null ? 28 : opts.gap);
     d.ensure(40);
@@ -934,12 +1187,12 @@ window.DATA = { DEFAULT_CFG, DOENCAS, CATALOGO, HORARIOS, EXAMES, EXAMES_POR_FAR
     d.page.drawLine({ start: { x, y: d.y }, end: { x: x + w, y: d.y }, thickness: 0.7, color: INK });
     d.y -= 12;
     d.page.drawText(san(cfg.medicoNomeCurto), { x, y: d.y - 2, size: 9.5, font: d.fb, color: INK }); d.y -= 12;
-    d.page.drawText(san(`${cfg.especialidade}  |  ${cfg.crm}  |  ${cfg.rqe}`), { x, y: d.y - 2, size: 8.5, font: d.f, color: GREY }); d.y -= 12;
+    d.page.drawText(san(regMedico(cfg)), { x, y: d.y - 2, size: 8.5, font: d.f, color: GREY }); d.y -= 12;
   }
 
   function cabecalho(d, cfg, titulo) {
     d.text(cfg.medicoNomeCurto, { bold: true, size: 13 });
-    d.text(`${cfg.especialidade}  |  ${cfg.crm}  |  ${cfg.rqe}`, { size: 8.5, color: GREY });
+    d.text(regMedico(cfg), { size: 8.5, color: GREY });
     d.text(`${cfg.endereco}, ${cfg.cidade} - ${cfg.uf}${cfg.telefone ? "  |  " + cfg.telefone : ""}`, { size: 8.5, color: GREY });
     d.gap(4); d.rule(INK); d.gap(6);
     if (titulo) { d.text(titulo, { bold: true, size: 15, after: 8 }); }
@@ -963,8 +1216,8 @@ window.DATA = { DEFAULT_CFG, DOENCAS, CATALOGO, HORARIOS, EXAMES, EXAMES_POR_FAR
       let label = `${m.nome} ${m.apres}`; let size = 9;
       while (f.widthOfTextAtSize(san(label), size) > 305 && size > 6.5) size -= 0.5;
       T(label, 62, rowsY[i] + (9 - size) / 2, size);
-      const q = String(m.qtdMes);
-      colsX.forEach(cx => { const tw = f.widthOfTextAtSize(q, 9); T(q, cx + (18 - tw) / 2, rowsY[i], 9); });
+      const q = String(m.qtdMes), cada = Math.max(1, Number(m.cada) || 1);
+      colsX.forEach((cx, mes) => { if (mes % cada) return; const tw = f.widthOfTextAtSize(q, 9); T(q, cx + (18 - tw) / 2, rowsY[i], 9); });
     });
     T(s.cid, 42, 424, 11); T(s.diagnostico, 108, 424, 11);
     // anamnese: caixa 36..562 x 350..407
@@ -995,11 +1248,12 @@ window.DATA = { DEFAULT_CFG, DOENCAS, CATALOGO, HORARIOS, EXAMES, EXAMES_POR_FAR
     const Ln = (x1, y1, x2, y2, c, th) => page.drawLine({ start: { x: x1, y: y1 }, end: { x: x2, y: y2 }, thickness: th || 0.5, color: c || LINE });
     const wrap = (t, font, size, width) => { const out = []; let cur = ""; for (const w of san(t).split(/\s+/)) { const c = cur ? cur + " " + w : w; if (font.widthOfTextAtSize(c, size) <= width) cur = c; else { if (cur) out.push(cur); cur = w; } } if (cur) out.push(cur); return out; };
     const campo = (rot, x, y, xFim, valor, sz) => { T(rot, x, y, 7, fb, GREY); const lx = x + fb.widthOfTextAtSize(san(rot), 7) + 3; if (valor) T(valor, lx, y, sz || 9); else Ln(lx, y - 1.5, xFim, y - 1.5); };
-    const VIAS = ["1ª VIA: RETENÇÃO DA FARMÁCIA", "2ª VIA: ORIENTAÇÃO AO PACIENTE"];
+    const simples = !!s.simples;
+    const VIAS = simples ? ["1ª VIA: FARMÁCIA", "2ª VIA: PACIENTE"] : ["1ª VIA: RETENÇÃO DA FARMÁCIA", "2ª VIA: ORIENTAÇÃO AO PACIENTE"];
 
     const frente = (top, viaLabel, k, meds, parte, nPartes) => {
       let y = top - 14;
-      const tit = "RECEITA DE CONTROLE ESPECIAL";
+      const tit = simples ? "RECEITUÁRIO" : "RECEITA DE CONTROLE ESPECIAL";
       T(tit, M + (W - fb.widthOfTextAtSize(tit, 11.5)) / 2, y, 11.5, fb); y -= 11;
       let sub = viaLabel;
       T(sub, M + (W - fb.widthOfTextAtSize(san(sub), 7)) / 2, y, 7, fb, GREY); y -= 8;
@@ -1023,11 +1277,12 @@ window.DATA = { DEFAULT_CFG, DOENCAS, CATALOGO, HORARIOS, EXAMES, EXAMES_POR_FAR
 
       // prescrição
       T("PRESCRIÇÃO", M, y, 6.5, fb, GREY); y -= 12;
-      const sigY = top - H + 112;           // linha da assinatura
+      const sigY = top - H + (simples ? 40 : 112);           // linha da assinatura (a receita simples não tem quadro do comprador)
       if (branco) {
         for (let yy = y - 4; yy > sigY + 34; yy -= 17) Ln(M, yy, M + W, yy);
       } else {
-        const cabUso = s.cabecalhoUso || ("Uso oral" + (meds.some(m => m.forma === "ad") ? " / transdérmico" : "") + (meds.some(m => m.forma === "amp") ? " / intramuscular" : "") + ". Uso contínuo.");
+        const vias = [...new Set(meds.map(m => m.via || (m.forma === "ad" ? "transdérmico" : m.forma === "amp" ? "intramuscular" : "oral")))];
+        const cabUso = s.cabecalhoUso || ("Uso " + vias.join(" / ") + ". Uso contínuo.");
         T(cabUso, M, y, 8, fb); y -= 12;
         meds.forEach((m, i) => {
           const nomeLinha = `${i + 1}) ${m.nome}${m.apres ? " " + m.apres : ""}`;
@@ -1058,6 +1313,7 @@ window.DATA = { DEFAULT_CFG, DOENCAS, CATALOGO, HORARIOS, EXAMES, EXAMES_POR_FAR
       const rot = "Identificação e assinatura do prescritor";
       T(rot, aX + (230 - f.widthOfTextAtSize(rot, 6.5)) / 2, sigY - 17, 6.5, f, GREY);
 
+      if (simples) return;
       // comprador
       const bY = top - H + 10; const bH = 70;
       R(M, bY, W, bH);
@@ -1097,12 +1353,16 @@ window.DATA = { DEFAULT_CFG, DOENCAS, CATALOGO, HORARIOS, EXAMES, EXAMES_POR_FAR
     };
 
     // regra: no máximo 3 medicamentos controlados por receita; a partir do 4º, folha adicional
-    const MAX_POR_RECEITA = 3;
-    const grupos = [];
-    const lista = branco ? [] : (s.meds || []);
-    for (let i = 0; i < lista.length; i += MAX_POR_RECEITA) grupos.push(lista.slice(i, i + MAX_POR_RECEITA));
-    if (!grupos.length) grupos.push([]);
-    for (let k = 1; k <= nRec; k++) for (let g = 0; g < grupos.length; g++) {
+    const MAX_POR_RECEITA = simples ? 6 : 3;
+    // medicamentos de aplicação espaçada (toxina a cada 3 meses, ácido zoledrônico anual) só entram nas receitas dos meses de aplicação
+    const todos = branco ? [] : (s.meds || []);
+    const gruposDoMes = (k) => {
+      const lista = todos.filter(m => (k - 1) % Math.max(1, Number(m.cada) || 1) === 0), grupos = [];
+      for (let i = 0; i < lista.length; i += MAX_POR_RECEITA) grupos.push(lista.slice(i, i + MAX_POR_RECEITA));
+      if (!grupos.length && branco) grupos.push([]);
+      return grupos;
+    };
+    for (let k = 1; k <= nRec; k++) { const grupos = gruposDoMes(k); for (let g = 0; g < grupos.length; g++) {
       page = pdf.addPage(A4);
       frente(A4[1] - 6, VIAS[0], k, grupos[g], g + 1, grupos.length);
       page.drawLine({ start: { x: M, y: H }, end: { x: A4[0] - M, y: H }, thickness: 0.6, color: GREY, dashArray: [4, 3] });
@@ -1113,7 +1373,7 @@ window.DATA = { DEFAULT_CFG, DOENCAS, CATALOGO, HORARIOS, EXAMES, EXAMES_POR_FAR
         page.drawLine({ start: { x: M, y: H }, end: { x: A4[0] - M, y: H }, thickness: 0.6, color: GREY, dashArray: [4, 3] });
         verso(H - 6);
       }
-    }
+    } }
     return pdf;
   }
 
@@ -1213,7 +1473,7 @@ window.DATA = { DEFAULT_CFG, DOENCAS, CATALOGO, HORARIOS, EXAMES, EXAMES_POR_FAR
     d.text("TERMO DE ESCLARECIMENTO E RESPONSABILIDADE", { bold: true, size: 12, align: "center", after: 2 });
     d.text(t.titulo, { bold: true, size: 9, align: "center", after: 10 });
     const p = (txt, o) => { const q = Object.assign({ size: 9.5, lh: 12.5, after: 5 }, o || {}); q.size *= sc; q.lh = (q.lh || q.size * 1.35) * sc; q.after *= sc; return d.text(txt, q); };
-    p(`Eu, ${s.paciente.nome} (nome do(a) paciente), declaro ter sido informado(a) claramente sobre os benefícios, riscos, contraindicações e principais eventos adversos relacionados ao uso de ${t.farmacosFrase}, indicados para o tratamento d${t.doenca}.`);
+    p(`Eu, ${s.paciente.nome} (nome do(a) paciente), declaro ter sido informado(a) claramente sobre os benefícios, riscos, contraindicações e principais eventos adversos relacionados ao uso de ${t.farmacosFrase}, ${t.indicados || "indicados"} para o tratamento d${t.doenca}.`);
     p(`Os termos médicos foram explicados e todas as dúvidas foram esclarecidas pelo(a) médico(a) ${cfg.medicoNomeCurto}, ${cfg.crm} (nome do(a) médico(a) que prescreve).`);
     p("Assim, declaro que fui claramente informado(a) de que o medicamento que passo a receber pode trazer os seguintes benefícios:", { after: 2 });
     t.beneficios.forEach(b => p(`-  ${b}`, { indent: 10, after: 1 }));
@@ -1223,7 +1483,7 @@ window.DATA = { DEFAULT_CFG, DOENCAS, CATALOGO, HORARIOS, EXAMES, EXAMES_POR_FAR
     p("Estou ciente de que este(s) medicamento(s) somente pode(m) ser utilizado(s) por mim, comprometendo-me a devolvê-lo(s) caso não queira ou não possa utilizá-lo(s) ou se o tratamento for interrompido. Sei também que continuarei a ser atendido(a), inclusive em caso de desistir de usar o(s) medicamento(s).");
     p("Autorizo o Ministério da Saúde e as Secretarias de Saúde a fazerem uso de informações relativas ao meu tratamento, desde que assegurado o anonimato.   (   ) Sim      (   ) Não");
     p("Meu tratamento constará de um ou mais dos seguintes medicamentos:", { after: 2 });
-    const sel = new Set(s.meds.map(m => m.nome.toLowerCase()));
+    const sel = new Set([].concat(...s.meds.map(m => m.ter || [m.nome])).map(n => n.toLowerCase()));
     const opts = t.opcoes; const half = Math.ceil(opts.length / 2);
     for (let i = 0; i < half; i++) {
       const a = opts[i], b = opts[i + half];
@@ -1273,6 +1533,9 @@ try { const c = localStorage.getItem("lme_cfg"); if (c) cfg = Object.assign(cfg,
 
 const st = { doenca: null, fase: null, incapaz: false, trat: false, tratManual: false, anamManual: false, meds: [], exames: [], docs: {} };
 let uidSeq = 1;
+// cópia dos dados do médico para os documentos, com "CRM:" e "RQE:" antes dos números
+function rotuloReg(r, v) { v = String(v || "").trim(); if (!v) return ""; return new RegExp("^" + r + "\\b", "i").test(v) ? v : r + ": " + v; }
+function cfgDoc() { return Object.assign({}, cfg, { crm: rotuloReg("CRM", cfg.crm), rqe: rotuloReg("RQE", cfg.rqe) }); }
 
 // ---------- utilidades de posologia ----------
 function fmtNum(n) {
@@ -1284,6 +1547,7 @@ function fmtNum(n) {
 }
 function unidTomada(m, n) {
   const pl = Number(n) > 1;
+  if (m.un) return pl ? m.un[1] : m.un[0];
   if (m.forma === "cp") return pl ? "comprimidos" : "comprimido";
   if (m.forma === "cap") return pl ? "cápsulas" : "cápsula";
   if (m.forma === "ad") return pl ? "adesivos" : "adesivo";
@@ -1297,6 +1561,7 @@ function textoFreq(m) {
   const f = FREQS.find(x => x[0] === Number(m.freq)); return f ? f[1] : "";
 }
 function gerarPosologia(m) {
+  if (m.forma === "out") return m.poso || "";
   const d = fmtNum(m.dose);
   if (m.forma === "ad") return `Aplicar ${d} ${unidTomada(m, m.dose)} a cada 24 horas${m.hor ? ", " + DATA.HORARIOS[m.hor] : ""}, em pele íntegra, limpa e seca (costas, braço ou tórax), retirando o anterior e alternando o local de aplicação. Uso contínuo.`;
   if (m.forma === "amp") return `Aplicar ${d} ${unidTomada(m, m.dose)} por via intramuscular profunda a cada 4 semanas. Uso contínuo.`;
@@ -1306,6 +1571,7 @@ function gerarPosologia(m) {
   return `Tomar ${d} ${unidTomada(m, m.dose)} ${textoFreq(m)}, ${via}${extra}. Uso contínuo.`;
 }
 function calcQtd(m) {
+  if (m.forma === "out") return Number(m.qtd) || 1;
   const dose = Number(m.dose) || 0, f = m.forma === "ad" ? 1 : (Number(m.freq) || 1);
   if (m.forma === "amp") return Math.max(1, Math.ceil(dose));
   if (m.forma === "sol") { const ml = m.gotas ? dose * f * 30 / 20 : dose * f * 30; return Math.max(1, Math.ceil(ml / (m.frasco || 100))); }
@@ -1314,8 +1580,9 @@ function calcQtd(m) {
 }
 
 // ---------- render: doenças ----------
-const ORDEM = ["alzheimer", "parkinson", "epilepsia", "esquizofrenia"];
-const SUBT = { alzheimer: "MEEM, CDR e escolaridade", parkinson: "G20", epilepsia: "G40.x", esquizofrenia: "F20.8 e BPRS-A" };
+// ordem alfabética das condições
+const ORDEM = ["alzheimer", "distonia", "dor", "epilepsia", "ela", "espasticidade", "esquizofrenia", "miastenia", "osteoporose", "parkinson"];
+const SUBT = { alzheimer: "MEEM, CDR e escolaridade", distonia: "G24.x e G51.x, toxina botulínica", dor: "R52.1 e R52.2", epilepsia: "G40.x", ela: "G12.2, riluzol", espasticidade: "Toxina botulínica", esquizofrenia: "F20.8 e BPRS-A", miastenia: "G70.0 e G70.2", osteoporose: "M80, M81, M82 e M85.8", parkinson: "G20" };
 $("doencas").innerHTML = ORDEM.map(k => `<button type="button" data-v="${k}" aria-pressed="false">${DATA.DOENCAS[k].nome}<small>${SUBT[k]}</small></button>`).join("");
 $("doencas").addEventListener("click", e => { const b = e.target.closest("button"); if (b) selDoenca(b.dataset.v); });
 
@@ -1440,6 +1707,15 @@ function renderMeds() {
   $("medsVazio").hidden = st.meds.length > 0;
   const nLME = st.meds.filter(m => !m.foraLME).length;
   box.innerHTML = st.meds.map(m => {
+    const avisos = (m.notifA ? `<p class="med-aviso">Exige Notificação de Receita A (talonário amarelo da Vigilância Sanitária). Entra no LME, mas a receita não é gerada pelo Neurotools.</p>` : "") + (m.aviso ? `<p class="med-aviso">${esc(m.aviso)}</p>` : "");
+    if (m.forma === "out") return `<div class="med ${m.foraLME ? "fora" : ""}" data-uid="${m.uid}">
+      <div class="med-head"><strong>${esc(m.nome)} ${esc(m.apres)}${m.foraLME ? '<span class="tag grey">só receita</span>' : '<span class="tag">LME</span>'}</strong><button class="x" type="button" data-act="del">Remover</button></div>
+      <div class="row">
+        <label class="f s4">${Number(m.cada) > 1 ? `Qtd. por aplicação (a cada ${m.cada} meses)` : "Qtd./mês"}<input type="number" data-k="qtdMes" min="1" value="${m.qtdMes}"><span class="hint" style="display:block;margin:0">${esc(unidTomada(m, 2))}</span></label>
+      </div>
+      <label class="f">Posologia na receita<textarea data-k="posologia" rows="2">${esc(m.posologia)}</textarea></label>${avisos}
+      <label class="check" style="margin-top:.45rem"><input type="checkbox" data-k="foraLME" ${m.foraLME ? "" : "checked"}> Incluir no LME</label>
+    </div>`;
     const doseUn = m.forma === "sol" ? (m.gotas ? "gotas por tomada" : "mL por tomada") : `${unidTomada(m, 2)} por ${m.forma === "ad" || m.forma === "amp" ? "aplicação" : "tomada"}`;
     const freqSel = (m.forma === "ad" || m.forma === "amp") ? "" : `<label class="f s4">Frequência<select data-k="freq">${FREQS.map(f => `<option value="${f[0]}" ${Number(m.freq) === f[0] ? "selected" : ""}>${f[1]}</option>`).join("")}</select></label>`;
     const horSel = (m.forma === "amp" || (Number(m.freq) !== 1 && m.forma !== "ad")) ? "" : `<label class="f s3">Horário<select data-k="hor"><option value="">Sem horário</option>${Object.entries(DATA.HORARIOS).map(([k, v]) => `<option value="${k}" ${m.hor === k ? "selected" : ""}>${v}</option>`).join("")}</select></label>`;
@@ -1451,7 +1727,7 @@ function renderMeds() {
         ${freqSel}${horSel}
         <label class="f s2">Qtd./mês<input type="number" data-k="qtdMes" min="1" value="${m.qtdMes}"><span class="hint" style="display:block;margin:0">${unQ}</span></label>
       </div>
-      <label class="f">Posologia na receita<textarea data-k="posologia" rows="2">${esc(m.posologia)}</textarea></label>
+      <label class="f">Posologia na receita<textarea data-k="posologia" rows="2">${esc(m.posologia)}</textarea></label>${avisos}
       <label class="check" style="margin-top:.45rem"><input type="checkbox" data-k="foraLME" ${m.foraLME ? "" : "checked"}> Incluir no LME</label>
     </div>`;
   }).join("");
@@ -1517,10 +1793,19 @@ $("exameAdd").addEventListener("click", () => { const t = $("exameNovo").value.t
 $("exameNovo").addEventListener("keydown", e => { if (e.key === "Enter") $("exameAdd").click(); });
 
 // ---------- documentos ----------
+// controlados (Portaria 344) saem em receita de controle especial; os demais, em receituário simples;
+// os que exigem Notificação de Receita A não saem (talonário próprio da Vigilância Sanitária)
+const ehCtrl = (m) => m.ctrl !== false && !m.notifA;
+function rotuloReceitas() {
+  const c = st.meds.some(ehCtrl), sp = st.meds.some(m => m.ctrl === false);
+  if (sp && !c) return "Receitas simples (uma por mês, 2 vias)";
+  if (sp && c) return "Receitas de controle especial e simples (uma por mês, 2 vias)";
+  return "Receitas de controle especial (uma por mês, 2 vias)";
+}
 function montarDocs() {
   if (!st.doenca || !st.fase) { $("docs").innerHTML = `<p class="empty">${!st.doenca ? "Escolha a doença" : "Escolha primeira liberação ou renovação"} para começar.</p>`; return; }
   const temExame = st.exames.some(e => e.on);
-  const lista = [["lme", "Laudo (LME)", true], ["receita", "Receitas de controle especial (uma por mês, 2 vias)", true]];
+  const lista = [["lme", "Laudo (LME)", true], ["receita", rotuloReceitas(), true]];
   if (temExame) lista.push(["exames", "Pedido de exames", true]);
   if (st.doenca === "alzheimer") { lista.push(["meem", "Ficha do MEEM", true]); lista.push(["cdr", "Ficha do CDR", true]); }
   if (st.doenca === "esquizofrenia") lista.push(["bprs", "Ficha da BPRS-A", true]);
@@ -1550,7 +1835,7 @@ function pendencias() {
   if (!$("pNome").value.trim()) f.push("Nome do paciente");
   if (st.docs.lme) { if (!$("pMae").value.trim()) f.push("Nome da mãe"); if (!$("pPeso").value) f.push("Peso"); if (!$("pAltura").value) f.push("Altura"); }
   if (st.incapaz && !$("pResp").value.trim()) f.push("Nome do responsável");
-  if (st.docs.receita) { const c = $("pCpf").value.trim(); if (!c) f.push("CPF ou passaporte do paciente (receita)"); else if (/^[\d.\-\s]+$/.test(c) && c.replace(/\D/g, "").length !== 11) f.push("CPF com 11 dígitos"); }
+  if (st.docs.receita && st.meds.some(m => !m.notifA)) { const c = $("pCpf").value.trim(); if (!c) f.push("CPF ou passaporte do paciente (receita)"); else if (/^[\d.\-\s]+$/.test(c) && c.replace(/\D/g, "").length !== 11) f.push("CPF com 11 dígitos"); }
   if ((st.docs.lme || st.docs.receita) && !st.meds.length) f.push("Ao menos um medicamento");
   if (st.meds.some(m => !m.posologia.trim() || !(m.qtdMes > 0))) f.push("Posologia e quantidade de todos os medicamentos");
   if (st.doenca === "alzheimer") {
@@ -1575,14 +1860,15 @@ function validar() {
 function b64ToBytes(b64) { const bin = atob(b64); const u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
 function montarEstado() {
   return {
-    cfg, doenca: st.doenca, fase: st.fase, nReceitas: Number($("nRec").value) || 1,
+    cfg: cfgDoc(), doenca: st.doenca, fase: st.fase, nReceitas: Number($("nRec").value) || 1,
     paciente: { nome: $("pNome").value.trim(), mae: $("pMae").value.trim(), peso: String($("pPeso").value).replace(".", ","), altura: String($("pAltura").value), endereco: $("pEnd").value.trim(), cpf: $("pCpf").value.trim() },
     cid: $("cid").value, diagnostico: $("diag").value.trim(), pcdt: DATA.DOENCAS[st.doenca].pcdt,
     anamnese: $("anamnese").value.trim(),
     tratPrevio: { sim: st.trat, texto: $("tratTxt").value.trim() },
     incapaz: { sim: st.incapaz, responsavel: $("pResp").value.trim() },
     data: hoje(),
-    meds: st.meds.map(m => ({ nome: m.nome, apres: m.apres, forma: m.forma, qtdMes: m.qtdMes, posologia: m.posologia.trim(), foraLME: m.foraLME })),
+    meds: st.meds.map(m => ({ nome: m.nome, apres: m.apres, forma: m.forma, qtdMes: m.qtdMes, posologia: m.posologia.trim(), foraLME: m.foraLME,
+      ctrl: m.ctrl, notifA: !!m.notifA, cada: m.cada || 1, via: m.via || "", ter: m.ter || null, unidS: m.un ? m.un[0] : undefined, unidP: m.un ? m.un[1] : undefined })),
     exames: st.exames.filter(e => e.on).map(e => e.t),
     meem: lerMeem().total, meemDom: lerMeem().dom || null, cdr: $("cdr").value, bprs: Number($("bprs").value)
   };
@@ -1598,7 +1884,11 @@ $("gerar").addEventListener("click", async () => {
   try {
     const partes = [];
     if (st.docs.lme) partes.push(await genLME(s, b64ToBytes(LME_BASE_B64)));
-    if (st.docs.receita) partes.push(await genReceita(s));
+    if (st.docs.receita) {
+      const ctrl = s.meds.filter(ehCtrl), simples = s.meds.filter(m => m.ctrl === false && !m.notifA);
+      if (ctrl.length) partes.push(await genReceita(Object.assign({}, s, { meds: ctrl })));
+      if (simples.length) partes.push(await genReceita(Object.assign({}, s, { meds: simples, simples: true })));
+    }
     if (st.docs.exames && s.exames.length) partes.push(await genExames(s));
     if (st.docs.meem) partes.push(await genMEEM(s));
     if (st.docs.cdr) partes.push(await genCDR(s));
@@ -1606,7 +1896,7 @@ $("gerar").addEventListener("click", async () => {
     if (st.docs.ter) { const t = await genTER(s); partes.push(t); if (st.docs.terDuas) partes.push(await genTER(s)); }
     const final = await mesclar(partes);
     const bytes = await final.save();
-    const nomeArq = `${DATA.DOENCAS[st.doenca].nome.split(" ").pop()}_${s.paciente.nome.split(" ").slice(0, 2).join("_")}_${s.data.replace(/\//g, "-")}.pdf`.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const nomeArq = `${(NOME_DOENCA[st.doenca] || st.doenca).replace(/\s+/g, "_")}_${s.paciente.nome.split(" ").slice(0, 2).join("_")}_${s.data.replace(/\//g, "-")}.pdf`.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     ultimoArquivo = { nome: nomeArq, bytes };
     mostrarPrevia(bytes, final.getPageCount(), "preview", "status");
     $("limpar").hidden = false;
@@ -1976,7 +2266,7 @@ $("rGerar").addEventListener("click", async () => {
   try {
     const n = Number($("rN").value) || 1;
     const s = {
-      cfg, nReceitas: n, data: isoParaBR($("rData").value),
+      cfg: cfgDoc(), nReceitas: n, data: isoParaBR($("rData").value),
       paciente: { nome: $("rNome").value.trim(), cpf: $("rSemCpf").checked ? "" : $("rCpf").value.trim(), endereco: $("rEnd").value.trim() },
       cabecalhoUso: $("rVia").value + "." + ($("rContinuo").checked ? " Uso contínuo." : ""), obs: $("rObs").value.trim(),
       meds: rMeds.map(m => ({ nome: m.nome.trim(), apres: "", forma: "", qtdMes: Number(m.qtd) || 0, unidS: UNIDS[m.unid][0], unidP: UNIDS[m.unid][1], posologia: m.posologia.trim() }))
@@ -1997,7 +2287,7 @@ $("bGerar").addEventListener("click", async () => {
   const status = $("bStatus"); status.className = "status"; status.textContent = "Gerando talonário...";
   try {
     const n = Math.min(100, Math.max(1, Number($("bFolhas").value) || 1));
-    const pdf = await genReceita({ cfg, branco: true, nReceitas: n });
+    const pdf = await genReceita({ cfg: cfgDoc(), branco: true, nReceitas: n });
     const bytes = await pdf.save();
     ultimoArquivo = { nome: `Receita_Controle_Especial_em_branco_${n}_folhas.pdf`, bytes };
     mostrarPrevia(bytes, pdf.getPageCount(), "rPreview", "bStatus");
@@ -2017,7 +2307,7 @@ $("rLimpar").addEventListener("click", () => {
 const arq = { db: null, uid: null, col: null, pacs: new Map(), pronto: false, falha: "" };
 const normNome = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase().replace(/\s+/g, " ").trim();
 const chaveNome = (s) => normNome(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 120) || "sem-nome";
-const NOME_DOENCA = { alzheimer: "Alzheimer", parkinson: "Parkinson", epilepsia: "Epilepsia", esquizofrenia: "Esquizofrenia" };
+const NOME_DOENCA = { alzheimer: "Alzheimer", distonia: "Distonia", dor: "Dor crônica", epilepsia: "Epilepsia", ela: "ELA", espasticidade: "Espasticidade", esquizofrenia: "Esquizofrenia", miastenia: "Miastenia", osteoporose: "Osteoporose", parkinson: "Parkinson" };
 function brParaDate(br) { const [d, m, y] = String(br).split("/").map(Number); return new Date(y, m - 1, d); }
 function vencida(br) { if (!br) return false; const hj = new Date(); hj.setHours(0, 0, 0, 0); return brParaDate(br) <= hj; }
 

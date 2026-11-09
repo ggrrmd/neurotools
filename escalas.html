@@ -115,6 +115,9 @@ table.tb{width:100%;border-collapse:collapse;font-size:13.5px;margin:4px 0}
 @media print{.acoes{display:none}.res{position:static;box-shadow:none}}
 </style></head>
 <body><div id="app"><div class="vazio">Escolha uma escala no menu.</div></div><div id="toast" role="status" aria-live="polite" hidden></div>
+<script>/* CRM e RQE com rótulo nos documentos: "107200" -> "CRM: 107200" */
+function rotuloReg(r, v) { v = String(v || '').trim(); if (!v) return ''; return new RegExp('^' + r + '\\b', 'i').test(v) ? v : r + ': ' + v; }
+</script>
 <script>/* Motor das escalas do Neurotools.
    Cada escala é registrada com NT.def({...}) e tem três formas:
    - tipo "pontos": itens com opções pontuadas, total e interpretação automáticos;
@@ -1420,6 +1423,71 @@ table.tb{width:100%;border-collapse:collapse;font-size:13.5px;margin:4px 0}
     },
     refs: ['Guy W. ECDEU Assessment Manual for Psychopharmacology. Rockville: US Department of Health, Education, and Welfare; 1976. p. 534-7.', 'Schooler NR, Kane JM. Research diagnoses for tardive dyskinesia. Arch Gen Psychiatry. 1982;39(4):486-7.']
   });
+
+  // ---------- Antipsicóticos: bloqueio D2 e risco de parkinsonismo ----------
+  // [fármaco, classe, Ki D2 (nM), risco, dose usual adulto (psicose), dose de menor risco (idoso, demência), observações, grau 0-5]
+  var APS = [
+    ['Flufenazina', 'Típico, alta potência', '~0,5', 'Muito alto', '2,5-10 mg/dia', '0,5-2,5 mg/dia', 'Depot com risco cumulativo', 5],
+    ['Haloperidol', 'Típico, alta potência', '~1', 'Muito alto', '2-10 mg/dia', '0,25-2 mg/dia', 'Ocupação D2 de ~80% já com 4-5 mg; evitar em DP e DCL', 5],
+    ['Pimozida', 'Típico, alta potência', '~1-3', 'Alto', '1-4 mg/dia (Tourette até 10 mg)', '0,5-2 mg/dia', 'Prolonga QT; interação com inibidores da CYP3A4', 4],
+    ['Trifluoperazina', 'Típico, alta potência', '~1-2', 'Alto', '5-20 mg/dia', '1-5 mg/dia', '', 4],
+    ['Perfenazina', 'Típico, média potência', '~0,5-1', 'Alto', '8-32 mg/dia', '2-8 mg/dia', 'No CATIE, risco de parkinsonismo próximo ao dos atípicos em dose moderada', 4],
+    ['Zuclopentixol', 'Típico, média potência', '~1-2', 'Alto', '10-50 mg/dia', 'Evitar', 'Formulação acetato para agitação aguda', 4],
+    ['Clorpromazina', 'Típico, baixa potência', '~2-10', 'Moderado', '200-600 mg/dia', '25-100 mg/dia', 'Anticolinérgico e alfa-1: hipotensão, sedação, delirium', 3],
+    ['Levomepromazina', 'Típico, baixa potência', '~5-10', 'Moderado', '25-200 mg/dia', '3-25 mg/dia (gotas)', 'Muito sedativa; hipotensão postural importante', 3],
+    ['Risperidona', 'Atípico', '~3', 'Moderado a alto, dependente de dose', '2-6 mg/dia', '0,25-1 mg/dia', 'Acima de 4-6 mg/dia comporta-se como típico', 3],
+    ['Paliperidona', 'Atípico', '~4', 'Moderado a alto', '3-12 mg/dia (usual 6 mg)', '3 mg/dia', 'Excreção renal; ajustar na DRC', 3],
+    ['Amissulprida', 'Atípico (benzamida)', '~2-3', 'Moderado a alto em dose alta', '400-800 mg/dia (sintomas positivos)', '25-100 mg/dia', 'Em dose baixa bloqueia D2/D3 pré-sináptico; renal; QT', 3],
+    ['Sulpirida', 'Típico/atípico (benzamida)', '~10-20', 'Moderado', '200-800 mg/dia', '50-200 mg/dia', 'Causa frequente de parkinsonismo iatrogênico não reconhecido', 3],
+    ['Lurasidona', 'Atípico', '~1', 'Moderado (acatisia frequente)', '40-160 mg/dia', '20-40 mg/dia', 'Tomar com refeição de pelo menos 350 kcal', 3],
+    ['Cariprazina', 'Atípico (agonista parcial D3/D2)', '~0,5 (D2)', 'Moderado (acatisia)', '1,5-6 mg/dia', '1,5 mg/dia', 'Metabólito de meia-vida muito longa; efeito tardio', 3],
+    ['Ziprasidona', 'Atípico', '~4', 'Baixo a moderado', '40-160 mg/dia', '20-40 mg/dia', 'Tomar com alimento; QT', 2],
+    ['Asenapina', 'Atípico', '~1,3', 'Baixo a moderado', '10-20 mg/dia (sublingual)', '5 mg/dia', '', 2],
+    ['Aripiprazol', 'Atípico (agonista parcial D2)', '~0,3-0,7', 'Baixo a moderado; acatisia frequente', '10-30 mg/dia', '2-10 mg/dia', 'A alta afinidade D2 é enganosa (agonismo parcial); parkinsonismo descrito em idosos', 2],
+    ['Brexpiprazol', 'Atípico (agonista parcial D2)', '~0,3', 'Baixo a moderado', '2-4 mg/dia', '1-3 mg/dia (agitação na DA)', 'Menos acatisia que o aripiprazol', 2],
+    ['Olanzapina', 'Atípico', '~11-30', 'Baixo, dependente de dose', '10-20 mg/dia', '2,5-5 mg/dia', 'Parkinsonismo relevante acima de 20 mg/dia; piora a DP; metabólico e anticolinérgico', 2],
+    ['Quetiapina', 'Atípico', '~160-500', 'Muito baixo', '300-800 mg/dia', '12,5-100 mg/dia', 'Fast-off; eficácia antipsicótica na DP é fraca, mas é bem tolerada', 1],
+    ['Clozapina', 'Atípico', '~125-180', 'Mínimo', '300-450 mg/dia (até 900 mg)', '6,25-50 mg/dia na psicose da DP', 'Única com eficácia comprovada na psicose da DP; hemograma (agranulocitose)', 1],
+    ['Pimavanserina', 'Agonista inverso 5-HT2A', 'Sem afinidade D2', 'Nulo', '34 mg/dia', '34 mg/dia', 'Aprovada pelo FDA para psicose na DP; sem registro na ANVISA', 0]
+  ];
+  var COR_AP = ['g1', 'g1', 'g2', 'g3', 'g4', 'g4'];
+  NT.def({
+    id: 'antipsic', area: A, nome: 'Antipsicóticos: bloqueio D2 e parkinsonismo', alias: 'antipsicotico neuroleptico bloqueio d2 dopamina parkinsonismo iatrogenico induzido droga haloperidol risperidona quetiapina clozapina pimavanserina afinidade ki ocupacao demencia lewy',
+    sub: 'Tabela de consulta ordenada do maior para o menor risco de parkinsonismo, com doses usuais e doses de menor risco no idoso e na demência.',
+    semPlacar: true,
+    render: function (c, st, k) {
+      c.appendChild(k.card('Como ler a tabela', null, [
+        el('p', { class: 'dica', html: '<b>Afinidade D2 (Ki):</b> quanto menor o valor, mais forte a ligação ao receptor. Os valores variam entre estudos e servem como ordem de grandeza.' }),
+        el('p', { class: 'dica', html: '<b>Ki e risco clínico não coincidem.</b> O risco de parkinsonismo depende também da <b>ocupação D2 estriatal</b> (efeito antipsicótico em torno de 65%; parkinsonismo acima de cerca de 78-80%), da <b>velocidade de dissociação do receptor</b> (fármacos "fast-off", como quetiapina e clozapina, causam menos parkinsonismo) e de <b>ações associadas</b> (antagonismo 5-HT2A, efeito anticolinérgico intrínseco e agonismo parcial reduzem o risco).' })
+      ]));
+      c.appendChild(k.card('Escolher um fármaco', 'Opcional: mostra o resumo do fármaco na barra abaixo, para copiar.', [k.campos([k.sel('f', 'Fármaco', APS.map(function (a) { return [a[0], a[0]]; }), { largo: true })])]));
+      var tb = el('table', { class: 'tb' }, [el('tr', null, ['Fármaco', 'Classe', 'Ki D2 (nM)', 'Risco de parkinsonismo', 'Dose usual adulto (psicose)', 'Dose de menor risco (idoso, demência)', 'Observações'].map(function (t) { return el('th', { text: t }); }))]
+        .concat(APS.map(function (a) { return el('tr', null, [el('td', null, [el('b', { text: a[0] })]), el('td', { text: a[1] }), el('td', { text: a[2] }), el('td', null, [el('span', { class: 'grau ' + COR_AP[a[7]], text: a[3] })]), el('td', { text: a[4] }), el('td', { text: a[5] }), el('td', { text: a[6] })]); })));
+      c.appendChild(k.card('Tabela', null, [el('div', { style: 'overflow-x:auto' }, [tb])]));
+      c.appendChild(k.card('Pontos práticos', null, [el('ul', { class: 'dica', style: 'padding-left:18px;margin:0' }, [
+        el('li', { html: '<b>Doença de Parkinson e demência com corpos de Lewy:</b> usar apenas clozapina, quetiapina ou pimavanserina (onde disponível). Na DCL, a sensibilidade a neurolépticos pode ser grave, até com risperidona e aripiprazol em dose baixa.' }),
+        el('li', { html: '<b>Demência em geral:</b> todos os antipsicóticos aumentam a mortalidade e o risco de AVC (alerta do FDA). Na doença de Alzheimer, as evidências mais consistentes são de risperidona 0,5-1 mg/dia e de brexpiprazol (aprovação específica do FDA para agitação). Usar pelo menor tempo possível e tentar a retirada periodicamente.' }),
+        el('li', { html: '<b>Bloqueadores D2 "ocultos" que causam parkinsonismo:</b> antieméticos e procinéticos (metoclopramida, bromoprida, levossulpirida); bloqueadores de canal de cálcio (flunarizina, cinarizina); depletores de dopamina (tetrabenazina, deutetrabenazina, valbenazina).' }),
+        el('li', { html: '<b>Parkinsonismo é dose-dependente</b> em quase todos os atípicos (risperidona, olanzapina, amissulprida, paliperidona). A "atipicidade" se perde em dose alta.' }),
+        el('li', { html: '<b>Faixas de dose:</b> as doses para idosos são faixas conservadoras de início e manutenção extraídas da literatura e da prática, não limites de bula.' })
+      ])]));
+    },
+    avaliar: function (st) {
+      var a = APS.filter(function (x) { return x[0] === st.f; })[0];
+      if (!a) return { rotulo: 'Tabela de consulta', frase: 'Escolha um fármaco para ver o resumo e copiá-lo.' };
+      var frase = a[0] + ' (' + a[1].charAt(0).toLowerCase() + a[1].slice(1) + '): afinidade D2 ' + a[2] + ' nM; risco de parkinsonismo ' + a[3].toLowerCase() + '. Dose usual no adulto ' + a[4] + '; dose de menor risco no idoso ou na demência ' + a[5] + '.' + (a[6] ? ' ' + a[6] + '.' : '');
+      return { rotulo: 'Risco de parkinsonismo: ' + a[3].toLowerCase(), classe: COR_AP[a[7]], frase: frase, copia: frase };
+    },
+    nota: 'Valores de Ki variam entre estudos e servem como ordem de grandeza. As doses no idoso não substituem a bula nem o julgamento clínico.',
+    refs: [
+      'Kapur S, Zipursky R, Jones C, Remington G, Houle S. Relationship between dopamine D2 occupancy, clinical response, and side effects: a double-blind PET study of first-episode schizophrenia. Am J Psychiatry. 2000;157(4):514-20.',
+      'Kapur S, Seeman P. Does fast dissociation from the dopamine D2 receptor explain the action of atypical antipsychotics? A new hypothesis. Am J Psychiatry. 2001;158(3):360-9.',
+      'Lieberman JA, Stroup TS, McEvoy JP, Swartz MS, Rosenheck RA, Perkins DO, et al. Effectiveness of antipsychotic drugs in patients with chronic schizophrenia. N Engl J Med. 2005;353(12):1209-23.',
+      'Huhn M, Nikolakopoulou A, Schneider-Thoma J, Krause M, Samara M, Peter N, et al. Comparative efficacy and tolerability of 32 oral antipsychotics for the acute treatment of adults with multi-episode schizophrenia: a systematic review and network meta-analysis. Lancet. 2019;394(10202):939-51.',
+      'Schneider LS, Dagerman KS, Insel P. Risk of death with atypical antipsychotic drug treatment for dementia: meta-analysis of randomized placebo-controlled trials. JAMA. 2005;294(15):1934-43.',
+      'McKeith IG, Boeve BF, Dickson DW, Halliday G, Taylor JP, Weintraub D, et al. Diagnosis and management of dementia with Lewy bodies: fourth consensus report of the DLB Consortium. Neurology. 2017;89(1):88-100.'
+    ]
+  });
 })();
 
 /* ===================== EPILEPSIA ===================== */
@@ -1984,7 +2052,7 @@ table.tb{width:100%;border-collapse:collapse;font-size:13.5px;margin:4px 0}
     L.push('A ausência do tratamento implica manutenção da dor incapacitante' + (st.moh ? ', perpetuação do uso excessivo de medicação sintomática e seus riscos associados,' : '') + ' e comprometimento da qualidade de vida e da capacidade laboral ' + g('da paciente', 'do paciente') + '.', '');
     L.push('Coloco-me à disposição para esclarecimentos adicionais.', '');
     var MD = (function () { try { return JSON.parse(localStorage.getItem('lme_cfg') || 'null') || {}; } catch (e) { return {}; } })();
-    L.push((st.cidade || MD.cidade || '[cidade]') + ', ' + dataExtenso() + '.', '', '', MD.medicoNomeCurto || MD.medicoNome || '[nome do médico]', MD.especialidade || 'Neurologista', [MD.crm, MD.rqe].filter(Boolean).join(' | ') || '[CRM]', '', 'Referências bibliográficas', '');
+    L.push((st.cidade || MD.cidade || '[cidade]') + ', ' + dataExtenso() + '.', '', '', MD.medicoNomeCurto || MD.medicoNome || '[nome do médico]', MD.especialidade || 'Neurologista', [rotuloReg('CRM', MD.crm), rotuloReg('RQE', MD.rqe)].filter(Boolean).join(' | ') || 'CRM: [número]', '', 'Referências bibliográficas', '');
     refs.forEach(function (r, i) { L.push((i + 1) + '. ' + r); });
     return { texto: L.join('\n'), classes: Object.keys(classes).length, usados: usados.length, midas: !!midas, hit: !!hit, mtoq: !!mtoq };
   }
@@ -3757,7 +3825,7 @@ table.tb{width:100%;border-collapse:collapse;font-size:13.5px;margin:4px 0}
   function assinatura() {
     var m = medico(), l = ['', hojeExt(m.cidade ? m.cidade + (m.uf ? ' (' + m.uf + ')' : '') : ''), '', '', '_________________________________'];
     l.push(m.medicoNomeCurto || m.medicoNome || '[nome do médico]');
-    var reg = [m.especialidade, m.crm, m.rqe].filter(Boolean).join(' · '); if (reg) l.push(reg);
+    var reg = [rotuloReg('CRM', m.crm), rotuloReg('RQE', m.rqe), m.especialidade].filter(Boolean).join(' | '); if (reg) l.push(reg);
     return l.join('\n');
   }
   function inicialPac(extra) { var b = barra(); return Object.assign({ nome: b.nome, cpf: b.cpf, sexo: 'f' }, extra || {}); }
@@ -3765,7 +3833,7 @@ table.tb{width:100%;border-collapse:collapse;font-size:13.5px;margin:4px 0}
   function lf(x) { x = String(x || ''); return /^[A-ZÀ-Ú][a-zà-ú]/.test(x) ? x.charAt(0).toLowerCase() + x.slice(1) : x; }
   function v(x, ph) { x = String(x == null ? '' : x).trim(); return x || '[' + ph + ']'; }
   function cardPac(c, st, k) {
-    c.appendChild(k.card('Paciente', 'Vem da barra do paciente; pode editar aqui.', [k.campos([k.txt('nome', 'Nome completo', { largo: true }), k.txt('cpf', 'CPF'), k.sel('sexo', 'Concordância', [['f', 'Feminino'], ['m', 'Masculino']])])]));
+    c.appendChild(k.card('Paciente', 'Vem da barra do paciente; pode editar aqui.', [k.campos([k.txt('nome', 'Nome completo', { largo: true }), k.txt('cpf', 'CPF'), k.sel('sexo', 'Sexo', [['f', 'Feminino'], ['m', 'Masculino']])])]));
   }
   function cardPrevia(c) {
     var pre = document.createElement('pre'); pre.className = 'nt-previa';

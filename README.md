@@ -5,7 +5,7 @@ Ferramentas para a prática clínica do neurologista: escalas e instrumentos, cr
 ## Princípios
 
 - **Código aberto**, sob a licença MIT (ver `LICENSE`).
-- **Local-first**: dados de pacientes e do médico ficam só no navegador do aparelho (IndexedDB e localStorage). Nada disso é enviado a servidores. A página "Meus dados" permite exportar, importar e apagar.
+- **Local-first**: dados de pacientes e do médico ficam só no navegador (IndexedDB e localStorage). Nada disso é enviado a servidores. A página "Meus dados" permite exportar, importar e apagar.
 - O login (Supabase Auth) guarda apenas email, nome e senha, para controlar o acesso.
 
 ## Estrutura

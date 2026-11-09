@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Escalas, critérios diagnósticos, receituários, relatórios e CID-10 para o neurologista. Código aberto, dados de pacientes só no seu aparelho.">
+<meta name="description" content="Escalas, critérios diagnósticos, receituários, relatórios e CID-10 para o neurologista. Código aberto, dados de pacientes só no seu navegador.">
 <link rel="icon" href="icones/icone-192.png">
 <link rel="apple-touch-icon" href="icones/icone-192.png">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
@@ -127,6 +127,9 @@ body:not(.logado) .shell{display:none}
 .usuario small{display:block;font-size:11.5px;color:var(--ink45);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .usuario button{border:0;background:none;color:var(--ink45);cursor:pointer;padding:6px;border-radius:8px;display:grid;place-items:center}
 .usuario button:hover{background:var(--nav-hover);color:var(--ink)}
+.sair-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:8px;padding:9px 12px;border:1px solid var(--rule);border-radius:10px;background:none;color:var(--ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.sair-btn:hover{background:var(--nav-hover)}
+.sair-btn .ic{width:16px;height:16px}
 
 /* topo (só dentro das ferramentas; no celular sempre) */
 .area-principal{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column}
@@ -413,8 +416,7 @@ dialog .campo input{background:var(--paper)}
       <p>Escalas, critérios diagnósticos, receituários, modelos de relatório e fontes de consulta, tudo num só lugar.</p>
     </div>
     <div class="lg-pilares">
-      <span><svg class="ic" aria-hidden="true"><use href="#i-codigo"/></svg>Código aberto, licença MIT</span>
-      <span class="priv"><svg class="ic" aria-hidden="true"><use href="#i-cadeado"/></svg><span><b>Privacidade e segurança:</b> plataforma com arquitetura Local-First. Os dados clínicos são processados e armazenados localmente no dispositivo do usuário, não sendo transmitidos ou armazenados em nossos servidores.</span></span>
+      <span class="priv"><svg class="ic" aria-hidden="true"><use href="#i-cadeado"/></svg><span><b>Privacidade e segurança:</b> plataforma com arquitetura Local-First. Os dados clínicos são processados e armazenados localmente, não sendo transmitidos ou armazenados em nossos servidores.</span></span>
     </div>
   </div>
   <div class="lg-form">
@@ -449,7 +451,7 @@ dialog .campo input{background:var(--paper)}
         <button class="btn-pri" type="submit">Salvar senha</button>
       </form>
       <p class="lg-info" id="lgInfo" role="status" hidden></p>
-      <p class="lg-pe">Versão 1.0.0. Projeto de código aberto (licença MIT), oferecido sem garantia. As decisões clínicas cabem ao médico. <a href="privacidade.html" target="_blank" rel="noopener">Privacidade e termos de uso</a>. <span id="lgPrevia">Prévia: a conferência de senha será ativada quando o site for publicado.</span></p>
+      <p class="lg-pe"><a href="privacidade.html" target="_blank" rel="noopener">Privacidade e termos de uso</a>. <span id="lgPrevia">Prévia: a conferência de senha será ativada quando o site for publicado.</span></p>
     </div>
   </div>
 </section>
@@ -463,8 +465,8 @@ dialog .campo input{background:var(--paper)}
       <div class="usuario">
         <span class="av" aria-hidden="true" id="uAv">?</span>
         <span class="q"><b id="uNome">Seus dados</b><small id="uCrm">Toque para configurar</small></span>
-        <button type="button" id="sair" title="Sair" aria-label="Sair"><svg class="ic" aria-hidden="true"><use href="#i-sair"/></svg></button>
       </div>
+      <button type="button" class="sair-btn" id="sair"><svg class="ic" aria-hidden="true"><use href="#i-sair"/></svg>Sair da conta</button>
     </div>
   </nav>
   <div class="veu" id="veu"></div>
@@ -522,8 +524,8 @@ dialog .campo input{background:var(--paper)}
 <script>
 (function () {
   'use strict';
-  var NT_VERSAO = '1.0.0';
-  var RODAPE = '<b>Neurotools ' + NT_VERSAO + ' é um projeto de código aberto, sob licença MIT.</b> As informações são oferecidas como estão, sem garantia de qualquer tipo, e os autores não se responsabilizam por elas nem pelo uso que delas se fizer. Cabe ao julgamento médico conferir a acurácia de cada resultado, verificar a pertinência da sua aplicação e decidir criteriosamente o que fazer com ele. <a href="privacidade.html" target="_blank" rel="noopener">Privacidade e termos de uso</a>.';
+  var NT_VERSAO = '1.1.0';
+  var RODAPE = '<b>Neurotools ' + NT_VERSAO + ' é um projeto de código aberto, sob licença MIT.</b> Cabe ao julgamento médico conferir a acurácia das informações obtidas e decidir criteriosamente o que fazer com elas. <a href="privacidade.html" target="_blank" rel="noopener">Privacidade e termos de uso</a>.';
   document.getElementById('rodape').innerHTML = RODAPE;
 
   // ================= armazenamento local (conveniências) =================
@@ -536,7 +538,7 @@ dialog .campo input{background:var(--paper)}
 
   // ================= armazenamento local dos dados clínicos (IndexedDB) =================
   // Banco "neurotools" neste navegador: "registros" (escalas, critérios e relatórios salvos)
-  // e "lme" (arquivo de pacientes do LME e das receitas). Nada disso sai do aparelho.
+  // e "lme" (arquivo de pacientes do LME e das receitas). Nada disso sai do navegador.
   var ntLocal = (function () {
     var dbp = null, memo = { registros: [], lme: {} }, memId = 1, ouvintes = {};
     function abrir() {
@@ -617,7 +619,7 @@ dialog .campo input{background:var(--paper)}
   function brIso(br) { var m = /^(\d{2})\/(\d{2})\/(\d{4})/.exec(br || ''); return m ? m[3] + '-' + m[2] + '-' + m[1] : (br || ''); }
   function isoBr(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : (iso || ''); }
   function hojeIso() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
-  var DOENCA_LME = { alzheimer: 'Alzheimer', parkinson: 'Parkinson', epilepsia: 'Epilepsia', esquizofrenia: 'Esquizofrenia' };
+  var DOENCA_LME = { alzheimer: 'Alzheimer', distonia: 'Distonia', dor: 'Dor crônica', epilepsia: 'Epilepsia', ela: 'ELA', espasticidade: 'Espasticidade', esquizofrenia: 'Esquizofrenia', miastenia: 'Miastenia', osteoporose: 'Osteoporose', parkinson: 'Parkinson' };
   var FASE_LME = { primeira: 'primeira liberação', renovacao: 'renovação' };
 
   // reúne registros e arquivo do LME por paciente (CPF; sem CPF, pelo nome)
@@ -665,7 +667,7 @@ dialog .campo input{background:var(--paper)}
   }
   ntLocal.ouvir('registros', recarregarPacientes); ntLocal.ouvir('lme', recarregarPacientes);
 
-  // cópia única do arquivo antigo do LME (guardado na conta do Claude) para este aparelho
+  // cópia única do arquivo antigo do LME (guardado na conta do Claude) para este navegador
   (function migrarLME() {
     if (ler('nt.migrouLME', false)) return;
     if (!window.claude || typeof window.claude.use !== 'function') return;
@@ -682,7 +684,7 @@ dialog .campo input{background:var(--paper)}
             var novos = snap.docs.filter(function (d) { return !tem[d.id]; });
             return Promise.all(novos.map(function (d) { return ntLocal.gravar('lme', { id: d.id, data: JSON.parse(JSON.stringify(d.data() || {})) }); })).then(function () {
               gravar('nt.migrouLME', true); persistir();
-              if (novos.length) avisar((novos.length === 1 ? '1 paciente do arquivo do LME foi copiado' : novos.length + ' pacientes do arquivo do LME foram copiados') + ' para este aparelho.');
+              if (novos.length) avisar((novos.length === 1 ? '1 paciente do arquivo do LME foi copiado' : novos.length + ' pacientes do arquivo do LME foram copiados') + ' para este navegador.');
             });
           });
         }, function () {});
@@ -721,7 +723,7 @@ dialog .campo input{background:var(--paper)}
     ['parkinson-foslevodopa', 'Foslevodopa (conversão)', 'Movimento', 'parkinson', 'foslevodopa', 2, 'vyalev infusao subcutanea'],
     ['parkinson-relatorio', 'Foslevodopa: relatório para o convênio', 'Movimento', 'parkinson', 'relatorio', 3, 'relatorio auditoria operadora foslevodopa vyalev'],
     ['cognitivo-relaa', 'Terapia antiamiloide: relatório', null, 'cognitivo', 'antiamiloide', 'Terapia antiamiloide', 'relatorio antiamiloide lecanemabe donanemabe operadora nat-jus judicial'],
-    ['epilepsia-troca', 'Troca de anticrise (cronograma)', 'Epilepsia', 'epilepsia', 'troca', 'Troca de medicação', 'troca medicacao titulacao retirada anticrise'],
+    ['epilepsia-troca', 'Troca de FAE (cronograma)', 'Epilepsia', 'epilepsia', 'troca', 'Troca de medicação', 'troca medicacao titulacao retirada anticrise'],
     ['lme-documentos', 'LME (alto custo)', null, 'lme', 'documentos', 'lme', 'lme ceaf laudo medicamento especializado pcdt receita exames alto custo'],
     ['lme-receita', 'Receita de controle especial', null, 'lme', 'receita', 'receita', 'receita controle especial branca c1 talonario em branco rdc 1000'],
     ['lme-rapida', 'Prescrição rápida', null, 'lme', 'rapida', 'rapida', 'prescricao rapida receita colar lista remedios'],
@@ -766,6 +768,7 @@ dialog .campo input{background:var(--paper)}
     ['bfm', 'BFM (distonia)', 'Movimento', 'burke fahn marsden distonia'],
     ['irls', 'IRLS (pernas inquietas)', 'Movimento', 'irls pernas inquietas willis ekbom'],
     ['aims', 'AIMS (discinesia tardia)', 'Movimento', 'aims discinesia tardia'],
+    ['antipsic', 'Antipsicóticos: bloqueio D2 e parkinsonismo', 'Movimento', 'antipsicotico neuroleptico bloqueio d2 parkinsonismo induzido haloperidol quetiapina clozapina'],
     ['farmaco', 'ILAE 2010 (farmacorresistência)', 'Epilepsia', 'farmacorresistente refrataria ilae kwan'],
     ['ilae14', 'ILAE 2014 (definição clínica)', 'Epilepsia', 'ilae 2014 fisher definicao epilepsia crise nao provocada resolvida'],
     ['ilae25', 'ILAE 2025 (classificação das crises)', 'Epilepsia', 'ilae 2025 classificacao crises focal generalizada consciencia'],
@@ -863,7 +866,8 @@ dialog .campo input{background:var(--paper)}
   var DESC = {
     'lme-receita': 'Modelo da RDC 1.000/2025, até seis receitas datadas mês a mês e talonário em branco.',
     'lme-rapida': 'Cole nome, CPF e os remédios, um por linha, e a receita sai preenchida.',
-    'lme-documentos': 'Laudo, receitas e exames dos PCDTs de Parkinson, Alzheimer, epilepsia e esquizofrenia.',
+    'lme-pacientes': 'Arquivo dos pacientes com LME e receitas; reabre o último laudo para renovar.',
+    'lme-documentos': 'Laudo, receitas e exames de 10 PCDTs: Alzheimer, distonia, dor crônica, epilepsia, ELA, espasticidade, esquizofrenia, miastenia, osteoporose e Parkinson.',
     'parkinson-relatorio': 'Justificativa para liberação da infusão subcutânea de foslevodopa e foscarbidopa.',
     relcgrp: 'Solicitação de anticorpo anti-CGRP para profilaxia de migrânea.',
     'cognitivo-relaa': 'Relatório em Word com literatura, para operadora, NAT-JUS ou processo judicial (na aba Terapia antiamiloide).',
@@ -873,17 +877,15 @@ dialog .campo input{background:var(--paper)}
     reltox: 'Rol da ANS, com esquema por músculo e cálculo de ampolas.',
     relatest: 'Afastamento ou comparecimento; CID só com autorização do paciente.'
   };
-  var REL_PREVISTOS = [
-    ['Aposentadoria por incapacidade', 'Aguardando o modelo.']
-  ];
+  var REL_PREVISTOS = [];
   var SUBG = { mgadl: 'Miastenia', qmg: 'Miastenia', mgfa: 'Miastenia', alsfrs: 'ELA', facedrops: 'Nervos cranianos',
-    psprs: 'Parkinsonismos atípicos', umsars: 'Parkinsonismos atípicos', tetras: 'Tremor, distonia e outros', twstrs: 'Tremor, distonia e outros', bfm: 'Tremor, distonia e outros', sara: 'Tremor, distonia e outros', irls: 'Tremor, distonia e outros', aims: 'Tremor, distonia e outros',
+    psprs: 'Parkinsonismos atípicos', umsars: 'Parkinsonismos atípicos', tetras: 'Tremor, distonia e outros', twstrs: 'Tremor, distonia e outros', bfm: 'Tremor, distonia e outros', sara: 'Tremor, distonia e outros', irls: 'Tremor, distonia e outros', aims: 'Tremor, distonia e outros', antipsic: 'Fármacos e parkinsonismo',
     ledd: 'Parkinson', c521: 'Parkinson', hyse: 'Parkinson', 'parkinson-iii': 'Parkinson', 'parkinson-iv': 'Parkinson', 'parkinson-foslevodopa': 'Parkinson',
     respcgrp: 'Anti-CGRP e toxina', preempt: 'Anti-CGRP e toxina', midas: 'Incapacidade e resposta', hit6: 'Incapacidade e resposta', mtoq: 'Incapacidade e resposta',
     'cognitivo-zescores': 'Testes e escalas', 'cognitivo-meem': 'Testes e escalas', 'cognitivo-conv': 'Testes e escalas', 'cognitivo-cdr': 'Testes e escalas', 'cognitivo-fast': 'Testes e escalas', 'cognitivo-pfeffer': 'Testes e escalas', 'cognitivo-madrs': 'Testes e escalas', katz: 'Testes e escalas', iqcode: 'Testes e escalas', mace: 'Testes e escalas', npiq: 'Testes e escalas',
     'cognitivo-antiamiloide': 'Terapia antiamiloide', aria: 'Terapia antiamiloide',
     nihss: 'AVC isquêmico', hints: 'AVC isquêmico', ascod: 'AVC isquêmico', rope: 'AVC isquêmico', sich: 'Hemorragia intracerebral', phases: 'Aneurisma e HSA', hunthess: 'Aneurisma e HSA', fisher: 'Aneurisma e HSA' };
-  var ORDEM_SUB = { 'Cognição': ['Testes e escalas', 'Terapia antiamiloide'], 'Movimento': ['Parkinson', 'Parkinsonismos atípicos', 'Tremor, distonia e outros'], 'Neuromuscular': ['Miastenia', 'ELA', 'Nervos cranianos'], 'Cefaleia': ['Incapacidade e resposta', 'Anti-CGRP e toxina'], 'Vascular': ['AVC isquêmico', 'Hemorragia intracerebral', 'Aneurisma e HSA'] };
+  var ORDEM_SUB = { 'Cognição': ['Testes e escalas', 'Terapia antiamiloide'], 'Movimento': ['Parkinson', 'Parkinsonismos atípicos', 'Tremor, distonia e outros', 'Fármacos e parkinsonismo'], 'Neuromuscular': ['Miastenia', 'ELA', 'Nervos cranianos'], 'Cefaleia': ['Incapacidade e resposta', 'Anti-CGRP e toxina'], 'Vascular': ['AVC isquêmico', 'Hemorragia intracerebral', 'Aneurisma e HSA'] };
 
   var CAT = [], porId = {};
   ANTIGAS.forEach(function (a) { CAT.push({ id: a[0], nome: a[1], area: a[2], tool: a[3], sub: a[4], alvo: a[5], alias: a[6], acao: !!a[7] }); });
@@ -1038,7 +1040,7 @@ dialog .campo input{background:var(--paper)}
     function onda(x, k) {
       var f = 0.018 + k * 0.004, base = Math.sin(x * f + k) * 7 + Math.sin(x * f * 2.7 + k * 3) * 4 + Math.sin(x * 0.11 + k) * 1.5;
       var per = 260 + k * 40, p = (x + k * 90) % per;
-      if (k === 1 && p < 34) { base += p < 8 ? -p * 5 : (p < 14 ? -40 + (p - 8) * 9 : Math.sin((p - 14) / 20 * Math.PI) * 18); }
+      if (k === 1 && p < 34) { base += p < 8 ? -p * 5 : (p < 14 ? -40 + (p - 8) * 40 / 6 : Math.sin((p - 14) / 20 * Math.PI) * 18); }
       return base;
     }
     function quadro(t) {
@@ -1051,7 +1053,10 @@ dialog .campo input{background:var(--paper)}
       for (var k = 0; k < linhas; k++) {
         var y0 = r.height * (0.52 + k * 0.1);
         ctx.beginPath();
-        for (var x = 0; x <= r.width; x += 3) { var y = y0 + onda(x + desl, k); if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
+        // amostras presas à grade do próprio traçado (e não da tela): a ponta é sempre desenhada pelos mesmos pontos,
+        // sem o serrilhado que fazia o paroxismo piscar enquanto a onda corria
+        var passo = 2, u0 = Math.floor(desl / passo) * passo;
+        for (var u = u0; u <= desl + r.width + passo; u += passo) { var x = u - desl, y = y0 + onda(u, k); if (u === u0) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
         ctx.stroke();
       }
       if (!reduz) raf = requestAnimationFrame(quadro);
@@ -1062,9 +1067,11 @@ dialog .campo input{background:var(--paper)}
 
   // ================= usuário e dados do médico =================
   function cfgMedico() { return ler('lme_cfg', null); }
+  // "107200" -> "CRM: 107200" (não duplica se o médico já escreveu o rótulo)
+  function rotulo(r, v) { v = String(v || '').trim(); if (!v) return ''; return new RegExp('^' + r + '\\b', 'i').test(v) ? v : r + ': ' + v; }
   function atualizarUsuario() {
     var c = cfgMedico() || {}, nome = c.medicoNomeCurto || (sessao && sessao.nome) || 'Seus dados';
-    var crm = [c.crm, c.rqe].filter(Boolean).join(' · ') || (sessao && sessao.email) || 'Toque para configurar';
+    var crm = [rotulo('CRM', c.crm), rotulo('RQE', c.rqe)].filter(Boolean).join(' · ') || (sessao && sessao.email) || 'Toque para configurar';
     document.getElementById('uNome').textContent = nome; document.getElementById('uCrm').textContent = crm;
     var ini = nome.replace(/^(Dr\.?|Dra\.?)\s+/i, '').split(/\s+/).filter(Boolean);
     document.getElementById('uAv').textContent = ini.length ? (ini[0][0] + (ini.length > 1 ? ini[ini.length - 1][0] : '')).toUpperCase() : '?';
@@ -1147,7 +1154,7 @@ dialog .campo input{background:var(--paper)}
       var t = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
       cabecalho(saudacao(), null, t.charAt(0).toUpperCase() + t.slice(1), [['Início', 'inicio']]);
       var md = cfgMedico() || {};
-      var h = (md.medicoNome || md.medicoNomeCurto ? '' : '<div class="ressalva">' + ic('i-pessoa') + '<p><b>Preencha seus dados de médico.</b> Nome, CRM, endereço e CNES entram nas receitas, no LME e nos relatórios, e ficam só neste aparelho. <a href="#lme-medico" data-ir="lme-medico">Preencher agora</a></p></div>') + favsHtml() + '<div class="cards">';
+      var h = (md.medicoNome || md.medicoNomeCurto ? '' : '<div class="ressalva">' + ic('i-pessoa') + '<p><b>Preencha seus dados de médico</b> para fazer receitas, LME e relatórios. Os dados ficam apenas neste navegador. <a href="#lme-medico" data-ir="lme-medico">Preencher agora</a></p></div>') + favsHtml() + '<div class="cards">';
       SECOES.forEach(function (s) {
         var info = '';
         if (s.id === 'receituarios') info = infoRenovar();
@@ -1164,9 +1171,7 @@ dialog .campo input{background:var(--paper)}
       cabecalho('Receituários', 'i-receita', 'Receitas para imprimir e assinar, e documentos do Componente Especializado (LME).', [['Início', 'inicio'], ['Receituários', 'receituarios']]);
       var h = '<div class="ressalva">' + ic('i-alerta') + '<p>Estas receitas são geradas para <b>impressão e assinatura à mão</b>. Não são receitas eletrônicas válidas e não podem ser enviadas ao paciente por meio digital. Para prescrição digital com assinatura certificada, use plataformas como <a href="https://memed.com.br" target="_blank" rel="noopener">Memed</a> ou <a href="https://mevo.com.br" target="_blank" rel="noopener">Mevo</a>.</p></div>';
       h += '<div class="sub-sec">Receitas</div><div class="tiles largos">' + tile(porId['lme-receita'], true) + tile(porId['lme-rapida'], true) + '</div>';
-      h += '<div class="sub-sec">Alto custo</div><div class="tiles largos">' + tile(porId['lme-documentos'], true) +
-        '<a class="tile" href="#renovar" data-ir="renovar"><span class="tx"><span>Receitas a renovar</span><small id="infoRenovar2">' + esc(infoRenovar()) + '</small></span>' + ic('i-seta') + '</a></div>';
-      h += '<p class="rodape" style="margin-top:22px;border:0;padding:0">Outras condições do Componente Especializado serão incluídas em etapas seguintes.</p>';
+      h += '<div class="sub-sec">Alto custo</div><div class="tiles largos">' + tile(porId['lme-documentos'], true) + tile(porId['lme-pacientes'], true) + '</div>';
       pCorpo.innerHTML = h;
     },
     escalas: function () {
@@ -1189,7 +1194,7 @@ dialog .campo input{background:var(--paper)}
     relatorios: function () {
       cabecalho('Relatórios', 'i-doc', 'Modelos de relatório preenchidos a partir dos dados da consulta.', [['Início', 'inicio'], ['Relatórios', 'relatorios']]);
       var h = '<div class="sub-sec">Disponíveis</div><div class="tiles largos">' + itens('relatorios').map(function (c) { return tile(c, true); }).join('') + '</div>';
-      h += '<div class="sub-sec">Em preparação</div><div class="tiles largos">' + REL_PREVISTOS.map(function (r) { return tileBreve(r[0], r[1]); }).join('') + '</div>';
+      if (REL_PREVISTOS.length) h += '<div class="sub-sec">Em preparação</div><div class="tiles largos">' + REL_PREVISTOS.map(function (r) { return tileBreve(r[0], r[1]); }).join('') + '</div>';
       pCorpo.innerHTML = h;
     },
     cid: function () {
@@ -1197,12 +1202,12 @@ dialog .campo input{background:var(--paper)}
       desenharCid();
     },
     prontuario: function () {
-      cabecalho('Miniprontuário', 'i-pasta', 'Tudo o que foi registrado para cada paciente neste aparelho.', [['Início', 'inicio'], ['Miniprontuário', 'prontuario']]);
+      cabecalho('Miniprontuário', 'i-pasta', 'Tudo o que foi registrado para cada paciente neste navegador.', [['Início', 'inicio'], ['Miniprontuário', 'prontuario']]);
       pCorpo.innerHTML = '<div id="mpCorpo"><p class="estado">Carregando…</p></div>';
       desenharMP();
     },
     dados: function () {
-      cabecalho('Meus dados', 'i-cadeado', 'O que está guardado neste aparelho e como fazer cópia, levar para outro aparelho ou apagar.', [['Início', 'inicio'], ['Meus dados', 'dados']]);
+      cabecalho('Meus dados', 'i-cadeado', 'O que está guardado neste navegador e como fazer cópia, levar para outro navegador ou aparelho, ou apagar.', [['Início', 'inicio'], ['Meus dados', 'dados']]);
       pCorpo.innerHTML = '<p class="estado">Carregando…</p>';
       desenharDados();
     }
@@ -1380,22 +1385,22 @@ dialog .campo input{background:var(--paper)}
       var h = '<div class="dados-grid"><div class="num"><b>' + pacs.length + '</b><span>pacientes no miniprontuário</span></div>' +
         '<div class="num"><b>' + regs.length + '</b><span>escalas, critérios e relatórios salvos</span></div>' +
         '<div class="num"><b>' + lme.length + '</b><span>pacientes no arquivo do LME e das receitas</span></div></div>';
-      h += '<div class="bloco"><h3>Onde ficam os dados</h3><p>Tudo fica no armazenamento interno deste navegador, neste aparelho. Nada é enviado aos servidores do Neurotools. ' +
-        'Cada navegador e cada aparelho têm o seu próprio armazenamento: o que você salva no computador não aparece no iPad, a menos que leve uma cópia de segurança.</p>' +
+      h += '<div class="bloco"><h3>Onde ficam os dados</h3><p>Tudo fica no armazenamento interno deste navegador. Nada é enviado aos servidores do Neurotools. ' +
+        'Cada navegador tem o seu próprio armazenamento: o que você salva no Chrome do computador não aparece no Safari nem no iPad, a menos que leve uma cópia de segurança.</p>' +
         (memoria ? '<p class="estado" style="color:var(--clay)">Este navegador bloqueou o armazenamento do site (janela anônima ou dados do site bloqueados). O que for salvo agora se perde ao fechar a página.</p>' :
           '<p class="estado' + (persist ? ' ok' : '') + '">' + (persist ? 'Armazenamento persistente ativado: o navegador não apaga estes dados sozinho.' : 'O navegador pode apagar estes dados se faltar espaço no aparelho, ou se você limpar os dados de navegação. Faça cópias de segurança.') + '</p>') +
         '<details><summary>Onde isso fica no disco</summary><p style="margin:8px 0 0">O navegador guarda os dados num banco próprio (IndexedDB, chamado <code>neurotools</code>), dentro da pasta do perfil. É um formato binário que não abre como planilha; para ver ou levar os dados, use os botões de exportar abaixo. Exemplos de pasta:</p><ul>' +
         '<li>Chrome no Mac: <code>~/Library/Application Support/Google/Chrome/Default/IndexedDB/</code></li>' +
         '<li>Chrome no Windows: <code>%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\IndexedDB\\</code></li>' +
         '<li>Safari, Firefox e Edge: dentro da pasta do perfil do navegador.</li></ul></details></div>';
-      h += '<div class="bloco"><h3>Cópia de segurança e outro aparelho</h3><p>O arquivo de cópia leva os registros do miniprontuário, o arquivo do LME e os dados do médico. Para usar em outro aparelho, abra o Neurotools lá e importe o arquivo. A importação junta os dados, sem apagar o que já existe.</p>' +
+      h += '<div class="bloco"><h3>Cópia de segurança e outro navegador</h3><p>O arquivo de cópia leva os registros do miniprontuário, o arquivo do LME e os dados do médico. Para usar em outro navegador ou aparelho, abra o Neurotools lá e importe o arquivo. A importação junta os dados, sem apagar o que já existe.</p>' +
         '<div class="acoes"><button type="button" class="btn-p" data-acao="exportar">Exportar cópia (.json)</button><button type="button" class="btn-l" data-acao="exportar-csv">Exportar planilha (.csv)</button>' +
         '<button type="button" class="btn-l" data-acao="importar">Importar cópia</button><input type="file" id="arqImportar" accept=".json,application/json" hidden></div></div>';
-      h += '<div class="bloco"><h3>Dados do médico</h3><p>' + (med && med.medicoNome ? esc(med.medicoNome) + (med.crm ? ' · ' + esc(med.crm) : '') + (med.cnes ? ' · CNES ' + esc(med.cnes) : '') + '. Ficam só neste aparelho e são usados nas receitas e no LME.' : 'Ainda não preenchidos neste aparelho.') + '</p>' +
+      h += '<div class="bloco"><h3>Dados do médico</h3><p>' + (med && med.medicoNome ? esc(med.medicoNome) + (med.crm ? ' · ' + esc(rotulo('CRM', med.crm)) : '') + (med.cnes ? ' · CNES ' + esc(med.cnes) : '') + '. Ficam só neste navegador e são usados nas receitas, no LME e nos relatórios.' : 'Ainda não preenchidos neste navegador.') + '</p>' +
         '<div class="acoes"><button type="button" class="btn-l" data-ir="lme-medico">Editar dados do médico</button></div></div>';
-      h += '<div class="bloco perigo"><h3>Apagar tudo</h3><p>Remove deste aparelho todos os registros do miniprontuário e o arquivo do LME. Não há como desfazer; exporte uma cópia antes se quiser guardar.</p>' +
+      h += '<div class="bloco perigo"><h3>Apagar tudo</h3><p>Remove deste navegador todos os registros do miniprontuário e o arquivo do LME. Não há como desfazer; exporte uma cópia antes se quiser guardar.</p>' +
         '<label class="chk"><input type="checkbox" id="apagarMed"> Apagar também os dados do médico</label>' +
-        '<div class="acoes">' + (apagarTudoPronto ? '<button type="button" class="btn-perigo" data-acao="apagar-tudo-sim">Apagar definitivamente</button><button type="button" class="btn-l" data-acao="apagar-tudo-nao">Cancelar</button>' : '<button type="button" class="btn-l" data-acao="apagar-tudo">Apagar todos os dados deste aparelho</button>') + '</div></div>';
+        '<div class="acoes">' + (apagarTudoPronto ? '<button type="button" class="btn-perigo" data-acao="apagar-tudo-sim">Apagar definitivamente</button><button type="button" class="btn-l" data-acao="apagar-tudo-nao">Cancelar</button>' : '<button type="button" class="btn-l" data-acao="apagar-tudo">Apagar todos os dados deste navegador</button>') + '</div></div>';
       pCorpo.innerHTML = h;
       document.getElementById('arqImportar').addEventListener('change', importar);
     });
@@ -1465,7 +1470,7 @@ dialog .campo input{background:var(--paper)}
         if (med) apagar('lme_cfg');
         try { sessionStorage.removeItem('nt.pac'); } catch (x) {}
         pacNome.value = ''; pacCpf.value = ''; apagarTudoPronto = false;
-        avisar('Todos os dados foram apagados deste aparelho.'); atualizarUsuario(); desenharDados();
+        avisar('Todos os dados foram apagados deste navegador.'); atualizarUsuario(); desenharDados();
       });
     }
   });
@@ -1596,9 +1601,11 @@ dialog .campo input{background:var(--paper)}
 
   // ================= receitas a renovar (arquivo do LME, agora local) =================
   var renovar = null;
-  function infoRenovar() { if (renovar === null) return 'Arquivo de pacientes do LME'; if (!renovar) return 'Nenhuma receita a renovar'; return plural(renovar, 'paciente com receita a renovar', 'pacientes com receitas a renovar'); }
+  // alerta de receitas a renovar desabilitado na versão 1.1 (a contagem continua disponível no arquivo de pacientes do LME)
+  var ALERTA_RENOVAR = false;
+  function infoRenovar() { if (!ALERTA_RENOVAR) return 'Receitas, LME e exames'; if (renovar === null) return 'Arquivo de pacientes do LME'; if (!renovar) return 'Nenhuma receita a renovar'; return plural(renovar, 'paciente com receita a renovar', 'pacientes com receitas a renovar'); }
   function mostrarRenovar() {
-    var b = document.getElementById('navRenovar'); if (b) { b.hidden = !renovar; b.textContent = renovar || ''; }
+    var b = document.getElementById('navRenovar'); if (b) { b.hidden = !ALERTA_RENOVAR || !renovar; b.textContent = renovar || ''; }
     ['infoRenovar', 'infoRenovar2'].forEach(function (id) { var c = document.getElementById(id); if (c) c.textContent = infoRenovar(); });
   }
   function contarRenovar() {

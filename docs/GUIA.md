@@ -22,10 +22,14 @@ Este guia serve para quem for alterar o site (inclusive uma nova conversa com o 
 - **Dados do médico** vêm de `localStorage.lme_cfg` (tela "Dados do médico" do LME); nas ferramentas React, pelo objeto `window.NTMED`. Nunca escreva dados pessoais no código.
 - **Dados de pacientes** ficam só no navegador (IndexedDB `neurotools`, objeto `ntLocal` no `index.html`). Nada de paciente vai para servidor.
 
+## LME: como acrescentar um PCDT
+
+Em `lme.html`, cada condição tem entradas com a mesma chave em `DOENCAS` (CIDs, diagnóstico e anamnese padrão), `CATALOGO` (medicamentos), `EXAMES` (primeira liberação e renovação) e `TER` (termo de esclarecimento), além de `ORDEM`, `SUBT` e `NOME_DOENCA` no app e `DOENCA_LME` no `index.html`. Campos dos medicamentos: `ceaf` (vai ao LME), `ctrl: false` (receituário simples em vez de controle especial), `notifA` (exige Notificação de Receita A, fica fora da receita), `forma: "out"` com `poso`, `qtd`, `un` e `via` para posologia fixa, `cada` (intervalo em meses entre aplicações), `aviso` e `ter` (opções marcadas no TER).
+
 ## Versões
 
 1. Faça as mudanças e teste localmente (`python3 -m http.server` na pasta do repositório).
-2. Atualize `NT_VERSAO` e a versão no texto do login (`index.html`), e escreva a entrada no `CHANGELOG.md`.
+2. Atualize `NT_VERSAO` (`index.html`) e escreva a entrada no `CHANGELOG.md`.
 3. Faça o commit, crie a tag (`git tag v1.1.0`) e envie (`git push --follow-tags`).
 
 ## Configuração externa
@@ -38,5 +42,5 @@ Este guia serve para quem for alterar o site (inclusive uma nova conversa com o 
 
 - Revisão de direitos autorais das escalas (MDS-UPDRS, HIT-6, ISI, IRLS, Epworth, NPI-Q, TETRAS, TWSTRS, UMSARS, PSPRS, Mini-ACE e textos de DSM-5-TR, ICSD-3-TR e ICHD-3).
 - Conferir no original: lista de tipos de crise da ILAE 2025, regra de narcolepsia tipo 1 na ICSD-3-TR, categorias da neuropatia motora multifocal, regra de PIDC possível com critérios de apoio, detalhes da revisão de 2024 dos critérios de McDonald.
-- Relatório de aposentadoria por incapacidade (aguardando modelo).
+- Relatório de aposentadoria por incapacidade (aguardando modelo; reativar com uma entrada em `REL_PREVISTOS` ou como relatório pronto).
 - Substituir `cid10.json` pelo arquivo baixado diretamente do DATASUS.

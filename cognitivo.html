@@ -1,15 +1,16 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<script>/* Dados do médico (salvos neste aparelho em "Dados do médico") usados nos documentos */
+<script>/* Dados do médico (salvos neste navegador em "Dados do médico") usados nos documentos */
 window.NTMED = (function () {
   function c() { try { return JSON.parse(localStorage.getItem('lme_cfg') || 'null') || {}; } catch (e) { return {}; } }
+  function rot(r, v) { v = String(v || '').trim(); if (!v) return ''; return new RegExp('^' + r + '\\b', 'i').test(v) ? v : r + ': ' + v; }
   return {
     get nome() { var x = c(); return x.medicoNomeCurto || x.medicoNome || '[nome do médico]'; },
-    get crm() { return c().crm || '[CRM]'; },
-    get rqe() { return c().rqe || ''; },
+    get crm() { return rot('CRM', c().crm) || 'CRM: [número]'; },
+    get rqe() { return rot('RQE', c().rqe); },
     get especialidade() { return c().especialidade || 'Neurologista'; },
-    get registro() { var x = c(); return [x.especialidade || 'Neurologista', x.crm || '[CRM]', x.rqe].filter(Boolean).join(' · '); },
+    get registro() { var x = c(); return [rot('CRM', x.crm) || 'CRM: [número]', rot('RQE', x.rqe), x.especialidade || 'Neurologista'].filter(Boolean).join(' | '); },
     get cidade() { return c().cidade || ''; },
     get endereco() { var x = c(); return [x.endereco, x.cidade, x.uf].filter(Boolean).join(', '); },
     get contato() { var x = c(); return [x.email, x.telefone].filter(Boolean).join(' | '); }

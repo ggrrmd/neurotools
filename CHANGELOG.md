@@ -2,6 +2,17 @@
 
 Numeração: **1.x** para entregas com novidades (novas escalas, critérios, relatórios ou seções); **1.x.y** para correções pequenas; **2.0** reservado para mudança grande de estrutura.
 
+## 1.1.0 (9 de novembro de 2026)
+
+- LME: seis novos PCDTs (distonia e espasmo hemifacial, dor crônica, esclerose lateral amiotrófica, espasticidade, miastenia gravis e osteoporose), com CID, medicamentos, exames e termo de esclarecimento de cada protocolo; condições em ordem alfabética.
+- LME: medicamentos não controlados saem em receituário simples; os controlados continuam na receita de controle especial; morfina e metadona entram no laudo, mas não na receita (exigem Notificação de Receita A). Toxina botulínica, pamidronato e ácido zoledrônico só aparecem nos meses de aplicação, no laudo e nas receitas.
+- Cabeçalhos e assinaturas de receitas, LME, pedidos de exames, fichas e relatórios passam a mostrar "CRM:" e "RQE:" antes dos números.
+- Escalas e instrumentos (Movimento): tabela de antipsicóticos, bloqueio D2 e risco de parkinsonismo.
+- Epilepsia: "Troca de FAE (cronograma)". Relatório de isenção de IR (e demais relatórios): campo "Sexo" no lugar de "Concordância".
+- Botão "Sair da conta" visível no menu; alerta de receitas a renovar desabilitado; relatório de aposentadoria retirado da lista até ficar pronto.
+- Textos do login, do rodapé e da página inicial revistos; referências a "neste aparelho" passam a "neste navegador".
+- Login: traçado de EEG sem a cintilação na área do paroxismo.
+
 ## 1.0.0 (7 de novembro de 2026)
 
 Primeira versão pública.
