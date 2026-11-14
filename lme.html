@@ -165,6 +165,9 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .btn.ghost { background: transparent; color: var(--accent); }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
 .btn.big { width: 100%; padding: .8rem 1rem; font-size: 1rem; }
+.btn.novo-rec { width: 100%; padding: .9rem 1rem; font-size: 1.05rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: .5rem; box-shadow: 0 4px 14px rgba(31, 75, 63, .22); }
+.btn.novo-rec span { font-size: 1.35rem; line-height: 1; font-weight: 500; }
+.btn.novo-rec.conf { background: #8a2a1f; border-color: #8a2a1f; color: #fff; }
 .med { border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: var(--radius); padding: .8rem .85rem; margin-top: .75rem; }
 .med.fora { border-left-color: var(--muted); }
 .med-head { display: flex; justify-content: space-between; gap: .5rem; align-items: baseline; margin-bottom: .5rem; }
@@ -402,6 +405,7 @@ dialog.wide { max-width: 860px; }
       </section>
     </main>
     <aside class="panel">
+      <button class="btn novo-rec" type="button" id="rLimpar"><span aria-hidden="true">+</span> Novo receituário</button>
       <section class="card">
         <h2>Gerar</h2>
         <button class="btn big" type="button" id="rGerar" disabled>Gerar receitas</button>
@@ -409,16 +413,6 @@ dialog.wide { max-width: 860px; }
         <div class="status" id="rStatus" role="status"></div>
         <div class="status sub" id="rStatusArq"></div>
         <div class="preview" id="rPreview" hidden></div>
-        <button class="btn ghost" type="button" id="rLimpar" style="margin-top:.75rem;width:100%" hidden>Nova receita</button>
-      </section>
-      <section class="card">
-        <h2>Talonário em branco</h2>
-        <p class="hint" style="margin:0 0 .6rem">Folhas no novo modelo, com seu cabeçalho, para preencher à mão no consultório.</p>
-        <div class="row" style="margin-bottom:.4rem">
-          <label class="f s6">Folhas<input type="number" id="bFolhas" min="1" max="100" value="20" inputmode="numeric"></label>
-        </div>
-        <button class="btn ghost" type="button" id="bGerar" style="width:100%">Gerar talonário em branco</button>
-        <div class="status" id="bStatus" role="status"></div>
       </section>
     </aside>
   </div>
@@ -1236,7 +1230,6 @@ window.DATA = { DEFAULT_CFG, DOENCAS, CATALOGO, HORARIOS, EXAMES, EXAMES_POR_FAR
   // ---------- Receita de Controle Especial (modelo Anvisa, RDC 1.000/2025), 2 vias na mesma página ----------
   // Frente: emitente (sem endereço, prescritor pessoa física), paciente (nome + CPF/passaporte), prescrição,
   // data e assinatura, comprador. Verso opcional: produtos dispensados e estabelecimento dispensador.
-  // s.branco = true gera folhas em branco para preenchimento manual (talonário do consultório).
   async function genReceita(s) {
     const pdf = await PDFDocument.create();
     const f = await pdf.embedFont(StandardFonts.Helvetica), fb = await pdf.embedFont(StandardFonts.HelveticaBold);
@@ -2276,29 +2269,27 @@ $("rGerar").addEventListener("click", async () => {
     const nomeArq = `Receita_${s.paciente.nome.split(" ").slice(0, 2).join("_")}_${s.data.replace(/\//g, "-")}.pdf`.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     ultimoArquivo = { nome: nomeArq, bytes };
     mostrarPrevia(bytes, pdf.getPageCount(), "rPreview", "rStatus");
-    $("rLimpar").hidden = false;
     registrarReceita(s);
     await salvar("rStatus");
   } catch (e) {
     console.error(e); status.className = "status err"; status.textContent = "Não foi possível gerar o PDF: " + (e && e.message ? e.message : e);
   } finally { rValidar(); }
 });
-$("bGerar").addEventListener("click", async () => {
-  const status = $("bStatus"); status.className = "status"; status.textContent = "Gerando talonário...";
-  try {
-    const n = Math.min(100, Math.max(1, Number($("bFolhas").value) || 1));
-    const pdf = await genReceita({ cfg: cfgDoc(), branco: true, nReceitas: n });
-    const bytes = await pdf.save();
-    ultimoArquivo = { nome: `Receita_Controle_Especial_em_branco_${n}_folhas.pdf`, bytes };
-    mostrarPrevia(bytes, pdf.getPageCount(), "rPreview", "bStatus");
-    status.className = "status ok"; status.textContent = `Talonário pronto (${n} folha${n > 1 ? "s" : ""}). A prévia e o botão Baixar PDF estão no quadro Gerar, acima.`;
-  } catch (e) { console.error(e); status.className = "status err"; status.textContent = "Não foi possível gerar o PDF: " + (e && e.message ? e.message : e); }
-});
-$("rLimpar").addEventListener("click", () => {
+// "Novo receituário": se houver algo preenchido e a receita ainda não foi gerada, pede um segundo toque para confirmar
+let rNovoConf = 0;
+$("rLimpar").addEventListener("click", (ev) => {
+  const b = $("rLimpar");
+  const preenchido = ["rNome", "rCpf", "rRapida", "rObs"].some(id => $(id).value.trim()) || rMeds.some(m => (m.nome || "").trim() || (m.posologia || "").trim());
+  if (ev.isTrusted && preenchido && !ultimoArquivo && Date.now() - rNovoConf > 4000) {
+    rNovoConf = Date.now(); b.classList.add("conf"); b.textContent = "Toque de novo para apagar o preenchido";
+    setTimeout(() => { if (Date.now() - rNovoConf >= 4000) { b.classList.remove("conf"); b.innerHTML = '<span aria-hidden="true">+</span> Novo receituário'; } }, 4100);
+    return;
+  }
+  rNovoConf = 0; b.classList.remove("conf"); b.innerHTML = '<span aria-hidden="true">+</span> Novo receituário';
   ["rNome", "rCpf", "rEnd"].forEach(id => $(id).value = ""); $("rSemCpf").checked = false; $("rCpf").disabled = false; $("rStatusArq").textContent = ""; $("rHint").hidden = true;
   rMeds = [novoRMed()]; renderRMeds(); $("rN").value = "1"; $("rData").value = isoHoje();
   $("rRapida").value = ""; $("rRapidaRel").hidden = true; $("rRapidaRel").innerHTML = ""; $("rObs").value = "";
-  $("rPreview").hidden = true; $("rPreview").innerHTML = ""; $("rStatus").textContent = ""; $("rLimpar").hidden = true;
+  $("rPreview").hidden = true; $("rPreview").innerHTML = ""; $("rStatus").textContent = "";
   ultimoArquivo = null; rValidar(); window.scrollTo({ top: 0 });
 });
 

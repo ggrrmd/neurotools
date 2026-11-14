@@ -2,6 +2,12 @@
 
 Numeração: **1.x** para entregas com novidades (novas escalas, critérios, relatórios ou seções); **1.x.y** para correções pequenas; **2.0** reservado para mudança grande de estrutura.
 
+## 1.2.1 (14 de novembro de 2026)
+
+- Página inicial: botão "Fale conosco" para relatar problemas ou mandar sugestões. A mensagem segue por email para neurotools.contato@gmail.com, com o email da conta para resposta; se o envio direto não estiver disponível, o site oferece abrir o programa de email com a mensagem pronta.
+- Receituários: botão "Novo receituário" no alto da coluna lateral, sempre visível e em destaque (pede um segundo toque antes de apagar uma receita preenchida e ainda não gerada). Retirado o talonário em branco.
+- Escalas e instrumentos (Cefaleia): diário de cefaleia, com folha de um mês para o paciente (dor, intensidade de 0 a 10 e remédio para a crise) e registro do diário devolvido, com resumo para o prontuário e alerta pelos limiares de uso excessivo de medicação da ICHD-3.
+
 ## 1.1.2 (9 de novembro de 2026)
 
 - Endereço oficial: aberto por outro endereço (como neurotools.ggrr-md.workers.dev), o site vai direto para neurotools.com.br; se houver dados guardados no endereço antigo, mostra um aviso com o botão para exportar a cópia antes de mudar.

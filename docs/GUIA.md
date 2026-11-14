@@ -15,6 +15,7 @@ Este guia serve para quem for alterar o site (inclusive uma nova conversa com o 
 | `lme.html` | Receituários e LME, gera PDFs com pdf-lib. |
 | `cid10.json` | CID-10 do DATASUS, versão 2008. |
 | `privacidade.html`, `404.html` | Páginas estáticas. |
+| `worker.js` | Única parte com servidor: responde a `POST /api/contato` (botão "Fale conosco"), confere a sessão no Supabase e envia o email pelo Resend. Todo o resto é servido como arquivo estático (`env.ASSETS`). |
 
 ## Como acrescentar
 
@@ -37,6 +38,7 @@ Em `lme.html`, cada condição tem entradas com a mesma chave em `DOENCAS` (CIDs
 - **Supabase**: projeto `alxkympzfvjhrmbpuzfh`; a chave publishable fica em `window.NT_SUPABASE` no `index.html` (é pública por natureza). Site URL e Redirect URLs apontam para o endereço do site. Emails enviados pelo Resend (SMTP smtp.resend.com, remetente Neurotools <nao-responda@neurotools.com.br>, domínio verificado; plano gratuito de 100 emails/dia). Modelos de email em português em Authentication > Emails. Contato do projeto: neurotools.contato@gmail.com.
 - **DNS (Cloudflare)**: DMARC em `p=none` desde 08/11/2026; endurecer para `p=quarantine` depois de algumas semanas sem problemas de entrega.
 - **Cloudflare**: Workers & Pages > neurotools.
+- **Contato (Fale conosco)**: o `worker.js` precisa do segredo `RESEND_API_KEY` (Workers & Pages > neurotools > Settings > Variables and Secrets, tipo Secret), com uma chave de API do Resend com permissão de envio. Sem o segredo, o envio responde 503 e o site oferece abrir o programa de email do usuário. Limite de 5 mensagens por conta por hora; as mensagens dividem a cota diária do Resend com os emails de login.
 
 ## Pendências conhecidas
 

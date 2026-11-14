@@ -216,6 +216,15 @@ body:not(.sem-ferr) .titulo-topo{display:none}
 .tile .tx{display:flex;flex-direction:column;gap:3px;min-width:0}
 .tile .tx small{font-size:12.5px;font-weight:400;color:var(--ink70);line-height:1.4}
 
+.contato{display:flex;align-items:center;justify-content:space-between;gap:12px 18px;flex-wrap:wrap;margin-top:18px;padding:14px 16px;border:1px dashed var(--rule);border-radius:12px;font-size:14px;color:var(--ink70)}
+.contato p{margin:0;display:flex;gap:10px;align-items:center}
+.contato .btn-p{display:inline-flex;align-items:center;gap:7px}
+.contato .btn-p svg.ic{width:16px;height:16px}
+.ct-tipos{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 12px}
+.ct-tipos label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);border-radius:999px;padding:5px 12px;font-size:13.5px;cursor:pointer}
+.ct-tipos label:has(input:checked){background:var(--pine);border-color:var(--pine);color:var(--pine-ink)}
+.ct-tipos input{position:absolute;opacity:0;pointer-events:none}
+.ct-ok{margin:0 0 14px;font-size:14px;line-height:1.5}
 .ressalva{display:flex;gap:12px;align-items:flex-start;background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-rule);border-radius:12px;padding:14px 16px;margin:0 0 22px;font-size:14px;line-height:1.5}
 .ressalva svg.ic{margin-top:1px}
 .ressalva p{margin:0}
@@ -399,6 +408,7 @@ dialog .campo input{background:var(--paper)}
     <symbol id="i-check" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="m8 9 1.8 1.8L13 7.6M8 15.5l1.8 1.8L13 14.1M15.5 9.5H17M15.5 16H17"/></symbol>
     <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
     <symbol id="i-copiar" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11.5" height="11.5" rx="2"/><path d="M15.5 8.5V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7.5a2 2 0 0 0 2 2h2.5"/></symbol>
+    <symbol id="i-carta" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></symbol>
     <symbol id="i-lupa" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
     <symbol id="i-cid" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.8-4.8"/><path d="M8 8.5h5M8 12h3.5"/></symbol>
     <symbol id="i-pasta" viewBox="0 0 24 24"><path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V6.5Z"/><path d="M8 13h8"/></symbol>
@@ -513,6 +523,21 @@ dialog .campo input{background:var(--paper)}
   </div>
 </div>
 <div id="aviso" role="status" aria-live="polite" hidden></div>
+<dialog class="nt" id="dlgContato" aria-labelledby="ctTit">
+  <form id="fContato" novalidate>
+    <h2 id="ctTit">Fale com o Neurotools</h2>
+    <p class="sub">Conte o problema que encontrou ou a sua sugestão. A resposta vai para o seu email de cadastro.</p>
+    <div class="ct-tipos" role="radiogroup" aria-label="Assunto">
+      <label><input type="radio" name="ctTipo" value="Problema" checked>Problema</label>
+      <label><input type="radio" name="ctTipo" value="Sugestão">Sugestão</label>
+      <label><input type="radio" name="ctTipo" value="Outro assunto">Outro assunto</label>
+    </div>
+    <label class="campo">Mensagem<textarea id="ctMsg" rows="7" maxlength="5000" placeholder="Se for um problema, diga em qual página e o que aconteceu."></textarea></label>
+    <p class="sub" style="margin:-4px 0 12px">Não escreva nomes, CPF ou outros dados de pacientes.</p>
+    <p class="lg-erro" id="ctErro" hidden></p>
+    <div class="dlg-acoes"><button type="button" class="btn-l" id="ctCancelar">Cancelar</button><button type="submit" class="btn-p" id="ctEnviar">Enviar</button></div>
+  </form>
+</dialog>
 <dialog class="nt" id="dlgSalvar" aria-labelledby="dsTit">
   <form id="fSalvar" novalidate>
     <h2 id="dsTit">Salvar no miniprontuário</h2>
@@ -528,7 +553,7 @@ dialog .campo input{background:var(--paper)}
 <script>
 (function () {
   'use strict';
-  var NT_VERSAO = '1.1.2';
+  var NT_VERSAO = '1.2.1';
   var RODAPE = '<b>Neurotools ' + NT_VERSAO + ' é um projeto de código aberto, sob licença MIT.</b> Cabe ao julgamento médico conferir a acurácia das informações obtidas e decidir criteriosamente o que fazer com elas. <a href="privacidade.html" target="_blank" rel="noopener">Privacidade e termos de uso</a>.';
   document.getElementById('rodape').innerHTML = RODAPE;
 
@@ -729,7 +754,7 @@ dialog .campo input{background:var(--paper)}
     ['cognitivo-relaa', 'Terapia antiamiloide: relatório', null, 'cognitivo', 'antiamiloide', 'Terapia antiamiloide', 'relatorio antiamiloide lecanemabe donanemabe operadora nat-jus judicial'],
     ['epilepsia-troca', 'Troca de FAE (cronograma)', 'Epilepsia', 'epilepsia', 'troca', 'Troca de medicação', 'troca medicacao titulacao retirada anticrise'],
     ['lme-documentos', 'LME (alto custo)', null, 'lme', 'documentos', 'lme', 'lme ceaf laudo medicamento especializado pcdt receita exames alto custo'],
-    ['lme-receita', 'Receita de controle especial', null, 'lme', 'receita', 'receita', 'receita controle especial branca c1 talonario em branco rdc 1000'],
+    ['lme-receita', 'Receita de controle especial', null, 'lme', 'receita', 'receita', 'receita controle especial branca c1 rdc 1000'],
     ['lme-rapida', 'Prescrição rápida', null, 'lme', 'rapida', 'rapida', 'prescricao rapida receita colar lista remedios'],
     ['lme-pacientes', 'Pacientes do LME', null, 'lme', 'pacientes', '#btnArq', 'arquivo pacientes renovar', true],
     ['lme-medico', 'Dados do médico', null, 'lme', 'medico', '#btnCfg', 'configuracao medico crm cnes cns cartao sus endereco', true]
@@ -795,6 +820,7 @@ dialog .campo input{background:var(--paper)}
     ['nmosd', 'IPND 2015 (NMOSD)', 'Neuroimunologia', 'neuromielite optica nmosd aqp4 devic'],
     ['mogad', 'Banwell 2023 (MOGAD)', 'Neuroimunologia', 'mogad anti-mog adem'],
     ['eai', 'Graus 2016 (encefalite autoimune)', 'Neuroimunologia', 'encefalite autoimune limbica anti-nmdar lgi1'],
+    ['diariocef', 'Diário de cefaleia', 'Cefaleia', 'diario cefaleia dor de cabeca calendario frequencia analgesico abortivo'],
     ['midas', 'MIDAS', 'Cefaleia', 'midas incapacidade migranea enxaqueca'],
     ['hit6', 'HIT-6', 'Cefaleia', 'hit-6 impacto cefaleia'],
     ['mtoq', 'mTOQ-4', 'Cefaleia', 'mtoq tratamento agudo'],
@@ -868,7 +894,7 @@ dialog .campo input{background:var(--paper)}
   ];
 
   var DESC = {
-    'lme-receita': 'Modelo da RDC 1.000/2025, até seis receitas datadas mês a mês e talonário em branco.',
+    'lme-receita': 'Modelo da RDC 1.000/2025, até seis receitas datadas mês a mês.',
     'lme-rapida': 'Cole nome, CPF e os remédios, um por linha, e a receita sai preenchida.',
     'lme-pacientes': 'Arquivo dos pacientes com LME e receitas; reabre o último laudo para renovar.',
     'lme-documentos': 'Laudo, receitas e exames de 10 PCDTs: Alzheimer, distonia, dor crônica, epilepsia, ELA, espasticidade, esquizofrenia, miastenia, osteoporose e Parkinson.',
@@ -885,11 +911,11 @@ dialog .campo input{background:var(--paper)}
   var SUBG = { mgadl: 'Miastenia', qmg: 'Miastenia', mgfa: 'Miastenia', alsfrs: 'ELA', facedrops: 'Nervos cranianos',
     psprs: 'Parkinsonismos atípicos', umsars: 'Parkinsonismos atípicos', tetras: 'Tremor, distonia e outros', twstrs: 'Tremor, distonia e outros', bfm: 'Tremor, distonia e outros', sara: 'Tremor, distonia e outros', irls: 'Tremor, distonia e outros', aims: 'Tremor, distonia e outros', antipsic: 'Fármacos e parkinsonismo',
     ledd: 'Parkinson', c521: 'Parkinson', hyse: 'Parkinson', 'parkinson-iii': 'Parkinson', 'parkinson-iv': 'Parkinson', 'parkinson-foslevodopa': 'Parkinson',
-    respcgrp: 'Anti-CGRP e toxina', preempt: 'Anti-CGRP e toxina', midas: 'Incapacidade e resposta', hit6: 'Incapacidade e resposta', mtoq: 'Incapacidade e resposta',
+    respcgrp: 'Anti-CGRP e toxina', preempt: 'Anti-CGRP e toxina', diariocef: 'Diário', midas: 'Incapacidade e resposta', hit6: 'Incapacidade e resposta', mtoq: 'Incapacidade e resposta',
     'cognitivo-zescores': 'Testes e escalas', 'cognitivo-meem': 'Testes e escalas', 'cognitivo-conv': 'Testes e escalas', 'cognitivo-cdr': 'Testes e escalas', 'cognitivo-fast': 'Testes e escalas', 'cognitivo-pfeffer': 'Testes e escalas', 'cognitivo-madrs': 'Testes e escalas', katz: 'Testes e escalas', iqcode: 'Testes e escalas', mace: 'Testes e escalas', npiq: 'Testes e escalas',
     'cognitivo-antiamiloide': 'Terapia antiamiloide', aria: 'Terapia antiamiloide',
     nihss: 'AVC isquêmico', hints: 'AVC isquêmico', ascod: 'AVC isquêmico', rope: 'AVC isquêmico', sich: 'Hemorragia intracerebral', phases: 'Aneurisma e HSA', hunthess: 'Aneurisma e HSA', fisher: 'Aneurisma e HSA' };
-  var ORDEM_SUB = { 'Cognição': ['Testes e escalas', 'Terapia antiamiloide'], 'Movimento': ['Parkinson', 'Parkinsonismos atípicos', 'Tremor, distonia e outros', 'Fármacos e parkinsonismo'], 'Neuromuscular': ['Miastenia', 'ELA', 'Nervos cranianos'], 'Cefaleia': ['Incapacidade e resposta', 'Anti-CGRP e toxina'], 'Vascular': ['AVC isquêmico', 'Hemorragia intracerebral', 'Aneurisma e HSA'] };
+  var ORDEM_SUB = { 'Cognição': ['Testes e escalas', 'Terapia antiamiloide'], 'Movimento': ['Parkinson', 'Parkinsonismos atípicos', 'Tremor, distonia e outros', 'Fármacos e parkinsonismo'], 'Neuromuscular': ['Miastenia', 'ELA', 'Nervos cranianos'], 'Cefaleia': ['Diário', 'Incapacidade e resposta', 'Anti-CGRP e toxina'], 'Vascular': ['AVC isquêmico', 'Hemorragia intracerebral', 'Aneurisma e HSA'] };
 
   var CAT = [], porId = {};
   ANTIGAS.forEach(function (a) { CAT.push({ id: a[0], nome: a[1], area: a[2], tool: a[3], sub: a[4], alvo: a[5], alias: a[6], acao: !!a[7] }); });
@@ -1168,7 +1194,8 @@ dialog .campo input{background:var(--paper)}
         else if (s.id === 'cid') info = 'Tabela do DATASUS';
         h += cardHtml({ nome: s.nome, ds: s.ds, ic: s.ic, ir: s.id, info: info, infoId: s.id === 'receituarios' ? 'infoRenovar' : (s.id === 'prontuario' ? 'infoMP' : null), dest: s.id === 'receituarios', breve: s.breve });
       });
-      pCorpo.innerHTML = h + '</div>';
+      h += '</div><div class="contato"><p>' + ic('i-carta') + '<span>Encontrou um problema ou tem uma sugestão para o Neurotools?</span></p><button type="button" class="btn-p" data-contato>' + ic('i-carta') + 'Fale conosco</button></div>';
+      pCorpo.innerHTML = h;
       recarregarPacientes(); avisoCopia();
     },
     receituarios: function () {
@@ -1560,6 +1587,45 @@ dialog .campo input{background:var(--paper)}
     if (ultimaCopia && ultimaCopia.id === c.id && Date.now() - ultimaCopia.t < 3600e3) return ultimaCopia.texto;
     return '';
   }
+  // ================= contato =================
+  // Envia pelo endereço /api/contato (worker.js), que confere a sessão no Supabase e manda o email pelo Resend.
+  // Sem servidor (prévia local) ou se o envio falhar, abre o programa de email com a mensagem pronta.
+  var CONTATO = 'neurotools.contato@gmail.com';
+  var dlgC = document.getElementById('dlgContato'), fC2 = document.getElementById('fContato');
+  function erroCt(m) { var e = document.getElementById('ctErro'); e.innerHTML = m || ''; e.hidden = !m; }
+  function abrirContato() {
+    fC2.reset(); erroCt(''); document.getElementById('ctEnviar').disabled = false;
+    try { dlgC.showModal(); } catch (e) { dlgC.setAttribute('open', ''); }
+    setTimeout(function () { document.getElementById('ctMsg').focus(); }, 30);
+  }
+  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-contato]')) { e.preventDefault(); abrirContato(); } });
+  document.getElementById('ctCancelar').addEventListener('click', function () { dlgC.close(); });
+  function porEmail(tipo, msg) {
+    var corpo = msg + '\n\n---\nNeurotools ' + NT_VERSAO + (sessao && sessao.email ? ' | ' + sessao.email : '');
+    return 'mailto:' + CONTATO + '?subject=' + encodeURIComponent('Neurotools: ' + tipo) + '&body=' + encodeURIComponent(corpo);
+  }
+  function semServidor(tipo, msg) {
+    var link = porEmail(tipo, msg);
+    erroCt('Não foi possível enviar daqui. <a href="' + link + '">Abrir no seu programa de email</a> ou escreva para <b>' + CONTATO + '</b>.');
+    document.getElementById('ctEnviar').disabled = false;
+  }
+  fC2.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var msg = document.getElementById('ctMsg').value.trim(), tipo = (fC2.querySelector('input[name=ctTipo]:checked') || {}).value || 'Outro assunto';
+    if (msg.length < 5) return erroCt('Escreva a mensagem.');
+    erroCt(''); var bt = document.getElementById('ctEnviar'); bt.disabled = true;
+    if (!sb) return semServidor(tipo, msg);
+    sb.auth.getSession().then(function (r) {
+      var tk = r && r.data && r.data.session && r.data.session.access_token;
+      if (!tk) throw new Error('sem sessão');
+      return fetch('/api/contato', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tk },
+        body: JSON.stringify({ tipo: tipo, mensagem: msg, versao: NT_VERSAO, pagina: location.hash || '#inicio', navegador: navigator.userAgent }) });
+    }).then(function (resp) {
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      dlgC.close(); avisar('Mensagem enviada. Obrigado!');
+    }).catch(function () { semServidor(tipo, msg); });
+  });
+
   var dlg = document.getElementById('dlgSalvar'), fS = document.getElementById('fSalvar');
   var TIPO_SECAO = { escalas: 'Escala', criterios: 'Critério', relatorios: 'Relatório' };
   document.getElementById('pacSalvar').addEventListener('click', function () {

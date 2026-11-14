@@ -1840,6 +1840,114 @@ function rotuloReg(r, v) { v = String(v || '').trim(); if (!v) return ''; return
   var NT = window.NT, el = NT.el, fmt = NT.fmt, num = NT.num, I = NT.I;
   var A = 'Cefaleia';
 
+  // ---------- Diário de cefaleia ----------
+  // Folha de um mês para o paciente preencher em casa (impressa) e registro do diário devolvido, com resumo para o prontuário.
+  var MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  var SEMANA = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+  function mesDe(v) { var m = /^(\d{4})-(\d{2})$/.exec(v || ''); return m ? { a: +m[1], m: +m[2] - 1 } : null; }
+  function diasNoMes(v) { var x = mesDe(v); return x ? new Date(x.a, x.m + 1, 0).getDate() : 31; }
+  function nomeMes(v) { var x = mesDe(v); return x ? MESES[x.m] + ' de ' + x.a : ''; }
+  function mesIso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
+  function pacBarra() { try { var d = window.parent.document; return (d.getElementById('pacNome') || {}).value || ''; } catch (e) { return ''; } }
+  function medicoCfg() { try { return JSON.parse(localStorage.getItem('lme_cfg') || 'null') || {}; } catch (e) { return {}; } }
+  function escH(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function folhaDiario(st) {
+    var x = mesDe(st.mes), n = diasNoMes(st.mes), linhas = '';
+    var esc = ''; for (var i = 0; i <= 10; i++) esc += '<span>' + i + '</span>';
+    for (var d = 1; d <= n; d++) {
+      var dia = x ? String(d).padStart(2, '0') + '/' + String(x.m + 1).padStart(2, '0') + ' <small>' + SEMANA[new Date(x.a, x.m, d).getDay()] + '</small>' : String(d);
+      linhas += '<tr><td class="d">' + dia + '</td><td class="sn"><span class="bx"></span> Sim &nbsp; <span class="bx"></span> Não</td><td class="esc">' + esc + '</td><td></td></tr>';
+    }
+    var m = medicoCfg(), reg = [rotuloReg('CRM', m.crm), rotuloReg('RQE', m.rqe)].filter(Boolean).join(' | ');
+    var med = m.medicoNomeCurto || m.medicoNome ? escH(m.medicoNomeCurto || m.medicoNome) + (reg ? ' (' + escH(reg) + ')' : '') : '';
+    var alto = n <= 28 ? 8.1 : n <= 30 ? 7.6 : 7.3;
+    return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Diário de cefaleia</title><style>' +
+      '@page{size:A4;margin:11mm 12mm}*{box-sizing:border-box}body{margin:0;font:10.5pt/1.3 Georgia,"Times New Roman",serif;color:#111}' +
+      'h1{font-size:17pt;margin:0 0 1.5mm}.cab{display:flex;gap:6mm;font-size:10.5pt;margin-bottom:2mm}.cab div{flex:1;border-bottom:.3mm solid #444;padding:0 0 .8mm}.cab div.mes{flex:0 0 62mm}' +
+      '.inst{font:8.6pt/1.35 Arial,Helvetica,sans-serif;color:#333;margin:0 0 2.5mm}' +
+      'table{width:100%;border-collapse:collapse;font:9pt Arial,Helvetica,sans-serif}th{font-size:8pt;text-transform:uppercase;letter-spacing:.04em;background:#eee;padding:1.4mm 1.5mm;border:.25mm solid #777;text-align:left}' +
+      'td{border:.25mm solid #777;padding:0 1.5mm;height:' + alto + 'mm}td.d{width:17mm;white-space:nowrap}td.d small{color:#666;font-size:7.5pt}td.sn{width:30mm;white-space:nowrap;font-size:8.5pt}' +
+      '.bx{display:inline-block;width:3mm;height:3mm;border:.3mm solid #333;vertical-align:-.4mm}td.esc{width:60mm;white-space:nowrap}td.esc span{display:inline-block;width:5.2mm;text-align:center;font-size:8.5pt;color:#333}' +
+      '.rod{display:flex;justify-content:space-between;font:7.8pt Arial,Helvetica,sans-serif;color:#555;margin-top:2mm}' +
+      '</style></head><body><h1>Diário de cefaleia</h1>' +
+      '<div class="cab"><div>Nome: ' + escH(st.nome || '') + '</div><div class="mes">Mês: ' + escH(nomeMes(st.mes)) + '</div></div>' +
+      '<p class="inst">Preencha <b>todos os dias</b>, também os dias sem dor. Nos dias com dor, circule a intensidade mais forte do dia (0 = sem dor; 10 = a pior dor imaginável) e anote o remédio que tomou para a dor, com a dose e quantas vezes. Traga esta folha na próxima consulta.</p>' +
+      '<table><thead><tr><th>Dia</th><th>Teve dor?</th><th>Intensidade (0 a 10)</th><th>Remédio para a dor (nome, dose e nº de vezes)</th></tr></thead><tbody>' + linhas + '</tbody></table>' +
+      '<div class="rod"><span>' + med + '</span><span>Neurotools</span></div></body></html>';
+  }
+  function imprimirHtml(html) {
+    var f = document.createElement('iframe');
+    f.setAttribute('aria-hidden', 'true'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+    document.body.appendChild(f);
+    var w = f.contentWindow; w.document.open(); w.document.write(html); w.document.close();
+    setTimeout(function () { try { w.focus(); w.print(); } catch (e) { NT.avisar('Não foi possível abrir a impressão neste navegador.'); } setTimeout(function () { f.remove(); }, 60000); }, 250);
+  }
+  NT.def({
+    id: 'diariocef', area: A, nome: 'Diário de cefaleia', alias: 'diario cefaleia dor de cabeca calendario enxaqueca migranea frequencia dias de dor analgesico abortivo uso excessivo',
+    sub: 'Folha de um mês para o paciente preencher em casa (dor, intensidade de 0 a 10 e remédio para a crise) e registro do diário devolvido, com resumo para o prontuário.',
+    inicial: function () { return { nome: pacBarra(), mes: mesIso(new Date()), d: {} }; },
+    render: function (c, st, k) {
+      if (!st.d) st.d = {};
+      var im = el('input', { type: 'month', value: st.mes || '' });
+      im.addEventListener('change', function () { st.mes = im.value; NT.abrir(NT.atual); });
+      var campoMes = el('label', { class: 'campo' }, [el('span', { text: 'Mês' }), im]);
+      c.appendChild(k.card('Folha para o paciente', 'Uma linha por dia do mês escolhido, numa folha A4. Sem mês, sai com 31 linhas e o mês em branco.', [
+        k.campos([k.txt('nome', 'Nome do paciente', { largo: true }), campoMes]),
+        el('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 6px' }, [
+          el('button', { type: 'button', class: 'btn prim', onclick: function () { imprimirHtml(folhaDiario(st)); } }, 'Imprimir folha em branco')])]));
+      var n = diasNoMes(st.mes), x = mesDe(st.mes);
+      var tb = el('table', { class: 'tb diario' }, [el('tr', null, [el('th', { text: 'Dia' }), el('th', { text: 'Dor' }), el('th', { text: 'Intensidade' }), el('th', { text: 'Remédio para a dor' })])]);
+      for (var d = 1; d <= n; d++) (function (d) {
+        var r = st.d[d] || (st.d[d] = {});
+        var ck = el('input', { type: 'checkbox', 'aria-label': 'Dor no dia ' + d }); ck.checked = !!r.dor;
+        var si = el('select', { 'aria-label': 'Intensidade no dia ' + d }); si.appendChild(el('option', { value: '', text: '-' }));
+        for (var i = 0; i <= 10; i++) si.appendChild(el('option', { value: String(i), text: String(i) }));
+        si.value = r.int == null ? '' : String(r.int);
+        var ab = el('input', { type: 'text', placeholder: 'ex.: sumatriptana 50 mg', 'aria-label': 'Remédio no dia ' + d, value: r.ab || '', list: 'diarioAb' });
+        ck.addEventListener('change', function () { r.dor = ck.checked; if (!ck.checked) { r.int = null; si.value = ''; } k.upd(); });
+        si.addEventListener('change', function () { r.int = si.value === '' ? null : +si.value; if (r.int > 0 && !r.dor) { r.dor = true; ck.checked = true; } k.upd(); });
+        ab.addEventListener('input', function () { r.ab = ab.value; k.upd(); });
+        ab.addEventListener('change', function () { atualizarLista(); });
+        var rot = x ? String(d).padStart(2, '0') + '/' + String(x.m + 1).padStart(2, '0') + ' ' + SEMANA[new Date(x.a, x.m, d).getDay()] : String(d);
+        tb.appendChild(el('tr', null, [el('td', { class: 'mini', style: 'white-space:nowrap;vertical-align:middle', text: rot }), el('td', { style: 'vertical-align:middle' }, ck), el('td', { style: 'width:90px' }, si), el('td', null, ab)]));
+      })(d);
+      var dl = el('datalist', { id: 'diarioAb' });
+      function atualizarLista() {
+        dl.innerHTML = ''; var vistos = {};
+        Object.keys(st.d).forEach(function (q) { var t = (st.d[q].ab || '').trim(); if (t && !vistos[t.toLowerCase()]) { vistos[t.toLowerCase()] = 1; dl.appendChild(el('option', { value: t })); } });
+      }
+      atualizarLista();
+      c.appendChild(k.card('Registro do diário devolvido', 'Transcreva a folha que o paciente trouxe. Ao escolher a intensidade, o dia é marcado como dia com dor. Nomes de remédio já digitados aparecem como sugestão.', [el('div', { class: 'rolavel' }, tb), dl]));
+    },
+    avaliar: function (st) {
+      var n = diasNoMes(st.mes), dor = 0, ints = [], fortes = 0, comAb = 0, porAb = {}, nomes = {}, reg = 0;
+      for (var d = 1; d <= n; d++) {
+        var r = (st.d || {})[d]; if (!r) continue;
+        var ab = (r.ab || '').trim();
+        if (r.dor || r.int != null || ab) reg++;
+        if (r.dor) { dor++; if (r.int != null) { ints.push(r.int); if (r.int >= 7) fortes++; } }
+        if (ab) { comAb++; var kk = ab.toLowerCase().replace(/\s+/g, ' '); porAb[kk] = (porAb[kk] || 0) + 1; nomes[kk] = nomes[kk] || ab; }
+      }
+      if (!reg) return { placar: '0', sufixo: 'dias com dor', rotulo: 'Transcreva o diário', frase: 'Imprima a folha para o paciente ou registre abaixo o diário que ele trouxe.' };
+      var media = ints.length ? ints.reduce(function (a, b) { return a + b; }, 0) / ints.length : null, max = ints.length ? Math.max.apply(null, ints) : null;
+      var cl = dor >= 15 ? 'g4' : dor >= 8 ? 'g3' : dor >= 4 ? 'g2' : 'g1';
+      var rot = dor === 0 ? 'Sem dias de dor' : dor >= 15 ? '15 ou mais dias de dor no mês' : dor >= 8 ? '8 a 14 dias de dor no mês' : dor >= 4 ? '4 a 7 dias de dor no mês' : '1 a 3 dias de dor no mês';
+      var meds = Object.keys(porAb).sort(function (a, b) { return porAb[b] - porAb[a]; }).map(function (q) { return nomes[q] + ': ' + porAb[q] + (porAb[q] > 1 ? ' dias' : ' dia'); });
+      var partes = ['cefaleia em ' + dor + ' de ' + n + ' dias'];
+      if (media != null) partes.push('intensidade média de ' + fmt(Math.round(media * 10) / 10) + '/10 nos dias com dor (máxima ' + max + ')');
+      if (fortes) partes.push('dor intensa (7 a 10) em ' + fortes + (fortes > 1 ? ' dias' : ' dia'));
+      partes.push(comAb ? 'medicação para a crise em ' + comAb + (comAb > 1 ? ' dias' : ' dia') + ' (' + meds.join('; ') + ')' : 'sem medicação para a crise');
+      var t = 'Diário de cefaleia' + (st.mes ? ' (' + nomeMes(st.mes) + ')' : '') + ': ' + partes.join('; ') + '.';
+      var al = [];
+      if (comAb >= 15) al.push('Medicação para a crise em 15 ou mais dias: atinge o limiar da ICHD-3 para uso excessivo também de analgésicos simples e AINE (se mantido por mais de 3 meses).');
+      else if (comAb >= 10) al.push('Medicação para a crise em 10 ou mais dias: atinge o limiar da ICHD-3 para uso excessivo de triptanos, ergotamínicos, opioides e analgésicos combinados (se mantido por mais de 3 meses).');
+      if (dor >= 15) al.push('Cefaleia em 15 ou mais dias no mês: se persistir por mais de 3 meses, considerar migrânea crônica (ICHD-3 1.3) ou outra cefaleia crônica diária.');
+      return { placar: String(dor), sufixo: 'dias com dor', rotulo: rot, classe: cl, frase: t, alerta: al.join(' ') || null, copia: t, dias: dor, diasAb: comAb };
+    },
+    nota: 'A intensidade é a mais forte do dia, na escala numérica de 0 a 10. Os limiares de uso excessivo seguem a ICHD-3 (8.2) e exigem uso regular por mais de 3 meses.',
+    refs: ['Headache Classification Committee of the International Headache Society (IHS). The International Classification of Headache Disorders, 3rd edition. Cephalalgia. 2018;38(1):1-211.', 'Diener HC, Tassorelli C, Dodick DW, Silberstein SD, Lipton RB, Ashina M, et al. Guidelines of the International Headache Society for controlled trials of acute treatment of migraine attacks in adults: fourth edition. Cephalalgia. 2019;39(6):687-710.']
+  });
+
   // ---------- MIDAS ----------
   var MQ = ['Quantos dias você faltou ao trabalho ou à escola por causa da dor de cabeça?', 'Em quantos dias sua produtividade no trabalho ou na escola caiu pela metade ou mais? (sem contar os dias da pergunta 1)', 'Em quantos dias você não fez as tarefas domésticas por causa da dor de cabeça?', 'Em quantos dias sua produtividade nas tarefas domésticas caiu pela metade ou mais? (sem contar os dias da pergunta 3)', 'Em quantos dias você deixou de participar de atividades familiares, sociais ou de lazer por causa da dor de cabeça?'];
   function grauMidas(s) { return s <= 5 ? ['I', 'mínima ou nenhuma', 'g1'] : s <= 10 ? ['II', 'leve', 'g2'] : s <= 20 ? ['III', 'moderada', 'g3'] : [s <= 40 ? 'IV-A' : 'IV-B', 'grave', 'g4']; }
