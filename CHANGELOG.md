@@ -2,6 +2,10 @@
 
 Numeração: **1.x** para entregas com novidades (novas escalas, critérios, relatórios ou seções); **1.x.y** para correções pequenas; **2.0** reservado para mudança grande de estrutura.
 
+## 1.2.2 (18 de novembro de 2026)
+
+- Receituários: fenobarbital (inclusive Gardenal e Carbital) deixa de aparecer como Notificação de Receita B. Pelo adendo da lista B1 da Portaria 344/1998, é prescrito na receita de controle especial em duas vias.
+
 ## 1.2.1 (14 de novembro de 2026)
 
 - Página inicial: botão "Fale conosco" para relatar problemas ou mandar sugestões. A mensagem segue por email para neurotools.contato@gmail.com, com o email da conta para resposta; se o envio direto não estiver disponível, o site oferece abrir o programa de email com a mensagem pronta.
