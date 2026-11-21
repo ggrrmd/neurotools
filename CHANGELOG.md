@@ -2,6 +2,17 @@
 
 Numeração: **1.x** para entregas com novidades (novas escalas, critérios, relatórios ou seções); **1.x.y** para correções pequenas; **2.0** reservado para mudança grande de estrutura.
 
+## 1.3.0 (21 de novembro de 2026)
+
+- Nova seção **Pedido de exames**, entre Relatórios e CID-10, com quatro modos:
+  - Modo livre: os exames saem exatamente como foram escritos.
+  - TUSS rápido: os exames escritos do jeito habitual saem com o código e o termo oficial da TUSS (recorte de 268 exames gerais e neurológicos da TUSS 22, versão 202609). Pacotes como função renal, função hepática, perfil lipídico, eletrólitos e função tireoidiana são desdobrados; complementos como "com contraste" ou "protocolo" são mantidos. O exame não localizado gera um alerta, sai como escrito e pode ser refeito no modo detalhado.
+  - TUSS detalhado: seleção por categoria, subcategoria e exame, com nova linha a cada exame escolhido, busca por nome e campo de complemento.
+  - Modelos salvos: qualquer pedido pode ser salvo como modelo e reaberto no modo em que foi feito.
+  - Saídas: copiar para o prontuário ou emitir em Word (.docx), com ou sem carimbo. A foto do carimbo é enviada uma vez e fica guardada só neste navegador.
+- Miniprontuário: cada registro (escala, critério, relatório, receita ou LME) aceita um comentário, que pode ser editado ou apagado.
+- Cópia de segurança (.json) passa a levar também o carimbo e os modelos de pedido de exames; a planilha (.csv) ganha a coluna de comentário.
+
 ## 1.2.2 (18 de novembro de 2026)
 
 - Receituários: fenobarbital (inclusive Gardenal e Carbital) deixa de aparecer como Notificação de Receita B. Pelo adendo da lista B1 da Portaria 344/1998, é prescrito na receita de controle especial em duas vias.

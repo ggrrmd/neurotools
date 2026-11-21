@@ -13,6 +13,8 @@ Este guia serve para quem for alterar o site (inclusive uma nova conversa com o 
 | `escalas.html` | Motor `NT.def({...})` com todas as escalas, os critérios diagnósticos (blocos "lote 1" a "lote 4") e os relatórios de texto (bloco "Relatórios"). |
 | `cognitivo.html`, `parkinson.html`, `epilepsia.html` | Ferramentas em React já compiladas (minificadas). Edite com cuidado, por substituição de trechos. |
 | `lme.html` | Receituários e LME, gera PDFs com pdf-lib. |
+| `exames.html` | Pedido de exames (HTML/JS puro). Traz o recorte da TUSS embutido (`TUSS_CAT`, `TUSS_SUB`, `TUSS`), a busca com sinônimos (`TROCAS`, `PACOTES`) e o gerador de Word feito à mão (XML do Office num zip sem compressão, sem biblioteca externa). Guarda no `localStorage` o estado de trabalho (`nt.exEstado`, sem o nome do paciente), os modelos (`nt.exModelos`) e a foto do carimbo (`nt.carimbo`). |
+| `docs/tuss-recorte.xlsx`, `docs/gerar_tuss.py` | Planilha do recorte da TUSS e o script que gera o bloco de dados de `exames.html` (com os sinônimos de busca de cada código). |
 | `cid10.json` | CID-10 do DATASUS, versão 2008. |
 | `privacidade.html`, `404.html` | Páginas estáticas. |
 | `worker.js` | Única parte com servidor: responde a `POST /api/contato` (botão "Fale conosco"), confere a sessão no Supabase e envia o email pelo Resend. Todo o resto é servido como arquivo estático (`env.ASSETS`). |
@@ -22,6 +24,17 @@ Este guia serve para quem for alterar o site (inclusive uma nova conversa com o 
 - **Escala, critério ou relatório**: crie um `NT.def({ id, area, nome, ... })` em `escalas.html` (antes da linha final que abre a escala pelo endereço) e acrescente a entrada em `ESCALAS` no `index.html`. Para critério, ponha também `id: 'criterios'` em `SECAO` e a doença em `DOENCA`; para relatório, `id: 'relatorios'` em `SECAO` e uma descrição em `DESC`. Todo instrumento termina com `refs` em estilo Vancouver.
 - **Dados do médico** vêm de `localStorage.lme_cfg` (tela "Dados do médico" do LME); nas ferramentas React, pelo objeto `window.NTMED`. Nunca escreva dados pessoais no código.
 - **Dados de pacientes** ficam só no navegador (IndexedDB `neurotools`, objeto `ntLocal` no `index.html`). Nada de paciente vai para servidor.
+
+## Pedido de exames: como mexer na TUSS
+
+- **Novo exame ou código**: acrescente a linha em `docs/tuss-recorte.xlsx` (aba "Recorte TUSS"), ponha sinônimos no dicionário `A` de `docs/gerar_tuss.py`, rode `python3 docs/gerar_tuss.py docs/tuss-recorte.xlsx tuss.js` e troque em `exames.html` o bloco de `var TUSS_CAT` até o fim de `var TUSS = [...]` pelo conteúdo gerado.
+- **Pacote** (ex.: função renal = ureia + creatinina): lista `PACOTES` em `exames.html`.
+- O modo de cada aba é aberto pela casca com `NTEX.modo('livre' | 'rapido' | 'detalhado' | 'modelos')`; os itens do catálogo são `exames-livre`, `exames-rapido`, `exames-detalhado` e `exames-modelos` (seção `exames`).
+
+## Miniprontuário: comentários
+
+- Escalas, critérios e relatórios: campo `comentario` (e `comentadoEm`) no próprio registro do IndexedDB.
+- Receitas e LME: campo `comentario` no item de `historico` do paciente no arquivo do LME (o `lme.html` copia o documento inteiro ao gravar, então o comentário é preservado).
 
 ## LME: como acrescentar um PCDT
 

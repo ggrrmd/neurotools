@@ -1,6 +1,6 @@
 # Neurotools
 
-Ferramentas para a prática clínica do neurologista: escalas e instrumentos, critérios diagnósticos, receituários (controle especial, prescrição rápida e LME), modelos de relatório, busca na CID-10 e um miniprontuário por CPF.
+Ferramentas para a prática clínica do neurologista: escalas e instrumentos, critérios diagnósticos, receituários (controle especial, prescrição rápida e LME), modelos de relatório, pedido de exames com códigos TUSS, busca na CID-10 e um miniprontuário por CPF.
 
 ## Princípios
 
@@ -16,6 +16,7 @@ Ferramentas para a prática clínica do neurologista: escalas e instrumentos, cr
 | `escalas.html` | Escalas, critérios diagnósticos e modelos de relatório |
 | `cognitivo.html`, `parkinson.html`, `epilepsia.html` | Ferramentas de cognição, Parkinson e troca de anticrise |
 | `lme.html` | Receituários de controle especial, prescrição rápida e LME |
+| `exames.html` | Pedido de exames (livre, TUSS rápido, TUSS detalhado e modelos), com cópia para o prontuário e Word |
 | `cid10.json` | CID-10 do DATASUS, versão 2008 |
 | `privacidade.html` | Privacidade e termos de uso |
 

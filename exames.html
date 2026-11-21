@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pedido de exames</title><style>:root{
+  --paper:#FBFBF8; --card:#FFFFFF; --ink:#101B2D; --ink70:#4A5468; --ink45:#6F7889;
+  --rule:#DDE1E6; --pine:#1F4B3F; --pine-ink:#FBFBF8; --chip:#E9EEEB; --chip-ink:#33413B; --sage:#93B7A9;
+  --soft:#F3F5F2; --warn:#7A4A0B; --warn-bg:#FFF4DE; --g1:#E7F1EC; --g1i:#1F4B3F; --g4:#F8E1DE; --g4i:#8A2A1F;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink)}
+body{font:15px/1.5 var(--sans);padding:22px max(16px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+button,input,select,textarea{font:inherit;color:inherit}
+[hidden]{display:none!important}
+#app{max-width:880px;margin:0 auto}
+.cab{padding-bottom:12px;border-bottom:1px solid var(--rule);margin-bottom:14px}
+.cab .area{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--pine)}
+.cab h1{font:700 25px/1.15 var(--serif);margin:2px 0 4px;letter-spacing:-.01em}
+.cab .sub{margin:0;color:var(--ink70);font-size:14px}
+.abas{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+.aba{border:1px solid var(--rule);background:#fff;border-radius:999px;padding:6px 14px;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--ink70)}
+.aba:hover{border-color:var(--sage)}
+.aba[aria-selected="true"]{background:var(--pine);border-color:var(--pine);color:var(--pine-ink)}
+.aba:focus-visible,.btn:focus-visible{outline:3px solid var(--sage);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:16px 16px 14px;margin-bottom:14px}
+.card h2{font:700 17px/1.25 var(--serif);margin:0 0 6px;display:flex;align-items:baseline;gap:10px;justify-content:space-between}
+.card h2 .sub{font:600 12px var(--sans);color:var(--ink45);white-space:nowrap}
+.dica{margin:0 0 10px;color:var(--ink70);font-size:13.5px}
+.mini{font-size:12.5px;color:var(--ink45)}
+.campos{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px 14px;margin:4px 0 4px}
+.campo{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--ink70)}
+.campo.largo{grid-column:1 / -1}
+.campo input,.campo select,.campo textarea,select.sel,input.txt{border:1px solid var(--rule);border-radius:9px;padding:7px 9px;background:#fff;font-size:15px;color:var(--ink);min-height:38px;width:100%}
+.campo textarea{min-height:130px;resize:vertical;font-size:14.5px;line-height:1.5}
+.campo input:focus,.campo select:focus,.campo textarea:focus,select.sel:focus,input.txt:focus{outline:3px solid var(--sage);outline-offset:0;border-color:var(--pine)}
+.btn{border:1px solid var(--rule);background:#fff;border-radius:9px;min-height:36px;padding:0 13px;cursor:pointer;font-size:13.5px;font-weight:600}
+.btn.prim{background:var(--pine);border-color:var(--pine);color:var(--pine-ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.peq{min-height:30px;padding:0 10px;font-size:12.5px}
+.btn.lnk{border:0;background:none;padding:0 4px;min-height:0;color:var(--pine);text-decoration:underline;font-weight:600}
+.btn.perigo{color:var(--g4i)}
+.acoes{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.caixa{border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.5;margin:10px 0 0}
+.caixa.info{background:var(--soft);color:var(--ink70)}
+.caixa.alerta{background:var(--warn-bg);color:var(--warn)}
+.caixa.ok{background:var(--g1);color:var(--g1i)}
+.caixa ul{margin:4px 0 0;padding-left:18px}
+.caixa li{margin:3px 0}
+/* resultado do TUSS rápido */
+.rl{list-style:none;margin:10px 0 0;padding:0}
+.rl li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:2px 8px;padding:8px 0;border-top:1px solid var(--rule)}
+.rl li:first-child{border-top:0}
+.rl .n{grid-row:span 2;width:24px;height:24px;border-radius:12px;background:var(--chip);color:var(--chip-ink);font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.rl li.falta .n{background:var(--warn-bg);color:var(--warn)}
+.rl .ex{font-size:14px}
+.rl .ex code,.prev code{font:700 12.5px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--pine);margin-right:6px}
+.rl .de{font-size:12px;color:var(--ink45)}
+.rl select{margin-top:4px;font-size:13px;min-height:32px;padding:4px 8px;border:1px solid var(--rule);border-radius:8px;background:#fff;max-width:100%}
+.sug{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.chip{border:1px solid var(--rule);background:#fff;border-radius:999px;padding:3px 10px;font-size:12.5px;cursor:pointer;text-align:left}
+.chip:hover{border-color:var(--sage)}
+.chip code{font:700 11.5px ui-monospace,Menlo,monospace;color:var(--pine);margin-right:4px}
+/* TUSS detalhado */
+.lin{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:8px;align-items:start;padding:9px 0;border-top:1px solid var(--rule)}
+.lin:first-child{border-top:0}
+.lin .n{width:24px;height:24px;border-radius:12px;background:var(--chip);color:var(--chip-ink);font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:7px}
+.lin .sels{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px}
+.lin .sels .ex{grid-column:1 / -1}
+.lin .sels input.ex{font-size:13.5px;min-height:34px}
+.lin .x{margin-top:4px}
+.busca{position:relative;margin-bottom:6px}
+.resb{border:1px solid var(--rule);border-radius:10px;margin-top:4px;background:#fff;overflow:hidden}
+.resb button{display:block;width:100%;text-align:left;border:0;border-top:1px solid var(--rule);background:#fff;padding:7px 10px;font-size:13.5px;cursor:pointer}
+.resb button:first-child{border-top:0}
+.resb button:hover,.resb button:focus{background:var(--soft);outline:0}
+.resb button code{font:700 12px ui-monospace,Menlo,monospace;color:var(--pine);margin-right:6px}
+.resb button small{display:block;color:var(--ink45);font-size:11.5px}
+/* modelos */
+.mod{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;padding:10px 0;border-top:1px solid var(--rule);align-items:center}
+.mod:first-child{border-top:0}
+.mod b{font-size:14.5px}
+.mod small{display:block;color:var(--ink45);font-size:12.5px}
+.mod .bt{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+/* pedido */
+.prev{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:break-word;min-height:44px}
+.prev.vazio{color:var(--ink45)}
+.opc{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-top:12px;font-size:13.5px}
+.opc label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.opc input{accent-color:var(--pine);width:17px;height:17px;margin:0}
+.carimbo{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.carimbo img{max-width:190px;max-height:90px;border:1px dashed var(--rule);border-radius:8px;background:#fff;padding:4px}
+.salvarmod{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.salvarmod input{flex:1 1 220px}
+.aviso{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:10px;padding:9px 16px;font-size:13.5px;box-shadow:0 6px 22px rgba(16,27,45,.2);z-index:9;max-width:90vw}
+.refs{margin-top:22px;font-size:12.5px;color:var(--ink70)}
+.refs h2{font-size:13px;margin:0 0 6px;letter-spacing:.04em;text-transform:uppercase;opacity:.75;font-family:var(--sans)}
+@media (max-width:560px){.lin .sels{grid-template-columns:1fr}}
+</style></head><body>
+<div id="app">
+  <header class="cab"><div class="area">Pedido de exames</div><h1 id="tit">Modo livre</h1><p class="sub" id="sub"></p></header>
+  <nav class="abas" role="tablist" aria-label="Modos do pedido de exames">
+    <button type="button" class="aba" role="tab" data-modo="livre">Modo livre</button>
+    <button type="button" class="aba" role="tab" data-modo="rapido">TUSS rápido</button>
+    <button type="button" class="aba" role="tab" data-modo="detalhado">TUSS detalhado</button>
+    <button type="button" class="aba" role="tab" data-modo="modelos">Modelos salvos</button>
+  </nav>
+
+  <section class="card" id="cPac">
+    <h2>Paciente</h2>
+    <div class="campos">
+      <label class="campo largo">Nome do paciente<input type="text" id="pNome" autocomplete="off" placeholder="Nome completo"></label>
+      <label class="campo">Data do pedido<input type="date" id="pData"></label>
+      <label class="campo">CID-10 (opcional)<input type="text" id="pCid" autocomplete="off" placeholder="Ex.: G30.1"></label>
+      <label class="campo largo">Indicação clínica (opcional)<input type="text" id="pInd" autocomplete="off" placeholder="Ex.: investigação de declínio cognitivo"></label>
+    </div>
+  </section>
+
+  <section class="card modo" data-m="livre">
+    <h2>Exames</h2>
+    <p class="dica">Escreva os exames como quer que saiam no pedido, um por linha (ou separados por ponto e vírgula). Nada é alterado nem codificado.</p>
+    <label class="campo largo"><span class="mini">Exames</span><textarea id="tLivre" spellcheck="true" placeholder="Hemograma completo&#10;RM de crânio com contraste, protocolo para epilepsia&#10;EEG em vigília e sono"></textarea></label>
+  </section>
+
+  <section class="card modo" data-m="rapido">
+    <h2>Exames <span class="sub" id="rCont"></span></h2>
+    <p class="dica">Escreva os exames do jeito que costuma pedir, um por linha ou separados por vírgula. Cada um é procurado no recorte da TUSS e sai com o código e o termo oficial. Pacotes como função renal, função hepática, perfil lipídico, eletrólitos, função tireoidiana e coagulograma são desdobrados.</p>
+    <label class="campo largo"><span class="mini">Exames</span><textarea id="tRapido" spellcheck="false" placeholder="hemograma, função renal, eletrólitos, TSH, T4 livre, B12, VDRL&#10;RM de crânio com contraste&#10;ENMG de 4 membros"></textarea></label>
+    <ol class="rl" id="rLista"></ol>
+    <div id="rFaltas"></div>
+  </section>
+
+  <section class="card modo" data-m="detalhado">
+    <h2>Exames <span class="sub" id="dCont"></span></h2>
+    <p class="dica">Escolha a categoria, a subcategoria e o exame. Uma nova linha abre a cada exame escolhido. Se preferir, busque pelo nome.</p>
+    <div class="busca"><input class="txt" type="search" id="dBusca" placeholder="Buscar exame na TUSS pelo nome, sigla ou código" autocomplete="off" aria-label="Buscar exame na TUSS"><div class="resb" id="dRes" hidden></div></div>
+    <div id="dPend"></div>
+    <div id="dLinhas"></div>
+  </section>
+
+  <section class="card modo" data-m="modelos">
+    <h2>Modelos salvos <span class="sub" id="mCont"></span></h2>
+    <p class="dica">Monte um pedido em qualquer modo e toque em <b>Salvar como modelo</b>. Ao usar um modelo, os exames voltam para o modo em que ele foi feito, prontos para ajustar.</p>
+    <div id="mLista"></div>
+  </section>
+
+  <section class="card" id="cPedido">
+    <h2>Pedido <span class="sub" id="pCont"></span></h2>
+    <div class="prev vazio" id="prev">Os exames aparecem aqui.</div>
+    <div class="acoes">
+      <button type="button" class="btn prim" id="bCopiar">Copiar para o prontuário</button>
+      <button type="button" class="btn" id="bModelo">Salvar como modelo</button>
+      <button type="button" class="btn lnk" id="bLimpar">Limpar exames</button>
+    </div>
+    <div class="salvarmod" id="fModelo" hidden>
+      <input class="txt" type="text" id="mNome" placeholder="Nome do modelo (ex.: Rastreio de demência reversível)" autocomplete="off">
+      <button type="button" class="btn prim" id="mSalvar">Salvar</button><button type="button" class="btn" id="mCancelar">Cancelar</button>
+    </div>
+    <div class="opc" role="radiogroup" aria-label="Carimbo no Word">
+      <b>Word (.docx):</b>
+      <label><input type="radio" name="carimbo" value="com" id="oCom"> com carimbo</label>
+      <label><input type="radio" name="carimbo" value="sem" id="oSem"> sem carimbo</label>
+      <button type="button" class="btn prim" id="bDocx">Emitir .docx</button>
+    </div>
+    <div id="carBox"></div>
+    <div id="medBox"></div>
+    <input type="file" id="arqCarimbo" accept="image/png,image/jpeg,image/webp,image/heic,image/*" hidden>
+  </section>
+  <section class="refs"><h2>Referência</h2><ol><li>Agência Nacional de Saúde Suplementar (ANS). Terminologia Unificada da Saúde Suplementar (TUSS): tabela 22, procedimentos e eventos em saúde. Versão 202609. Rio de Janeiro: ANS; 2026.</li></ol></section>
+</div>
+<script>
+// Recorte da TUSS 22 (versão 202609) feito pelo Dr. Guilherme: [código, descrição oficial, categoria, subcategoria, sinônimos para a busca].
+// Gerado de docs/tuss-recorte.xlsx por docs/gerar_tuss.py; para mudar, edite a planilha e rode o script de novo.
+var TUSS_CAT = ["Laboratório geral", "Laboratório neurológico", "Neurofisiologia", "Imagem geral e exames cardiológicos", "Neuroimagem", "Medicina nuclear"];
+var TUSS_SUB = ["Hematologia e coagulação", "Bioquímica", "Ferro e vitaminas", "Endócrino", "Sorologias", "Urina", "Líquor", "Anticorpos (autoimunes e paraneoplásicos)", "Junção neuromuscular, nervo e músculo", "Reumatológico, vasculite e gamopatias", "Trombofilias e AVC no jovem", "Metabólico, carencial e tóxico", "Infecciosas", "Nível sérico de fármacos", "Genética", "Eletroencefalografia", "Eletroneuromiografia", "Potenciais evocados", "Sono", "Vestibular e autonômico", "Radiologia", "Ultrassonografia", "Tomografia", "Cardiológicos", "Ressonância magnética", "Técnicas avançadas de RM", "Angio-RM", "Ultrassonografia vascular", "Angiografia digital", "Neurológicos", "Outros de interesse neurológico"];
+var TUSS = [
+["40304361", "Hemograma com contagem de plaquetas ou frações (eritrograma, leucograma, plaquetas)", 0, 0, ["hemograma", "hemograma completo", "hemo", "hmg", "hemograma com plaquetas"]],
+["40304370", "Hemossedimentação, (VHS) - pesquisa e/ou dosagem", 0, 0, ["vhs", "velocidade de hemossedimentacao", "hemossedimentacao"]],
+["40304558", "Reticulócitos, contagem", 0, 0, ["reticulocitos"]],
+["40304590", "Tempo de protrombina - determinação", 0, 0, ["tp", "tap", "inr", "tempo de protrombina", "tp inr", "rni"]],
+["40304639", "Tempo de tromboplastina parcial ativada - determinação", 0, 0, ["ttpa", "kptt", "ttpa kptt", "tempo de tromboplastina parcial"]],
+["40304264", "Fibrinogênio, teste funcional, dosagem", 0, 0, ["fibrinogenio"]],
+["40304906", "Dímero D - pesquisa e/ou dosagem", 0, 0, ["dimero d", "d dimero"]],
+["40302040", "Glicose - pesquisa e/ou dosagem", 0, 1, ["glicose", "glicemia", "glicemia de jejum", "glicose de jejum", "gj"]],
+["40302733", "Hemoglobina glicada (Fração A1c) - pesquisa e/ou dosagem", 0, 1, ["hba1c", "hemoglobina glicada", "a1c", "glicada"]],
+["40302709", "Teste oral de tolerância à glicose - 2 dosagens", 0, 1, ["ttog", "curva glicemica", "tolerancia a glicose"]],
+["40301605", "Colesterol total - pesquisa e/ou dosagem", 0, 1, ["colesterol", "colesterol total", "ct"]],
+["40301583", "Colesterol (HDL) - pesquisa e/ou dosagem", 0, 1, ["hdl", "hdl colesterol"]],
+["40301591", "Colesterol (LDL) - pesquisa e/ou dosagem", 0, 1, ["ldl", "ldl colesterol"]],
+["40302695", "Colesterol (VLDL) - pesquisa e/ou dosagem", 0, 1, ["vldl"]],
+["40302547", "Triglicerídeos - pesquisa e/ou dosagem", 0, 1, ["triglicerides", "triglicerideos", "tg", "trigliceridios"]],
+["40302580", "Uréia - pesquisa e/ou dosagem", 0, 1, ["ureia", "ur"]],
+["40301630", "Creatinina - pesquisa e/ou dosagem", 0, 1, ["creatinina", "cr", "creat"]],
+["40302423", "Sódio - pesquisa e/ou dosagem", 0, 1, ["sodio", "na"]],
+["40302318", "Potássio - pesquisa e/ou dosagem", 0, 1, ["potassio", "k"]],
+["40301400", "Cálcio - pesquisa e/ou dosagem", 0, 1, ["calcio", "calcio total", "ca"]],
+["40301419", "Cálcio iônico - pesquisa e/ou dosagem", 0, 1, ["calcio ionico", "calcio ionizado", "cai"]],
+["40302237", "Magnésio - pesquisa e/ou dosagem", 0, 1, ["magnesio", "mg"]],
+["40301931", "Fósforo - pesquisa e/ou dosagem", 0, 1, ["fosforo", "p"]],
+["40302504", "Transaminase oxalacética (amino transferase aspartato) - pesquisa e/ou dosagem", 0, 1, ["tgo", "ast", "aspartato aminotransferase", "tgo ast"]],
+["40302512", "Transaminase pirúvica (amino transferase de alanina) - pesquisa e/ou dosagem", 0, 1, ["tgp", "alt", "alanina aminotransferase", "tgp alt"]],
+["40301990", "Gama-glutamil transferase - pesquisa e/ou dosagem", 0, 1, ["ggt", "gama gt", "gama glutamil transferase", "gamagt"]],
+["40301885", "Fosfatase alcalina - pesquisa e/ou dosagem", 0, 1, ["fa", "fosfatase alcalina"]],
+["40301397", "Bilirrubinas (direta, indireta e total) - pesquisa e/ou dosagem", 0, 1, ["bilirrubinas", "bilirrubina", "bt e fracoes", "bilirrubina total e fracoes"]],
+["40302385", "Proteínas totais albumina e globulina - pesquisa e/ou dosagem", 0, 1, ["proteinas totais e fracoes", "proteinas totais", "proteina total e fracoes"]],
+["40301222", "Albumina - pesquisa e/ou dosagem", 0, 1, ["albumina", "albumina serica"]],
+["40301150", "Ácido úrico - pesquisa e/ou dosagem", 0, 1, ["acido urico"]],
+["40301648", "Creatino fosfoquinase total (CK) - pesquisa e/ou dosagem", 0, 1, ["ck", "cpk", "creatinoquinase", "creatinofosfoquinase", "ck total", "cpk total"]],
+["40301281", "Amilase - pesquisa e/ou dosagem", 0, 1, ["amilase"]],
+["40302199", "Lipase - pesquisa e/ou dosagem", 0, 1, ["lipase"]],
+["40308391", "Proteína C reativa, quantitativa - pesquisa e/ou dosagem", 0, 1, ["pcr", "proteina c reativa", "pcr quantitativa"]],
+["40302113", "Homocisteína - pesquisa e/ou dosagem", 0, 1, ["homocisteina"]],
+["40302016", "Gasometria (pH, pCO2, SA, O2, excesso base) - pesquisa e/ou dosagem", 0, 1, ["gasometria", "gasometria arterial", "gasometria venosa"]],
+["40301842", "Ferro sérico - pesquisa e/ou dosagem", 0, 2, ["ferro", "ferro serico"]],
+["40316270", "Ferritina - pesquisa e/ou dosagem", 0, 2, ["ferritina"]],
+["40302520", "Transferrina - pesquisa e/ou dosagem", 0, 2, ["transferrina"]],
+["40321231", "Índice de saturação de ferro", 0, 2, ["ist", "saturacao de transferrina", "indice de saturacao de transferrina", "saturacao de ferro"]],
+["40316572", "Vitamina B12 - pesquisa e/ou dosagem", 0, 2, ["b12", "vitamina b12", "cobalamina", "vit b12"]],
+["40301087", "Ácido fólico, pesquisa e/ou dosagem nos eritrócitos", 0, 2, ["acido folico", "folato", "folato serico", "folato eritrocitario"]],
+["40302830", "Vitamina \"D\" 25 HIDROXI, pesquisa e/ou dosagem (Vitamina D3)", 0, 2, ["vitamina d", "25 oh vitamina d", "25 hidroxivitamina d", "vit d", "25oh d", "25 oh d"]],
+["40316521", "Tireoestimulante, hormônio (TSH) - pesquisa e/ou dosagem", 0, 3, ["tsh"]],
+["40316491", "T4 livre - pesquisa e/ou dosagem", 0, 3, ["t4 livre", "t4l"]],
+["40316556", "Triiodotironina (T3) - pesquisa e/ou dosagem", 0, 3, ["t3", "t3 total"]],
+["40316157", "Anti-TPO - pesquisa e/ou dosagem", 0, 3, ["anti tpo", "antitpo", "antiperoxidase", "anticorpo antitireoperoxidase", "anti tireoperoxidase"]],
+["40316190", "Cortisol - pesquisa e/ou dosagem", 0, 3, ["cortisol", "cortisol serico", "cortisol basal"]],
+["40316416", "Prolactina - pesquisa e/ou dosagem", 0, 3, ["prolactina", "prl"]],
+["40316360", "Insulina - pesquisa e/ou dosagem", 0, 3, ["insulina", "insulina basal"]],
+["40316149", "Antígeno específico prostático total (PSA) - pesquisa e/ou dosagem", 0, 3, ["psa", "psa total"]],
+["40316130", "Antígeno específico prostático livre (PSA livre) - pesquisa e/ou dosagem", 0, 3, ["psa livre"]],
+["40307760", "Sífilis - VDRL", 0, 4, ["vdrl", "sifilis", "sorologia para sifilis"]],
+["40307735", "Sífilis - FTA-ABS-IgG - pesquisa", 0, 4, ["fta abs", "ftaabs", "fta abs igg"]],
+["40308286", "Sífilis anticorpo total - pesquisa e/ou dosagem", 0, 4, ["treponemico", "teste treponemico", "anticorpos antitreponema", "sifilis anticorpos totais"]],
+["40307182", "HIV1+ HIV2, (determinação conjunta), pesquisa de anticorpos", 0, 4, ["hiv", "anti hiv", "sorologia hiv", "anti hiv 1 e 2", "sorologia para hiv"]],
+["40307018", "Hepatite B - HBSAG (AU, antígeno austrália) - pesquisa e/ou dosagem", 0, 4, ["hbsag", "hbs ag"]],
+["40306992", "Hepatite B - HBSAC (anti-antígeno de superfície) - pesquisa e/ou dosagem", 0, 4, ["anti hbs"]],
+["40306950", "Hepatite B - HBCAC - IgG (anti-core IgG ou Acoreg) - pesquisa e/ou dosagem", 0, 4, ["anti hbc", "anti hbc igg", "anti hbc total"]],
+["40307026", "Hepatite C - anti-HCV - pesquisa e/ou dosagem", 0, 4, ["anti hcv", "hepatite c", "hcv", "sorologia hepatite c"]],
+["40311210", "Rotina de urina (caracteres físicos, elementos anormais e sedimentoscopia)", 0, 5, ["urina 1", "urina tipo 1", "eas", "urina rotina", "parcial de urina", "exame de urina", "u1", "sumario de urina"]],
+["40310213", "Cultura, urina com contagem de colônias", 0, 5, ["urocultura", "urocultura com antibiograma", "cultura de urina"]],
+["40309169", "Punção lombar com manometria para coleta de líquido cefalorraqueano", 1, 6, ["puncao lombar", "pl", "puncao lombar com manometria", "pressao de abertura"]],
+["40309100", "LCR ambulatorial rotina (aspectos cor + índice de cor + contagem global e específica de leucócitos e hemácias + citologia oncótica + proteína + glicose + cloro + eletroforese com concentração + IgG + reações para neurocisticercose (2) + reações para neuroles (2)).", 1, 6, ["liquor", "lcr", "liquor rotina", "lcr rotina", "liquor ambulatorial", "exame de liquor", "liquor completo", "lcr completo", "liquido cefalorraquidiano"]],
+["40309118", "LCR hospitalar neurologia (aspectos cor + índices de cor + contagem global e específica de leucócitos e hemácias + proteína + glicose + cloro + reações para neurocisticercose (2) + reações para neurolues (2) + bacterioscopia + cultura + látex para bactérias).", 1, 6, ["liquor hospitalar", "lcr hospitalar", "liquor com cultura"]],
+["40309029", "Bioquímica ICR (proteínas + pandy + glicose + cloro) - pesquisa e/ou dosagem em líquidos orgânicos", 1, 6, ["bioquimica do liquor", "bioquimica de liquor", "liquor bioquimica"]],
+["40309134", "Pesquisa de bandas oligoclonais por isofocalização - pesquisa e/ou dosagem em líquidos orgânicos", 1, 6, ["bandas oligoclonais", "bandas oligoclonais no liquor", "bocs", "boc"]],
+["40309096", "Índice de imunoprodução (eletrof. e IgG em soro e líquor) - pesquisa e/ou dosagem", 1, 6, ["indice de igg", "indice de igg no liquor", "indice de imunoproducao", "indice de link"]],
+["40309061", "Eletroforese de proteínas no líquor, com concentração - pesquisa e/ou dosagem em líquidos orgânicos", 1, 6, ["eletroforese de proteinas no liquor"]],
+["40324397", "Imunoglobulina G, líquor", 1, 6, ["igg no liquor", "igg liquor"]],
+["40322378", "Albumina, líquor", 1, 6, ["albumina no liquor", "albumina liquor"]],
+["40324273", "Cadeias leves livres Kappa/Lambda, dosagem, líquor", 1, 6, ["cadeias leves livres no liquor", "kappa no liquor", "cadeias leves kappa liquor", "kflc liquor"]],
+["40309045", "Células, pesquisa de células neoplásicas (citologia oncótica) - pesquisa e/ou dosagem em líquidos orgânicos", 1, 6, ["citologia oncotica do liquor", "citologia oncotica", "pesquisa de celulas neoplasicas"]],
+["40312216", "Esclerose múltipla, painel", 1, 6, ["painel de esclerose multipla", "painel em"]],
+["40503909", "Quantificação de proteína beta amilóide-42, no líquido cefalorraquidiano (LCR)", 1, 6, ["beta amiloide 42 no liquor", "abeta 42", "ab42", "amiloide 42", "beta amiloide no liquor", "beta amiloide 42"]],
+["40503925", "Quantificação de proteína Tau-fosforilada, no líquido cefalorraquidiano (LCR)", 1, 6, ["tau fosforilada", "p tau", "ptau", "p tau 181", "tau fosforilada no liquor"]],
+["40503933", "Quantificação de proteína Tau-Total, no líquido cefalorraquidiano (LCR)", 1, 6, ["tau total", "t tau", "ttau", "tau total no liquor"]],
+["40312291", "Proteína 14-3-3", 1, 6, ["14 3 3", "proteina 14 3 3"]],
+["40503950", "Painel multiplex infeccioso no líquor - painel com até 25 agentes", 1, 6, ["painel multiplex", "painel de meningite", "filmarray", "painel meningite encefalite", "painel infeccioso no liquor"]],
+["40503755", "Detecção/tipagem herpes vírus 1/2 líquor", 1, 6, ["pcr herpes no liquor", "herpes no liquor", "pcr hsv", "hsv no liquor", "pcr para herpes"]],
+["40309258", "Líquor látex para meningite", 1, 6, ["latex no liquor", "latex para meningite"]],
+["40309215", "Líquor cisticercose Western Blot", 1, 6, ["cisticercose no liquor", "western blot cisticercose no liquor"]],
+["40503941", "Detecção de anticorpo IgG anti-HTLV-1/2 no líquido cefalorraquidiano (LCR)", 1, 6, ["htlv no liquor", "anti htlv no liquor"]],
+["40316661", "Aquaporina 4 (AQP4)", 1, 7, ["aqp4", "anti aqp4", "aquaporina 4", "anti aquaporina 4", "nmo igg"]],
+["40324664", "Anticorpo anti-MOG", 1, 7, ["mog", "anti mog", "mog igg"]],
+["40324656", "Anticorpo anti-NMDAR", 1, 7, ["nmdar", "anti nmdar", "anti nmda", "nmda", "receptor nmda"]],
+["40324699", "Anticorpos anti-LGI1, dosagem sangue", 1, 7, ["lgi1", "anti lgi1", "lgi1 sangue", "anti lgi1 sangue", "lgi1 soro"]],
+["40324745", "Anticorpo anti-LGi1, dosagem líquor", 1, 7, ["lgi1 no liquor", "anti lgi1 no liquor", "lgi1 liquor"]],
+["40324702", "Anticorpos anti-CASPR2", 1, 7, ["caspr2", "anti caspr2"]],
+["40324672", "Anticorpo anti-AMPAR, dosagem sangue", 1, 7, ["ampar", "anti ampar", "ampar sangue"]],
+["40324753", "Anticorpo anti-AMPAR, dosagem líquor", 1, 7, ["ampar no liquor", "anti ampar no liquor"]],
+["40324680", "Anticorpos anti-GABAR", 1, 7, ["gabar", "anti gabar", "anti gaba b", "gaba b", "anti gabab"]],
+["40305341", "Gad-Ab-antidescarboxilase do ácido - pesquisa e/ou dosagem", 1, 7, ["anti gad", "gad", "gad65", "anti gad 65", "anticorpo anti gad"]],
+["40324257", "HU (anti neurônio), anticorpos", 1, 7, ["anti hu", "hu", "anna1", "anna 1", "anti hu sangue"]],
+["40324761", "Anti HU (ANNA1), dosagem líquor", 1, 7, ["anti hu no liquor", "anna1 no liquor"]],
+["40324150", "Neuronal nuclear IgG, anticorpos, soro", 1, 7, ["anticorpos antineuronais nucleares", "anna soro"]],
+["40308782", "Anticorpos anti neuronal nuclear 1 e 2 LCR", 1, 7, ["anna no liquor", "antineuronais no liquor"]],
+["40308570", "Anti YO (PCA1), dosagem sangue", 1, 7, ["anti yo", "yo", "pca1", "pca 1"]],
+["40308588", "Anti YO (PCA1), dosagem líquor", 1, 7, ["anti yo no liquor"]],
+["40308537", "Anti RI (Western Blot)", 1, 7, ["anti ri", "ri", "anna2", "anna 2"]],
+["40308936", "Anticorpos CV2 auto, soro", 1, 7, ["anti cv2", "cv2", "crmp5", "anti crmp5"]],
+["40308901", "Acetilcolina, anticorpos bloqueador receptor", 1, 8, ["anticorpo bloqueador do receptor de acetilcolina", "achr bloqueador"]],
+["40323030", "Acetilcolina, anticorpos ligador receptor", 1, 8, ["anti achr", "achr", "antirreceptor de acetilcolina", "anticorpo antirreceptor de acetilcolina", "anti receptor de acetilcolina", "anticorpos anti ach", "anti ach", "ac anti receptor de acetilcolina", "achr ligador"]],
+["40323048", "Acetilcolina, anticorpos modulador receptor", 1, 8, ["achr modulador", "anticorpo modulador do receptor de acetilcolina"]],
+["40324729", "Anticorpos anti tiroquinase músculo específica (anti-MUSK), dosagem", 1, 8, ["musk", "anti musk"]],
+["40308910", "Anticorpos contra canal de cálcio regulado por voltagem", 1, 8, ["vgcc", "anti vgcc", "canal de calcio", "anticorpos anticanal de calcio", "canal de calcio voltagem dependente", "anti canal de calcio"]],
+["40324737", "Anticorpos anti-VGKC, dosagem", 1, 8, ["vgkc", "anti vgkc", "canal de potassio"]],
+["40308472", "Anti GM1 - IgG/IgM", 1, 8, ["anti gm1", "gm1"]],
+["40308960", "Anticorpos Gangliosídeos, soro", 1, 8, ["antigangliosideos", "anti gangliosideos", "gangliosideos"]],
+["40323579", "Perfil para anticorpos anti gangliosídeo", 1, 8, ["painel de gangliosideos", "perfil de gangliosideos", "perfil antigangliosideos"]],
+["40323013", "Anticorpos GQ1B - IgG", 1, 8, ["anti gq1b", "gq1b"]],
+["40323552", "Neuropatia motora, painel", 1, 8, ["painel de neuropatia motora"]],
+["40324710", "Anticorpos anti-HMG-CoA redutase (anti-hmgcoar), dosagem", 1, 8, ["anti hmgcr", "hmgcr", "anti hmg coa redutase"]],
+["40301230", "Aldolase - pesquisa e/ou dosagem", 1, 8, ["aldolase"]],
+["40306380", "Antimúsculo estriado - pesquisa e/ou dosagem", 1, 8, ["antimusculo estriado", "anti musculo estriado"]],
+["40306852", "Fator antinúcleo, (FAN) - pesquisa e/ou dosagem", 1, 9, ["fan", "fator antinuclear", "ana"]],
+["40306062", "Anti-DNA - pesquisa e/ou dosagem", 1, 9, ["anti dna", "anti dsdna", "anti dna nativo"]],
+["40306119", "Anti-Ro/SSA - pesquisa e/ou dosagem", 1, 9, ["anti ro", "anti ssa", "anti ro ssa"]],
+["40306089", "Anti-LA/SSB - pesquisa e/ou dosagem", 1, 9, ["anti la", "anti ssb", "anti la ssb"]],
+["40306402", "Antineutrófilos (anca) C - pesquisa e/ou dosagem", 1, 9, ["c anca", "canca", "anca c"]],
+["40306410", "Antineutrófilos (anca) P - pesquisa e/ou dosagem", 1, 9, ["p anca", "panca", "anca p"]],
+["40305287", "Enzima conversora da angiotensina (ECA) - pesquisa e/ou dosagem", 1, 9, ["eca", "enzima conversora da angiotensina", "enzima conversora de angiotensina"]],
+["40308014", "Crioglobulinas, caracterização - imunoeletroforese", 1, 9, ["crioglobulinas"]],
+["40302717", "Eletroforese de proteínas de alta resolução", 1, 9, ["eletroforese de proteinas", "eletroforese de proteinas sericas", "eletroforese"]],
+["40302725", "Imunofixação - cada fração", 1, 9, ["imunofixacao", "imunofixacao serica", "imunofixacao no soro"]],
+["40324265", "Cadeias leves livres Kappa/Lambda, dosagem, sangue", 1, 9, ["cadeias leves livres", "cadeias leves livres kappa lambda", "kappa lambda", "cadeias leves livres no soro", "relacao kappa lambda"]],
+["40308553", "Anti transglutaminase tecidual - IgA", 1, 9, ["antitransglutaminase", "anti transglutaminase", "anti ttg", "antitransglutaminase iga"]],
+["40306143", "Anticardiolipina - IgG - pesquisa e/ou dosagem", 1, 10, ["anticardiolipina igg"]],
+["40306151", "Anticardiolipina - IgM - pesquisa e/ou dosagem", 1, 10, ["anticardiolipina igm"]],
+["40304019", "Anticoagulante lúpico, pesquisa", 1, 10, ["anticoagulante lupico", "lupus anticoagulante"]],
+["40308898", "Anticorpos Beta 2 glicoproteina I - IgG/IgM/IgA", 1, 10, ["beta 2 glicoproteina", "anti beta 2 glicoproteina", "b2gp1", "anti b2gp1", "beta2 glicoproteina"]],
+["40304507", "Proteína C - pesquisa e/ou dosagem", 1, 10, ["proteina c"]],
+["40304515", "Proteína S, teste funcional", 1, 10, ["proteina s"]],
+["40304060", "Antitrombina III, dosagem", 1, 10, ["antitrombina", "antitrombina 3", "antitrombina iii", "at iii"]],
+["40314057", "Fator V de Leiden por PCR - pesquisa", 1, 10, ["fator v de leiden", "fator v leiden", "mutacao do fator v"]],
+["40319326", "Protrombina, pesquisa de mutação", 1, 10, ["mutacao da protrombina", "protrombina g20210a", "mutacao g20210a", "mutacao do gene da protrombina"]],
+["40302210", "Lipoproteína (a) - Lp (a) - pesquisa e/ou dosagem", 1, 10, ["lp a", "lipoproteina a"]],
+["40313301", "Ácido metil malônico - pesquisa e/ou dosagem", 1, 11, ["acido metilmalonico", "mma"]],
+["40301478", "Ceruloplasmina - pesquisa e/ou dosagem", 1, 11, ["ceruloplasmina"]],
+["40301567", "Cobre - pesquisa e/ou dosagem", 1, 11, ["cobre", "cobre serico"]],
+["40302784", "Vitamina B1, pesquisa e/ou dosagem", 1, 11, ["vitamina b1", "tiamina", "b1", "vit b1"]],
+["40302814", "Vitamina B6, pesquisa e/ou dosagem", 1, 11, ["vitamina b6", "piridoxina", "b6", "vit b6"]],
+["40302610", "Vitamina E - pesquisa e/ou dosagem", 1, 11, ["vitamina e", "vit e", "tocoferol"]],
+["40301109", "Ácido láctico (lactato) - pesquisa e/ou dosagem", 1, 11, ["lactato", "acido latico", "acido lactico"]],
+["40301320", "Amônia - pesquisa e/ou dosagem", 1, 11, ["amonia", "amonemia"]],
+["40302903", "Ácidos graxos cadeia muito longa", 1, 11, ["acidos graxos de cadeia muito longa", "agcml", "vlcfa"]],
+["40302300", "Porfirinas quantitativas (cada) - pesquisa e/ou dosagem", 1, 11, ["porfirinas"]],
+["40311198", "Porfobilinogênio, pesquisa - na urina", 1, 11, ["porfobilinogenio", "pbg"]],
+["40313107", "Chumbo - pesquisa e/ou dosagem", 1, 11, ["chumbo", "plumbemia"]],
+["40313190", "Metais Al, As, Cd, Cr, Mn, Hg, Ni, Zn, Co, outro (s) absorção atômica (cada) - pesquisa e/ou dosagem", 1, 11, ["metais pesados", "arsenico", "mercurio", "manganes", "aluminio", "zinco"]],
+["40307212", "HTLV1 ou HTLV2 pesquisa de anticorpo (cada)", 1, 12, ["htlv", "anti htlv", "sorologia htlv", "htlv 1 e 2"]],
+["40306658", "Cisticercose, AC - pesquisa e/ou dosagem", 1, 12, ["cisticercose", "sorologia para cisticercose", "anticorpos anticisticerco"]],
+["40323218", "Cisticercose Western Blot", 1, 12, ["western blot cisticercose", "cisticercose western blot no soro"]],
+["40301168", "Ácido valpróico - pesquisa e/ou dosagem", 1, 13, ["acido valproico", "valproato", "nivel de valproato", "nivel serico de acido valproico", "valproico"]],
+["40301435", "Carbamazepina - pesquisa e/ou dosagem", 1, 13, ["carbamazepina", "nivel de carbamazepina", "nivel serico de carbamazepina"]],
+["40301826", "Fenitoína - pesquisa e/ou dosagem", 1, 13, ["fenitoina", "nivel de fenitoina", "nivel serico de fenitoina", "hidantal"]],
+["40301834", "Fenobarbital - pesquisa e/ou dosagem", 1, 13, ["fenobarbital", "nivel de fenobarbital", "nivel serico de fenobarbital"]],
+["40302741", "Lamotrigina - pesquisa e/ou dosagem", 1, 13, ["lamotrigina", "nivel de lamotrigina", "nivel serico de lamotrigina"]],
+["40321347", "Levetiracetam, dosagem", 1, 13, ["levetiracetam", "nivel de levetiracetam", "nivel serico de levetiracetam"]],
+["40302288", "Oxcarbazepina, pesquisa e/ou dosagem", 1, 13, ["oxcarbazepina", "nivel de oxcarbazepina", "nivel serico de oxcarbazepina"]],
+["40321614", "Topiramato, dosagem (sangue)", 1, 13, ["topiramato", "nivel de topiramato", "nivel serico de topiramato"]],
+["40302229", "Lítio - pesquisa e/ou dosagem", 1, 13, ["litio", "litemia", "nivel de litio", "nivel serico de litio"]],
+["40314014", "Apolipoproteína E, genotipagem", 1, 14, ["apoe", "apo e", "genotipagem apoe", "apolipoproteina e", "genotipagem da apoe"]],
+["40503348", "Distrofia miotonica, análise por DNA", 1, 14, ["distrofia miotonica", "steinert", "dm1", "dmpk"]],
+["40503658", "Atrofia muscular e bulbar (Kennedy), por PCR", 1, 14, ["kennedy", "doenca de kennedy", "sbma", "atrofia muscular espinobulbar"]],
+["40503690", "Distrofia muscular (Duchenne), por PCR", 1, 14, ["duchenne", "distrofia de duchenne", "dmd"]],
+["40503364", "Neurofibromatose tipo 1, estudo molecular", 1, 14, ["nf1", "neurofibromatose", "neurofibromatose tipo 1"]],
+["40503739", "Atrofia dentato-rubro-palido-luysiana, DRPLA, sangue total", 1, 14, ["drpla"]],
+["40314235", "X frágil por PCR - pesquisa", 1, 14, ["x fragil", "fmr1", "sindrome do x fragil"]],
+["40503151", "Análise de DNA por MLPA, por sonda de DNA utilizada, por amostra", 1, 14, ["mlpa"]],
+["40503062", "Análise de DNA por sonda, ou PCR por locus, por amostra", 1, 14, ["pcr por locus", "huntington", "doenca de huntington", "sca", "ataxia espinocerebelar", "ataxias espinocerebelares", "expansao de repeticoes", "teste genetico para huntington", "sca3", "machado joseph"]],
+["40503836", "Mutação familial específica - PCR do loccus identificado", 1, 14, ["mutacao familial", "mutacao familiar", "variante familiar"]],
+["40503801", "Sequenciamento de Nova Geração (NGS) - genes isolados, painéis e grandes regiões genômicas (inclui Captura, Amplificação e Sequenciamento)", 1, 14, ["ngs", "painel genetico", "painel ngs", "sequenciamento de nova geracao", "painel de genes"]],
+["40503810", "Sequenciamento de Nova geração de todas as regiões codificadoras (éxons) de todo os genes do genoma - Sequenciamento do Exoma (inclui Captura, Amplificação e Sequenciamento)", 1, 14, ["exoma", "sequenciamento do exoma", "exoma completo", "wes"]],
+["40103170", "EEG de rotina", 2, 15, ["eeg", "eletroencefalograma", "eeg de rotina", "eletroencefalograma de rotina"]],
+["40103234", "Eletrencefalograma em vigília, e sono espontâneo ou induzido", 2, 15, ["eeg com sono", "eeg em vigilia e sono", "eeg vigilia e sono", "eletroencefalograma com sono", "eeg com privacao de sono", "eeg sono induzido", "eeg com fotoestimulacao e sono"]],
+["40103200", "Eletrencefalograma especial: terapia intensiva, morte encefálica, EEG prolongado (até 2 horas)", 2, 15, ["eeg prolongado", "eeg especial", "eeg de morte encefalica", "eeg na uti"]],
+["40103862", "Eletroencefalograma com eletrodos especiais", 2, 15, ["eeg com eletrodos especiais", "eeg com eletrodos esfenoidais"]],
+["40103196", "EEGQ quantitativo (mapeamento cerebral)", 2, 15, ["mapeamento cerebral", "eeg quantitativo", "eegq"]],
+["40103757", "Vídeo-EEG contínua não invasiva - a cada 12 horas", 2, 15, ["video eeg", "videoeeg", "video eletroencefalograma", "monitorizacao com video eeg", "video eeg prolongado"]],
+["40103919", "Vídeoeletroencefalograma contínua invasiva para avaliação de tratamento cirúrgico de epilepsia - a cada 12 horas", 2, 15, ["video eeg invasivo", "seeg", "video eeg com eletrodos invasivos"]],
+["20102135", "Holter cerebral", 2, 15, ["holter cerebral", "eeg ambulatorial", "eeg de 24 horas"]],
+["40103315", "Eletroneuromiografia de MMII", 2, 16, ["enmg de mmii", "enmg dos membros inferiores", "eletroneuromiografia dos membros inferiores", "enmg membros inferiores"]],
+["40103323", "Eletroneuromiografia de MMSS", 2, 16, ["enmg de mmss", "enmg dos membros superiores", "eletroneuromiografia dos membros superiores", "enmg membros superiores"]],
+["40103331", "Eletroneuromiografia de MMSS e MMII", 2, 16, ["enmg", "eletroneuromiografia", "enmg de 4 membros", "enmg dos 4 membros", "enmg de quatro membros", "enmg mmss e mmii", "eletroneuromiografia de 4 membros", "eletroneuromiografia dos quatro membros", "enmg membros superiores e inferiores"]],
+["40103340", "Eletroneuromiografia de segmento complementar", 2, 16, ["enmg de segmento complementar"]],
+["40103358", "Eletroneuromiografia de segmento especial", 2, 16, ["enmg de segmento especial", "enmg de face", "enmg facial"]],
+["40103307", "Eletroneuromiografia (velocidade de condução) testes de estímulos para paralisia facial", 2, 16, ["enmg para paralisia facial", "eletroneurografia facial", "enog", "teste de estimulacao para paralisia facial"]],
+["40103714", "Teste de estimulação repetitiva (um ou mais músculos)", 2, 16, ["estimulacao repetitiva", "teste de estimulacao repetitiva", "enmg com estimulacao repetitiva", "decremento", "pesquisa de decremento"]],
+["40103390", "EMG quantitativa ou EMG de fibra única", 2, 16, ["fibra unica", "emg de fibra unica", "jitter", "emg quantitativa"]],
+["40103374", "EMG com registro de movimento involuntário (teste dinâmico de escrita; estudo funcional de tremores)", 2, 16, ["estudo de tremor", "emg de tremor", "eletromiografia de tremor", "estudo funcional de tremores", "emg de movimento involuntario"]],
+["40103382", "EMG para monitoração de quimodenervação (por sessão)", 2, 16, ["emg para toxina", "emg guiada para toxina botulinica", "monitoracao de quimiodenervacao"]],
+["40103684", "Reflexo cutâneo-simpático", 2, 16, ["reflexo cutaneo simpatico", "rcs", "resposta cutanea simpatica"]],
+["40103633", "Potencial evocado visual (PEV)", 2, 17, ["pev", "potencial evocado visual", "pe visual"]],
+["40103617", "Potencial evocado somato-sensitivo - membros inferiores (PESS)", 2, 17, ["pess de mmii", "pess membros inferiores", "potencial evocado somatossensitivo de membros inferiores", "pess mmii", "pess tibial"]],
+["40103625", "Potencial evocado somato-sensitivo - membros superiores (PESS)", 2, 17, ["pess de mmss", "pess membros superiores", "potencial evocado somatossensitivo de membros superiores", "pess mmss", "pess mediano"]],
+["40103498", "Potencial evocado auditivo de tronco cerebral (PEA-TC)", 2, 17, ["peatc", "pea tc", "potencial evocado auditivo", "potencial evocado auditivo de tronco encefalico", "pea"]],
+["40103064", "Audiometria de tronco cerebral (PEA) BERA", 2, 17, ["bera"]],
+["40103609", "Potencial evocado motor - PEM (bilateral)", 2, 17, ["pem", "potencial evocado motor", "estimulacao magnetica transcraniana diagnostica"]],
+["40103560", "Potencial evocado - P300", 2, 17, ["p300"]],
+["40103870", "Potencial evocado do nervo trigêmeo", 2, 17, ["potencial evocado trigeminal", "pe trigeminal"]],
+["40103528", "Polissonografia de noite inteira (PSG) (inclui polissonogramas)", 2, 18, ["polissonografia", "psg", "polissonografia basal", "polissonografia de noite inteira"]],
+["40103536", "Polissonograma com EEG de noite inteira", 2, 18, ["polissonografia com eeg", "psg com eeg", "polissonografia com eeg estendido", "psg com montagem de eeg"]],
+["40103544", "Polissonograma com teste de CPAP/BIPAP nasal", 2, 18, ["polissonografia com cpap", "titulacao de cpap", "psg com cpap", "polissonografia para titulacao"]],
+["40103730", "Teste de latências múltiplas de sono (TLMS) diurno pós PSG", 2, 18, ["tlms", "teste de latencias multiplas do sono", "mslt", "teste de multiplas latencias"]],
+["40103765", "Videonistagmografia infravermelha", 2, 19, ["videonistagmografia", "vng"]],
+["40103749", "Vectoeletronistagmografia - computadorizada", 2, 19, ["vectoeletronistagmografia", "veng", "eletronistagmografia"]],
+["40103927", "Teste de impulso cefálico ou vHIT (Vídeo Head Impulse Teste (Vídeo HT))", 2, 19, ["vhit", "video head impulse", "teste do impulso cefalico", "head impulse test"]],
+["20102070", "Tilt teste", 2, 19, ["tilt", "tilt test", "tilt teste", "teste de inclinacao"]],
+["20102143", "Tilt teste com provas farmacológicas", 2, 19, ["tilt com sensibilizacao", "tilt teste com provas farmacologicas", "tilt sensibilizado"]],
+["40805026", "RX - Tórax - 2 incidências", 3, 20, ["rx de torax", "raio x de torax", "radiografia de torax", "rx torax"]],
+["40802019", "RX - Coluna cervical - 3 incidências", 3, 20, ["rx de coluna cervical", "raio x de coluna cervical", "radiografia de coluna cervical"]],
+["40802035", "RX - Coluna dorsal - 2 incidências", 3, 20, ["rx de coluna dorsal", "rx de coluna toracica", "raio x de coluna dorsal", "radiografia de coluna dorsal"]],
+["40802051", "RX - Coluna lombo-sacra - 3 incidências", 3, 20, ["rx de coluna lombar", "rx de coluna lombossacra", "raio x de coluna lombar", "radiografia de coluna lombar"]],
+["40802094", "RX - Coluna total para escoliose (telespondilografia)", 3, 20, ["rx de coluna total", "escanometria", "telespondilografia", "panoramica de coluna"]],
+["40804011", "RX - Bacia", 3, 20, ["rx de bacia", "raio x de bacia", "rx de pelve", "radiografia de bacia"]],
+["40808130", "Densitometria óssea - rotina: coluna e fêmur (ou dois segmentos)", 3, 20, ["densitometria", "densitometria ossea", "dmo", "dexa"]],
+["40901122", "US - Abdome total (abdome superior, rins, bexiga, aorta, veia cava inferior e adrenais)", 3, 21, ["us de abdome", "us abdome total", "ultrassom de abdome", "usg de abdome", "ultrassonografia de abdome total", "us de abdome total"]],
+["40901769", "US - Aparelho urinário (rins, ureteres e bexiga)", 3, 21, ["us de vias urinarias", "us de rins e vias urinarias", "ultrassom de rins", "us renal", "us de aparelho urinario"]],
+["40901203", "US - Órgãos superficiais (tireóide ou escroto ou pênis ou crânio)", 3, 21, ["us de tireoide", "ultrassom de tireoide", "usg de tireoide", "ultrassonografia de tireoide", "us de bolsa escrotal", "us transfontanela"]],
+["40901211", "US - Estruturas superficiais (cervical ou axila ou músculo ou tendão)", 3, 21, ["us de musculo", "us de nervo", "ultrassom de nervo", "ultrassonografia de nervo", "us de nervo periferico", "ultrassom muscular", "us cervical", "us de partes moles"]],
+["41001079", "TC - Tórax", 3, 22, ["tc de torax", "tomografia de torax"]],
+["41001095", "TC - Abdome total (abdome superior, pelve e retroperitônio)", 3, 22, ["tc de abdome", "tc de abdome total", "tomografia de abdome", "tc de abdome e pelve"]],
+["40101010", "ECG convencional de até 12 derivações", 3, 23, ["ecg", "eletrocardiograma"]],
+["20102020", "Holter de 24 horas - 3 canais - digital", 3, 23, ["holter", "holter 24 horas", "holter de 24h", "holter 24h"]],
+["20102127", "Holter 7 dias", 3, 23, ["holter de 7 dias", "holter prolongado", "holter 7 dias"]],
+["20102038", "Monitorização ambulatorial da pressão arterial - MAPA (24 horas)", 3, 23, ["mapa", "mapa 24 horas", "monitorizacao ambulatorial da pressao arterial"]],
+["40901106", "Ecodopplercardiograma transtorácico", 3, 23, ["ecocardiograma", "eco", "ecocardiograma transtoracico", "ett", "ecodopplercardiograma", "eco tt"]],
+["40901092", "Ecodopplercardiograma transesofágico (inclui transtorácico)", 3, 23, ["ecocardiograma transesofagico", "ete", "eco te", "eco transesofagico"]],
+["41001010", "TC - Crânio ou sela túrcica ou órbitas", 4, 22, ["tc de cranio", "tomografia de cranio", "tc de encefalo", "tomografia de cranio sem contraste", "tc de cranio sem contraste", "tc de cranio com contraste", "tc de sela", "tc de orbitas"]],
+["41001125", "TC - Coluna cervical ou dorsal ou lombo-sacra (até 3 segmentos)", 4, 22, ["tc de coluna", "tc de coluna cervical", "tc de coluna lombar", "tc de coluna dorsal", "tomografia de coluna"]],
+["41001133", "TC - Coluna - segmento adicional", 4, 22, ["tc de coluna segmento adicional"]],
+["41001370", "Angiotomografia arterial de crânio", 4, 22, ["angiotc de cranio", "angio tc de cranio", "angiotomografia de cranio", "angiotomografia arterial de cranio", "angiotc arterial de cranio", "angio tc intracraniana", "angiotomografia intracraniana"]],
+["41001389", "Angiotomografia venosa de crânio", 4, 22, ["angiotc venosa de cranio", "angiotomografia venosa", "venotomografia", "angio tc venosa"]],
+["41001397", "Angiotomografia arterial de pescoço", 4, 22, ["angiotc de pescoco", "angio tc de pescoco", "angiotomografia de pescoco", "angiotomografia cervical", "angiotc cervical", "angio tc de vasos cervicais"]],
+["41002016", "Tomomielografia (até 3 segmentos) - acrescentar a TC da coluna e incluir a punção", 4, 22, ["mielotomografia", "tomomielografia"]],
+["41101014", "RM - Crânio (encéfalo)", 4, 24, ["rm de cranio", "rm de encefalo", "ressonancia de cranio", "ressonancia de encefalo", "rnm de cranio", "rm de cranio com contraste", "rm de cranio sem contraste", "rm encefalo", "rm cranio", "rm de encefalo com contraste", "ressonancia magnetica de cranio", "ressonancia magnetica de encefalo"]],
+["41101022", "RM - Sela túrcica (hipófise)", 4, 24, ["rm de sela", "rm de hipofise", "rm de sela turcica", "ressonancia de hipofise", "ressonancia de sela"]],
+["41101073", "RM - Órbita bilateral", 4, 24, ["rm de orbitas", "rm de orbita", "ressonancia de orbitas"]],
+["41101227", "RM - Coluna cervical ou dorsal ou lombar", 4, 24, ["rm de coluna", "rm de coluna cervical", "rm de coluna dorsal", "rm de coluna toracica", "rm de coluna lombar", "rm de coluna lombossacra", "ressonancia de coluna", "ressonancia de coluna cervical", "ressonancia de coluna lombar", "ressonancia de coluna dorsal", "rm cervical", "rm lombar", "rm de coluna total", "rm de neuroeixo"]],
+["41101243", "RM - Plexo braquial (desfiladeiro torácico) ou lombossacral (não inclui coluna cervical ou lombar)", 4, 24, ["rm de plexo braquial", "rm de plexo lombossacral", "rm de plexo", "ressonancia de plexo braquial", "neurografia por rm"]],
+["41101286", "RM - Coxa (unilateral)", 4, 24, ["rm de coxa", "rm de coxas", "rm muscular de coxa", "rm de musculos da coxa"]],
+["41101294", "RM - Perna (unilateral)", 4, 24, ["rm de perna", "rm de pernas", "rm muscular de perna", "rm de musculos da perna"]],
+["41101057", "Perfusão cerebral por RM", 4, 25, ["perfusao por rm", "rm com perfusao", "perfusao cerebral por rm", "rm perfusao"]],
+["41101065", "Espectroscopia por RM", 4, 25, ["espectroscopia", "espectroscopia por rm", "rm com espectroscopia"]],
+["41101456", "RM - Difusão por RM", 4, 25, ["difusao por rm", "rm com difusao", "rm difusao"]],
+["41101448", "RM - Tractografia", 4, 25, ["tractografia", "dti", "rm com tractografia", "tensor de difusao"]],
+["41101049", "Estudo funcional (mapeamento cortical por RM)", 4, 25, ["rm funcional", "rmf", "ressonancia funcional", "mapeamento cortical por rm"]],
+["41101235", "RM - Fluxo liquórico (como complementar)", 4, 25, ["estudo de fluxo liquorico", "fluxo liquorico", "rm de fluxo liquorico", "rm com estudo de fluxo liquorico", "cine rm"]],
+["41101537", "Angio-RM arterial de crânio", 4, 26, ["angiorm de cranio", "angio rm de cranio", "angiorressonancia de cranio", "angiorressonancia arterial de cranio", "angio rm arterial", "angiorm arterial de cranio", "angiorressonancia intracraniana", "angio rm intracraniana"]],
+["41101545", "Angio-RM venosa de crânio", 4, 26, ["angiorm venosa", "angio rm venosa", "angiorressonancia venosa", "venorressonancia", "angiorressonancia venosa de cranio", "venografia por rm"]],
+["41101618", "Angio-RM arterial de pescoço", 4, 26, ["angiorm de pescoco", "angio rm de pescoco", "angiorressonancia de pescoco", "angiorressonancia cervical", "angio rm cervical", "angio rm de vasos cervicais"]],
+["40901360", "Doppler colorido de vasos cervicais arteriais bilateral (carótidas e vertebrais)", 4, 27, ["doppler de carotidas", "doppler de carotidas e vertebrais", "doppler de vasos cervicais", "us doppler de carotidas", "duplex de carotidas", "eco doppler de carotidas", "doppler carotideo", "doppler de carotidas e vertebrais bilateral"]],
+["40901602", "Doppler transcraniano", 4, 27, ["doppler transcraniano", "dtc", "ultrassom transcraniano"]],
+["40812049", "Angiografia por cateterismo seletivo de ramo primário - por vaso", 4, 28, ["angiografia cerebral", "arteriografia cerebral", "angiografia digital", "angiografia digital cerebral", "arteriografia", "angiografia cerebral digital"]],
+["40812154", "Angiografia Medular", 4, 28, ["angiografia medular", "arteriografia medular", "angiografia de medula"]],
+["40707091", "Cintilografia perfusão cerebral para avaliação de transportadores de dopamina", 5, 29, ["trodat", "spect com trodat", "cintilografia com trodat", "datscan", "spect de transportador de dopamina", "dat spect", "spect trodat", "cintilografia de transportador de dopamina"]],
+["40708136", "PET CT neurológico com FDG", 5, 29, ["pet fdg", "pet ct com fdg", "pet fdg cerebral", "pet ct fdg", "pet com fdg", "pet ct cerebral com fdg", "fdg pet"]],
+["41001311", "PET-CT neurológico", 5, 29, ["pet ct neurologico", "pet amiloide", "pet ct amiloide", "pet de amiloide", "pet para amiloide", "pet tau"]],
+["40707032", "Cintilografia de perfusão cerebral", 5, 29, ["spect cerebral", "spect de perfusao", "cintilografia de perfusao cerebral", "spect perfusional", "spect ecd", "spect cerebral de perfusao"]],
+["40707024", "Cintilografia cerebral com FDG-18 F, em câmara hibrída", 5, 29, ["cintilografia cerebral com fdg"]],
+["40707016", "Cintilografia cerebral", 5, 29, ["cintilografia cerebral"]],
+["40707040", "Cisternocintilografia (inclui estudo do trânsito liquórico)", 5, 29, ["cisternocintilografia", "cisternografia isotopica", "cisternocintilografia para hpn"]],
+["40707059", "Cisternocintilografia para pesquisa de fístula liquórica", 5, 29, ["cisternocintilografia para fistula", "pesquisa de fistula liquorica", "fistula liquorica"]],
+["40708047", "Cintilografia com MIBG (metaiodobenzilguanidina)", 5, 30, ["mibg", "cintilografia com mibg", "cintilografia miocardica com mibg", "mibg cardiaco"]],
+["40708055", "Cintilografia de corpo total com FDG-18 F, em câmara híbrida", 5, 30, ["pet de corpo inteiro", "pet ct de corpo inteiro", "cintilografia de corpo inteiro com fdg", "pet ct corpo inteiro", "pet ct para pesquisa de neoplasia oculta", "pet de corpo total"]],
+["40708128", "PET dedicado oncológico", 5, 30, ["pet oncologico", "pet ct oncologico"]]
+];
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function ler(k, p) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : p; } catch (e) { return p; } }
+  function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  function hojeIso() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function isoBr(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : (iso || ''); }
+  var host = (function () { try { return window.parent && window.parent !== window ? window.parent.auxNeuroHost : null; } catch (e) { return null; } })();
+  var tAviso = null;
+  function avisar(m) {
+    if (host && host.aviso) { host.aviso(m); return; }
+    var a = $('nt-aviso'); if (!a) { a = document.createElement('div'); a.id = 'nt-aviso'; a.className = 'aviso'; a.setAttribute('role', 'status'); document.body.appendChild(a); }
+    a.textContent = m; a.hidden = false; clearTimeout(tAviso); tAviso = setTimeout(function () { a.hidden = true; }, 3200);
+  }
+
+  // ================= busca na TUSS =================
+  function norm(s) {
+    return String(s || '').toLowerCase().replace(/β/g, ' beta ').replace(/α/g, ' alfa ').normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]+/g, ' ').trim();
+  }
+  // uniformiza siglas e sinônimos de exame antes de comparar (vale para a pergunta e para a tabela)
+  var TROCAS = [
+    [/\bangio ?ressonancia( magnetica)?\b|\bangio ?rnm\b|\bangio ?rm\b|\bangio ?mr\b/g, 'angio rm'],
+    [/\bressonancia( nuclear)? magnetica\b|\bressonancia\b|\brnm\b|\birm\b|\bmri\b/g, 'rm'],
+    [/\bangio ?tomografia( computadorizada)?\b|\bangio ?tc\b|\bangio ?ct\b/g, 'angio tc'],
+    [/\btomografia( computadorizada)?\b|\btac\b|\btcc\b/g, 'tc'],
+    [/\bultrassonografia\b|\bultra ?som\b|\busg\b|\becografia\b/g, 'us'],
+    [/\braio ?x\b|\bradiografia\b|\brx\b/g, 'rx'],
+    [/\bencefalo\b|\bcerebro\b|\bintracranian[oa]s?\b/g, 'cranio'],
+    [/\bteste genetico\b|\bestudo genetico\b|\banalise genetica\b|\bpesquisa genetica\b|\bgenotipagem\b/g, ' '],
+    [/\bmembros superiores\b|\bmembro superior\b|\bmmss\b/g, 'mmss'],
+    [/\bmembros inferiores\b|\bmembro inferior\b|\bmmii\b/g, 'mmii'],
+    [/\b(4|quatro) membros\b/g, 'mmss mmii'],
+    [/\beletr?o?encefalograma\b|\beletrencefalografia\b|\beletroencefalografia\b/g, 'eeg'],
+    [/\beletroneuromiografia\b|\beletroneuromiograma\b/g, 'enmg'],
+    [/\bvit\b/g, 'vitamina'],
+    [/\bdoppler colorido\b|\becodoppler\b|\beco doppler\b|\bduplex scan\b|\bduplex\b/g, 'doppler'],
+    [/\bliquido cefalorraqu?[ei]ano\b|\bliquido cefalorraquidiano\b|\blcr\b|\bicr\b/g, 'liquor'],
+    [/\bpesquisa\b|\bdosagem\b|\bdeterminacao\b|\bquantitativa?\b|\bserica?\b|\bserico\b|\bnivel\b|\bniveis\b/g, ' '],
+    [/\banticorpos?\b|\bac\b/g, 'anti'],
+    [/\b(\d+) ?h(oras)?\b/g, '$1 horas']
+  ];
+  var STOP = {};
+  'de da do das dos e com sem por para a o as os em no na nos nas ou um uma ao aos exame exames solicito solicitacao pedido ate cada'.split(' ').forEach(function (w) { STOP[w] = 1; });
+  function canon(s) { var n = ' ' + norm(s) + ' '; TROCAS.forEach(function (t) { n = n.replace(t[0], t[1]); }); return n.replace(/\s+/g, ' ').trim(); }
+  function toks(n) { return n.split(' ').filter(function (t) { return t && !STOP[t]; }); }
+  var IDX = TUSS.map(function (e, i) {
+    var al = (e[4] || []).map(canon);
+    return { i: i, c: e[0], d: e[1], cat: e[2], sub: e[3], formas: [toks(canon(e[1]))].concat(al.map(toks)), exatos: al.concat([canon(e[1])]) };
+  });
+  var porCod = {}; IDX.forEach(function (x) { porCod[x.c] = x; });
+  function cobre(q, T) {
+    if (T.indexOf(q) >= 0) return 1;
+    if (q.length >= 4) for (var k = 0; k < T.length; k++) { var t = T[k]; if (t.length >= 4 && (t.indexOf(q) === 0 || q.indexOf(t) === 0)) return 0.9; }
+    return 0;
+  }
+  function pontuar(Q, T) {
+    if (!Q.length || !T.length) return { rec: 0, prec: 0 };
+    var s = 0; Q.forEach(function (q) { s += cobre(q, T); });
+    var m = 0; T.forEach(function (t) { if (cobre(t, Q)) m++; });
+    return { rec: s / Q.length, prec: m / T.length };
+  }
+  // devolve os exames da tabela que correspondem ao texto, do mais provável ao menos provável
+  function buscar(texto, max) {
+    var cn = canon(texto), Q = toks(cn), out = [];
+    var cod = /\b(\d{8})\b/.exec(texto || '');
+    IDX.forEach(function (x) {
+      var exato = x.exatos.indexOf(cn) >= 0, best = { rec: 0, prec: 0, s: 0 };
+      x.formas.forEach(function (T) { var p = pontuar(Q, T); var s = p.rec * 10 + p.prec * 2; if (s > best.s) best = { rec: p.rec, prec: p.prec, s: s }; });
+      if (cod && cod[1] === x.c) { exato = true; best.rec = 1; }
+      if (exato) best = { rec: 1, prec: 1, s: 100 };
+      if (best.rec > 0) out.push({ x: x, rec: best.rec, s: best.s });
+    });
+    out.sort(function (a, b) { return b.s - a.s || a.x.i - b.x.i; });
+    return out.slice(0, max || 8);
+  }
+  var LIMIAR = 0.88;
+
+  // pacotes usuais desdobrados em exames
+  var PACOTES = [
+    [['funcao renal', 'provas de funcao renal'], ['40302580', '40301630']],
+    [['eletrolitos', 'ions', 'eletrolitos basicos'], ['40302423', '40302318']],
+    [['eletrolitos completos', 'ions completos'], ['40302423', '40302318', '40301400', '40302237']],
+    [['funcao hepatica', 'provas de funcao hepatica', 'enzimas hepaticas', 'hepatograma'], ['40302504', '40302512', '40301990', '40301885', '40301397']],
+    [['transaminases'], ['40302504', '40302512']],
+    [['perfil lipidico', 'lipidograma', 'colesterol e fracoes', 'colesterol total e fracoes'], ['40301605', '40301583', '40301591', '40302547']],
+    [['funcao tireoidiana', 'funcao tireoideana', 'perfil tireoidiano', 'tsh e t4 livre', 'tsh t4 livre', 'tsh e t4l', 'tsh t4l'], ['40316521', '40316491']],
+    [['coagulograma', 'coagulacao'], ['40304590', '40304639']],
+    [['cinetica do ferro', 'perfil de ferro', 'perfil do ferro', 'ferro e ferritina', 'metabolismo do ferro'], ['40301842', '40316270', '40302520', '40321231']],
+    [['sorologias', 'sorologias para demencia'], ['40307760', '40307182']],
+    [['sorologias para hepatites', 'sorologia para hepatites', 'hepatites', 'hepatites virais', 'hepatites b e c', 'sorologia hepatites b e c'], ['40307018', '40306992', '40306950', '40307026']],
+    [['hepatite b', 'sorologia hepatite b'], ['40307018', '40306992', '40306950']],
+    [['saf', 'anticorpos antifosfolipides', 'antifosfolipides', 'sindrome antifosfolipide', 'pesquisa de saf'], ['40306143', '40306151', '40304019', '40308898']],
+    [['anticardiolipina', 'anticardiolipinas', 'anticardiolipina igg e igm'], ['40306143', '40306151']],
+    [['trombofilias', 'trombofilia', 'pesquisa de trombofilia', 'painel de trombofilia'], ['40304507', '40304515', '40304060', '40314057', '40319326']],
+    [['anca', 'ancas', 'anca c e p', 'p anca e c anca'], ['40306402', '40306410']],
+    [['anti ro e anti la', 'anti ro la', 'anti ssa e anti ssb', 'anti ssa ssb'], ['40306119', '40306089']],
+    [['biomarcadores de alzheimer', 'biomarcadores no liquor', 'biomarcadores de alzheimer no liquor', 'biomarcadores liquoricos', 'proteinas do alzheimer no liquor', 'beta amiloide e tau no liquor', 'abeta tau'], ['40503909', '40503925', '40503933']],
+    [['painel de encefalite autoimune', 'encefalite autoimune', 'anticorpos de encefalite autoimune', 'painel encefalite autoimune'], ['40324656', '40324699', '40324702', '40324672', '40324680', '40305341']],
+    [['paraneoplasicos', 'anticorpos paraneoplasicos', 'painel paraneoplasico', 'antineuronais', 'anticorpos antineuronais'], ['40324257', '40308570', '40308537', '40308936']],
+    [['miastenia', 'anticorpos de miastenia', 'painel de miastenia'], ['40323030', '40324729']],
+    [['gamopatia', 'pesquisa de gamopatia', 'pesquisa de gamopatia monoclonal', 'gamopatia monoclonal', 'proteinograma e imunofixacao'], ['40302717', '40302725', '40324265']],
+    [['vitaminas b1 b6 e b12', 'complexo b', 'vitaminas do complexo b'], ['40302784', '40302814', '40316572']],
+    [['urina', 'urina 1 e urocultura'], ['40311210', '40310213']]
+  ];
+  var PAC = {}; PACOTES.forEach(function (p) { p[0].forEach(function (k) { PAC[canon(k)] = p[1]; }); });
+
+  // complementos que não mudam o código, mas o médico quer que saiam no pedido
+  var COMPL = [/\b(com e sem|com|sem) (contraste|gadol[ií]nio)( endovenoso| ev| iv)?\b/i, /\b(com|sob) seda[cç][aã]o\b/i, /\bprotocolo\b.*$/i, /\bbilateral\b/i, /(?:^|\s)(às|as) ?\d{1,2} ?h(oras)?( da manh[ãa])?(?=\s|$)/i, /\bmatinal\b/i, /\b(direit[oa]|esquerd[oa])\b/i];
+  function separarCompl(t) {
+    var c = [];
+    COMPL.forEach(function (r) { var m = r.exec(t); if (m) { c.push(m[0].trim()); t = t.replace(m[0], ' '); } });
+    return { base: t.replace(/\s+/g, ' ').replace(/[\s,;:\-]+$/, '').trim(), compl: c.join(', ') };
+  }
+  function linhas(t, comVirgula) {
+    var re = comVirgula ? /\n|;|,(?!\d)|\s\+\s/ : /\n|;/;
+    return String(t || '').split(re).map(function (s) { return s.replace(/^\s*(\d+\s*[\.\)\-]|[-•*·–])\s*/, '').trim(); }).filter(Boolean);
+  }
+  function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+
+  // ================= estado =================
+  var ESTADO = 'nt.exEstado', MODELOS = 'nt.exModelos', CARIMBO = 'nt.carimbo';
+  var S = Object.assign({ modo: 'livre', livre: '', rapido: '', escolha: {}, det: [], pend: [], carimbo: 'com' }, ler(ESTADO, {}));
+  if (!S.det || !S.det.length) S.det = [{}];
+  function guardar() { gravar(ESTADO, { modo: S.modo, livre: S.livre, rapido: S.rapido, escolha: S.escolha, det: S.det, pend: S.pend, carimbo: S.carimbo }); }
+  var TIT = { livre: 'Modo livre', rapido: 'TUSS rápido', detalhado: 'TUSS detalhado', modelos: 'Modelos salvos' };
+  var SUB = {
+    livre: 'Os exames saem exatamente como foram escritos.',
+    rapido: 'Os exames saem com o código e o termo oficial da TUSS.',
+    detalhado: 'Escolha os exames um a um, por categoria da TUSS.',
+    modelos: 'Pedidos prontos para usar de novo.'
+  };
+
+  // ================= TUSS rápido =================
+  function resolverRapido() {
+    var res = [];
+    linhas(S.rapido, true).forEach(function (ln) {
+      var sc = separarCompl(ln), cn = canon(sc.base);
+      if (PAC[cn]) { res.push({ texto: ln, pacote: PAC[cn].map(function (c) { return porCod[c]; }).filter(Boolean), compl: sc.compl }); return; }
+      var achados = buscar(sc.base || ln, 8), bons = achados.filter(function (a) { return a.rec >= LIMIAR; });
+      var esc = S.escolha[norm(ln)];
+      var x = esc && porCod[esc] ? porCod[esc] : (bons[0] && bons[0].x);
+      if (esc === '-') x = null;
+      res.push({ texto: ln, x: x || null, alt: bons.map(function (a) { return a.x; }), sug: x ? [] : achados.filter(function (a) { return a.rec >= 0.34; }).slice(0, 4).map(function (a) { return a.x; }), compl: sc.compl, forcado: !!(esc && x && (!bons[0] || bons[0].x !== x)) });
+    });
+    return res;
+  }
+  function desenharRapido() {
+    var r = resolverRapido(), h = '', n = 0, faltas = [];
+    r.forEach(function (o, k) {
+      if (o.pacote) {
+        o.pacote.forEach(function (x) { n++; h += '<li><span class="n">' + n + '</span><span class="ex"><code>' + x.c + '</code>' + esc(x.d) + '</span><span class="de">de "' + esc(o.texto) + '"</span></li>'; });
+        return;
+      }
+      n++;
+      if (o.x) {
+        var sel = '';
+        var alt = o.alt.slice(); if (alt.indexOf(o.x) < 0) alt.unshift(o.x);
+        if (alt.length > 1) sel = '<select data-esc="' + esc(norm(o.texto)) + '" aria-label="Trocar o exame">' + alt.map(function (x) { return '<option value="' + x.c + '"' + (x === o.x ? ' selected' : '') + '>' + x.c + ' ' + esc(x.d) + '</option>'; }).join('') + '<option value="-">Nenhum destes (sai como escrito, sem código)</option></select>';
+        h += '<li><span class="n">' + n + '</span><span class="ex"><code>' + o.x.c + '</code>' + esc(o.x.d) + (o.compl ? ' (' + esc(o.compl) + ')' : '') + '</span><span class="de">de "' + esc(o.texto) + '"' + (o.forcado ? ' · escolhido por você <button type="button" class="btn lnk" data-desfaz="' + esc(norm(o.texto)) + '">desfazer</button>' : '') + (alt.length > 1 ? '' : '') + '</span>' + (sel ? '<span></span>' + sel : '') + '</li>';
+      } else {
+        faltas.push(o.texto);
+        h += '<li class="falta"><span class="n">' + n + '</span><span class="ex">' + esc(cap(o.texto)) + ' <span class="mini">(sem código TUSS)</span></span><span class="de">Não localizado na tabela TUSS.' + (S.escolha[norm(o.texto)] === '-' ? ' <button type="button" class="btn lnk" data-desfaz="' + esc(norm(o.texto)) + '">procurar de novo</button>' : '') + '</span>' +
+          (o.sug.length ? '<span></span><span class="sug">' + o.sug.map(function (x) { return '<button type="button" class="chip" data-aceita="' + esc(norm(o.texto)) + '" data-cod="' + x.c + '" title="Usar este código"><code>' + x.c + '</code>' + esc(x.d) + '</button>'; }).join('') + '</span>' : '') + '</li>';
+      }
+    });
+    $('rLista').innerHTML = h;
+    $('rCont').textContent = n ? n + (n === 1 ? ' exame' : ' exames') : '';
+    $('rFaltas').innerHTML = faltas.length ? '<div class="caixa alerta"><b>' + (faltas.length === 1 ? 'Um exame não foi localizado' : faltas.length + ' exames não foram localizados') + ' na tabela TUSS:</b> ' + faltas.map(function (f) { return '"' + esc(f) + '"'; }).join(', ') +
+      '. ' + (faltas.length === 1 ? 'Ele será descrito' : 'Eles serão descritos') + ' como solicitado, sem código. Se precisar do código, toque numa das sugestões da lista ou refaça o pedido no modo TUSS detalhado.' +
+      '<div class="acoes"><button type="button" class="btn peq" id="rParaDet">Refazer no TUSS detalhado</button></div></div>' : '';
+    return r;
+  }
+  function itensRapido() {
+    var out = [], vistos = {};
+    resolverRapido().forEach(function (o) {
+      if (o.pacote) { o.pacote.forEach(function (x) { if (!vistos[x.c]) { vistos[x.c] = 1; out.push({ tuss: x.c, nome: x.d }); } }); return; }
+      if (o.x) { var nome = o.x.d + (o.compl ? ' (' + o.compl + ')' : ''); var k = o.x.c + '|' + o.compl; if (!vistos[k]) { vistos[k] = 1; out.push({ tuss: o.x.c, nome: nome }); } }
+      else out.push({ tuss: '', nome: cap(o.texto) });
+    });
+    return out;
+  }
+  $('tRapido').addEventListener('input', function () { S.rapido = this.value; guardar(); atualizar(); });
+  $('rLista').addEventListener('change', function (e) { var s = e.target.closest('select[data-esc]'); if (!s) return; S.escolha[s.getAttribute('data-esc')] = s.value; guardar(); atualizar(); });
+  $('rLista').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-aceita]');
+    if (b) { S.escolha[b.getAttribute('data-aceita')] = b.getAttribute('data-cod'); guardar(); atualizar(); return; }
+    var d = e.target.closest('[data-desfaz]'); if (d) { delete S.escolha[d.getAttribute('data-desfaz')]; guardar(); atualizar(); }
+  });
+  $('rFaltas').addEventListener('click', function (e) {
+    if (!e.target.closest('#rParaDet')) return;
+    var r = resolverRapido(), rows = [], pend = [];
+    r.forEach(function (o) {
+      if (o.pacote) o.pacote.forEach(function (x) { rows.push({ cat: x.cat, sub: x.sub, cod: x.c }); });
+      else if (o.x) rows.push({ cat: o.x.cat, sub: o.x.sub, cod: o.x.c, compl: o.compl || '' });
+      else pend.push(o.texto);
+    });
+    S.det = rows.concat([{}]); S.pend = pend; guardar(); modo('detalhado');
+    avisar(pend.length ? 'Exames localizados levados ao TUSS detalhado. Procure os que faltam.' : 'Exames levados ao TUSS detalhado.');
+  });
+
+  // ================= TUSS detalhado =================
+  function opts(lista, val, rot) { return '<option value="">' + rot + '</option>' + lista.map(function (o) { return '<option value="' + esc(o[0]) + '"' + (String(o[0]) === String(val) ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join(''); }
+  function subsDe(cat) { var v = {}, l = []; IDX.forEach(function (x) { if (x.cat === cat && !v[x.sub]) { v[x.sub] = 1; l.push([x.sub, TUSS_SUB[x.sub]]); } }); return l; }
+  function examesDe(cat, sub) { return IDX.filter(function (x) { return x.cat === cat && x.sub === sub; }).map(function (x) { return [x.c, x.d + ' (' + x.c + ')']; }); }
+  function desenharDet() {
+    if (!S.det.length || S.det[S.det.length - 1].cod) S.det.push({});
+    var h = '';
+    S.det.forEach(function (r, k) {
+      var cat = r.cat === undefined || r.cat === '' ? '' : +r.cat, sub = r.sub === undefined || r.sub === '' ? '' : +r.sub;
+      h += '<div class="lin" data-k="' + k + '"><span class="n">' + (k + 1) + '</span><div class="sels">' +
+        '<select class="sel" data-f="cat" aria-label="Categoria">' + opts(TUSS_CAT.map(function (c, i) { return [i, c]; }), cat, 'Categoria') + '</select>' +
+        (cat !== '' ? '<select class="sel" data-f="sub" aria-label="Subcategoria">' + opts(subsDe(cat), sub, 'Subcategoria') + '</select>' : '') +
+        (cat !== '' && sub !== '' ? '<select class="sel ex" data-f="cod" aria-label="Exame">' + opts(examesDe(cat, sub), r.cod || '', 'Exame') + '</select>' : '') +
+        (r.cod ? '<input class="txt ex" type="text" data-f="compl" value="' + esc(r.compl || '') + '" placeholder="Complemento (opcional): com contraste, protocolo, lado…" aria-label="Complemento do exame">' : '') +
+        '</div>' + ((r.cat !== undefined && r.cat !== '') || S.det.length > 1 ? '<button type="button" class="btn peq x" data-tira="' + k + '" aria-label="Tirar esta linha">tirar</button>' : '<span></span>') + '</div>';
+    });
+    $('dLinhas').innerHTML = h;
+    var n = S.det.filter(function (r) { return r.cod; }).length;
+    $('dCont').textContent = n ? n + (n === 1 ? ' exame' : ' exames') : '';
+    $('dPend').innerHTML = S.pend && S.pend.length ? '<div class="caixa alerta" style="margin:0 0 8px">Vindos do TUSS rápido sem código. Toque para procurar: <span class="sug">' + S.pend.map(function (p, i) { return '<button type="button" class="chip" data-pend="' + i + '">' + esc(p) + '</button>'; }).join('') + '</span><div class="mini" style="margin-top:6px">Os que ficarem de fora não entram no pedido deste modo. <button type="button" class="btn lnk" id="dPendX">Dispensar</button></div></div>' : '';
+  }
+  $('dLinhas').addEventListener('input', function (e) {
+    var t = e.target.closest('input[data-f=compl]'); if (!t) return;
+    S.det[+t.closest('.lin').getAttribute('data-k')].compl = t.value; guardar(); desenharPrevia();
+  });
+  $('dLinhas').addEventListener('change', function (e) {
+    var s = e.target.closest('select[data-f]'); if (!s) return;
+    var k = +s.closest('.lin').getAttribute('data-k'), r = S.det[k], f = s.getAttribute('data-f');
+    if (f === 'cat') { S.det[k] = s.value === '' ? {} : { cat: +s.value }; }
+    else if (f === 'sub') { r.sub = s.value === '' ? '' : +s.value; delete r.cod; }
+    else { r.cod = s.value; if (!s.value) delete r.compl; }
+    guardar(); atualizar();
+    if (f === 'cod' && s.value) { var nova = document.querySelector('.lin[data-k="' + (S.det.length - 1) + '"] select'); if (nova) try { nova.focus({ preventScroll: true }); } catch (x) {} }
+    else { var prox = document.querySelector('.lin[data-k="' + k + '"] select[data-f="' + (f === 'cat' ? 'sub' : 'cod') + '"]'); if (prox) prox.focus(); }
+  });
+  $('dLinhas').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-tira]'); if (!b) return;
+    S.det.splice(+b.getAttribute('data-tira'), 1); if (!S.det.length) S.det = [{}]; guardar(); atualizar();
+  });
+  function adicionarDet(x) {
+    if (S.det.some(function (r) { return r.cod === x.c; })) { avisar('Este exame já está no pedido.'); return; }
+    var vazia = S.det.length && !S.det[S.det.length - 1].cod ? S.det.pop() : null;
+    S.det.push({ cat: x.cat, sub: x.sub, cod: x.c }); S.det.push({}); void vazia;
+    guardar(); atualizar();
+  }
+  var dBusca = $('dBusca'), dRes = $('dRes'), achadosDet = [];
+  function desenharBusca() {
+    var q = dBusca.value.trim();
+    if (q.length < 2) { dRes.hidden = true; dRes.innerHTML = ''; return; }
+    achadosDet = buscar(q, 8).filter(function (a) { return a.rec >= 0.34; });
+    dRes.hidden = false;
+    dRes.innerHTML = achadosDet.length ? achadosDet.map(function (a, i) { return '<button type="button" data-ad="' + i + '"><code>' + a.x.c + '</code>' + esc(a.x.d) + '<small>' + esc(TUSS_CAT[a.x.cat] + ' · ' + TUSS_SUB[a.x.sub]) + '</small></button>'; }).join('') : '<div class="mini" style="padding:8px 10px">Nada encontrado no recorte da TUSS para "' + esc(q) + '".</div>';
+  }
+  dBusca.addEventListener('input', desenharBusca);
+  dBusca.addEventListener('keydown', function (e) { if (e.key === 'Enter' && achadosDet[0]) { e.preventDefault(); adicionarDet(achadosDet[0].x); dBusca.value = ''; desenharBusca(); } else if (e.key === 'Escape') { dBusca.value = ''; desenharBusca(); } });
+  dRes.addEventListener('click', function (e) { var b = e.target.closest('[data-ad]'); if (!b) return; adicionarDet(achadosDet[+b.getAttribute('data-ad')].x); dBusca.value = ''; desenharBusca(); dBusca.focus(); });
+  $('dPend').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-pend]');
+    if (b) { var i = +b.getAttribute('data-pend'); dBusca.value = separarCompl(S.pend[i]).base; S.pend.splice(i, 1); guardar(); desenharDet(); desenharBusca(); dBusca.focus(); return; }
+    if (e.target.closest('#dPendX')) { S.pend = []; guardar(); desenharDet(); }
+  });
+  function itensDet() { return S.det.filter(function (r) { return r.cod && porCod[r.cod]; }).map(function (r) { var c = String(r.compl || '').trim(); return { tuss: r.cod, nome: porCod[r.cod].d + (c ? ' (' + c + ')' : ''), compl: c }; }); }
+
+  // ================= modo livre =================
+  $('tLivre').addEventListener('input', function () { S.livre = this.value; guardar(); atualizar(); });
+  function itensLivre() { return linhas(S.livre, false).map(function (l) { return { tuss: '', nome: cap(l) }; }); }
+
+  // ================= modelos =================
+  function modelos() { return ler(MODELOS, []); }
+  function itensDoModo(m) { return m === 'livre' ? itensLivre() : m === 'rapido' ? itensRapido() : m === 'detalhado' ? itensDet() : []; }
+  var mConf = null;
+  function desenharModelos() {
+    var l = modelos();
+    $('mCont').textContent = l.length ? l.length + (l.length === 1 ? ' modelo' : ' modelos') : '';
+    $('mLista').innerHTML = l.length ? l.map(function (m) {
+      var n = (m.itens || []).length;
+      return '<div class="mod"><div><b>' + esc(m.nome) + '</b><small>' + esc(TIT[m.modo] || '') + ' · ' + n + (n === 1 ? ' exame' : ' exames') + ': ' + esc((m.itens || []).slice(0, 6).map(function (i) { return i.nome; }).join('; ')) + (n > 6 ? '; …' : '') + '</small></div>' +
+        '<div class="bt"><button type="button" class="btn prim peq" data-usar="' + esc(m.id) + '">Usar</button><button type="button" class="btn peq perigo" data-apagar="' + esc(m.id) + '">' + (mConf === m.id ? 'confirmar exclusão' : 'apagar') + '</button></div></div>';
+    }).join('') : '<div class="caixa info">Nenhum modelo salvo neste navegador ainda.</div>';
+  }
+  $('mLista').addEventListener('click', function (e) {
+    var u = e.target.closest('[data-usar]'), a = e.target.closest('[data-apagar]');
+    if (u) {
+      var m = modelos().filter(function (x) { return x.id === u.getAttribute('data-usar'); })[0]; if (!m) return;
+      if (m.modo === 'livre') { S.livre = m.texto || ''; $('tLivre').value = S.livre; }
+      else if (m.modo === 'rapido') { S.rapido = m.texto || ''; S.escolha = Object.assign({}, m.escolha || {}); $('tRapido').value = S.rapido; }
+      else { S.det = (m.itens || []).map(function (i) { var x = porCod[i.tuss]; return x ? { cat: x.cat, sub: x.sub, cod: x.c, compl: i.compl || '' } : null; }).filter(Boolean).concat([{}]); S.pend = []; }
+      guardar(); modo(m.modo); avisar('Modelo "' + m.nome + '" carregado.');
+    } else if (a) {
+      var id = a.getAttribute('data-apagar');
+      if (mConf !== id) { mConf = id; desenharModelos(); return; }
+      mConf = null; gravar(MODELOS, modelos().filter(function (x) { return x.id !== id; })); desenharModelos(); avisar('Modelo apagado.');
+    }
+  });
+  $('bModelo').addEventListener('click', function () {
+    if (!itensDoModo(S.modo).length) { avisar('Inclua ao menos um exame antes de salvar o modelo.'); return; }
+    $('fModelo').hidden = false; $('mNome').value = ''; $('mNome').focus();
+  });
+  $('mCancelar').addEventListener('click', function () { $('fModelo').hidden = true; });
+  $('mNome').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); $('mSalvar').click(); } else if (e.key === 'Escape') $('fModelo').hidden = true; });
+  $('mSalvar').addEventListener('click', function () {
+    var nome = $('mNome').value.trim(); if (!nome) { $('mNome').focus(); return; }
+    var l = modelos().filter(function (x) { return x.nome.toLowerCase() !== nome.toLowerCase(); });
+    var substituiu = l.length < modelos().length;
+    var m = { id: 'm' + Date.now().toString(36), nome: nome, modo: S.modo, itens: itensDoModo(S.modo), criadoEm: new Date().toISOString() };
+    if (S.modo === 'livre') m.texto = S.livre;
+    if (S.modo === 'rapido') { m.texto = S.rapido; m.escolha = S.escolha; }
+    l.push(m); l.sort(function (a, b) { return a.nome.localeCompare(b.nome, 'pt-BR'); });
+    if (!gravar(MODELOS, l)) { avisar('Não foi possível salvar o modelo neste navegador.'); return; }
+    $('fModelo').hidden = true; avisar(substituiu ? 'Modelo "' + nome + '" atualizado.' : 'Modelo "' + nome + '" salvo.');
+  });
+
+  // ================= pedido (prévia, cópia e Word) =================
+  function itensAtuais() { return itensDoModo(S.modo); }
+  function textoPedido(itens) {
+    var nome = $('pNome').value.trim(), ind = $('pInd').value.trim(), cid = $('pCid').value.trim();
+    var l = ['Solicitação de exames (' + isoBr($('pData').value || hojeIso()) + ')'];
+    if (nome) l.push('Paciente: ' + nome);
+    if (ind) l.push('Indicação clínica: ' + ind);
+    if (cid) l.push('CID-10: ' + cid);
+    itens.forEach(function (it, i) { l.push((i + 1) + '. ' + it.nome + (it.tuss ? ' (TUSS ' + it.tuss + ')' : '')); });
+    return l.join('\n');
+  }
+  function desenharPrevia() {
+    var it = itensAtuais(), p = $('prev');
+    $('pCont').textContent = it.length ? it.length + (it.length === 1 ? ' exame' : ' exames') : '';
+    if (!it.length) { p.className = 'prev vazio'; p.textContent = 'Os exames aparecem aqui.'; }
+    else {
+      p.className = 'prev';
+      var nome = $('pNome').value.trim();
+      p.innerHTML = '<b>Solicitação de exames</b> · ' + esc(isoBr($('pData').value || hojeIso())) + (nome ? '\nPaciente: ' + esc(nome) : '\n<span class="mini">Falta o nome do paciente.</span>') +
+        ($('pInd').value.trim() ? '\nIndicação clínica: ' + esc($('pInd').value.trim()) : '') + ($('pCid').value.trim() ? '\nCID-10: ' + esc($('pCid').value.trim()) : '') + '\n' +
+        it.map(function (x, i) { return (i + 1) + '. ' + (x.tuss ? '<code>' + x.tuss + '</code>' : '') + esc(x.nome); }).join('\n');
+    }
+    $('bCopiar').disabled = $('bDocx').disabled = $('bModelo').disabled = !it.length;
+  }
+  function copiarTexto(t) {
+    function sel() { var ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} ta.remove(); }
+    try { navigator.clipboard.writeText(t).then(function () { avisar('Pedido copiado. Cole no prontuário.'); }, function () { sel(); avisar('Pedido copiado. Cole no prontuário.'); }); } catch (e) { sel(); avisar('Pedido copiado. Cole no prontuário.'); }
+  }
+  $('bCopiar').addEventListener('click', function () { var it = itensAtuais(); if (it.length) copiarTexto(textoPedido(it)); });
+  $('bLimpar').addEventListener('click', function () {
+    if (S.modo === 'livre') { S.livre = ''; $('tLivre').value = ''; }
+    else if (S.modo === 'rapido') { S.rapido = ''; S.escolha = {}; $('tRapido').value = ''; }
+    else if (S.modo === 'detalhado') { S.det = [{}]; S.pend = []; }
+    guardar(); atualizar();
+  });
+  ['pNome', 'pInd', 'pCid', 'pData'].forEach(function (id) { $(id).addEventListener('input', desenharPrevia); });
+  $('pNome').addEventListener('input', function () {
+    // o nome segue para a barra do paciente do Neurotools
+    try { var p = JSON.parse(sessionStorage.getItem('nt.pac') || 'null') || {}; p.nome = this.value.trim(); sessionStorage.setItem('nt.pac', JSON.stringify(p)); } catch (e) {}
+    try { var b = window.parent.document.getElementById('pacNome'); if (b) b.value = this.value; } catch (e) {}
+  });
+  function nomeDaBarra() {
+    if ($('pNome').value.trim()) return;
+    var n = '';
+    try { var b = window.parent.document.getElementById('pacNome'); if (b) n = b.value.trim(); } catch (e) {}
+    if (!n) try { n = ((JSON.parse(sessionStorage.getItem('nt.pac') || 'null') || {}).nome || '').trim(); } catch (e) {}
+    if (n) $('pNome').value = n;
+  }
+
+  // ---------- carimbo ----------
+  function carimbo() { return ler(CARIMBO, null); }
+  function desenharCarimbo() {
+    var c = carimbo(), com = S.carimbo === 'com';
+    $('oCom').checked = com; $('oSem').checked = !com;
+    var h = '';
+    if (com && !c) h = '<div class="caixa alerta"><b>Falta a foto do carimbo.</b> Para emitir com carimbo, envie uma foto do seu carimbo com a assinatura (PNG ou JPG, de preferência sobre papel branco e bem recortada). A imagem fica guardada só neste navegador e passa a entrar nos pedidos com carimbo.' +
+      '<div class="acoes"><button type="button" class="btn prim peq" id="cEnviar">Enviar foto do carimbo</button><label class="mini" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="cFundo" checked> tornar o fundo claro transparente</label></div></div>';
+    else if (com && c) h = '<div class="caixa info"><div class="carimbo"><img src="' + esc(c.src) + '" alt="Carimbo guardado neste navegador"><div>Carimbo guardado neste navegador.<div class="acoes" style="margin-top:6px"><button type="button" class="btn peq" id="cEnviar">Trocar foto</button><button type="button" class="btn peq perigo" id="cTirar">Remover</button><label class="mini" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="cFundo" checked> fundo claro transparente na troca</label></div></div></div></div>';
+    $('carBox').innerHTML = h;
+    var md = medico();
+    $('medBox').innerHTML = md.medicoNome || md.medicoNomeCurto ? '' : '<div class="caixa alerta"><b>Preencha seus dados de médico</b> (nome, CRM, RQE e endereço) para o cabeçalho e o rodapé do Word. <button type="button" class="btn lnk" id="irMedico">Preencher agora</button></div>';
+  }
+  document.querySelectorAll('input[name=carimbo]').forEach(function (r) { r.addEventListener('change', function () { S.carimbo = this.value; guardar(); desenharCarimbo(); }); });
+  $('carBox').addEventListener('click', function (e) {
+    if (e.target.closest('#cEnviar')) $('arqCarimbo').click();
+    if (e.target.closest('#cTirar')) { try { localStorage.removeItem(CARIMBO); } catch (x) {} desenharCarimbo(); avisar('Carimbo removido deste navegador.'); }
+  });
+  $('medBox').addEventListener('click', function (e) { if (e.target.closest('#irMedico') && host && host.ir) host.ir('lme-medico'); });
+  $('arqCarimbo').addEventListener('change', function () {
+    var f = this.files && this.files[0]; this.value = ''; if (!f) return;
+    var transp = !!($('cFundo') && $('cFundo').checked);
+    var rd = new FileReader();
+    rd.onload = function () {
+      var img = new Image();
+      img.onload = function () {
+        var max = 900, k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+        var w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
+        var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+        var cx = cv.getContext('2d'); cx.drawImage(img, 0, 0, w, h);
+        var url;
+        if (transp) {
+          var d = cx.getImageData(0, 0, w, h), p = d.data;
+          for (var i = 0; i < p.length; i += 4) {
+            var r = p[i], g = p[i + 1], b = p[i + 2], mx = Math.max(r, g, b), mn = Math.min(r, g, b), lum = 0.299 * r + 0.587 * g + 0.114 * b;
+            if (lum > 200 && mx - mn < 40) p[i + 3] = lum > 225 ? 0 : Math.round(255 * (225 - lum) / 25);
+          }
+          cx.putImageData(d, 0, 0); url = cv.toDataURL('image/png');
+        } else url = cv.toDataURL('image/jpeg', 0.88);
+        if (!gravar(CARIMBO, { src: url, w: w, h: h, em: new Date().toISOString() })) { avisar('A imagem é grande demais para guardar neste navegador. Tente uma foto menor ou mais recortada.'); return; }
+        S.carimbo = 'com'; guardar(); desenharCarimbo(); avisar('Carimbo guardado neste navegador.');
+      };
+      img.onerror = function () { avisar('Não foi possível ler esta imagem. Use PNG ou JPG.'); };
+      img.src = rd.result;
+    };
+    rd.readAsDataURL(f);
+  });
+
+  // ---------- dados do médico ----------
+  function medico() { return Object.assign({ medicoNome: '', medicoNomeCurto: '', crm: '', rqe: '', endereco: '', cidade: '', uf: '', telefone: '', especialidade: 'Neurologia' }, ler('lme_cfg', {}) || {}); }
+  function rotulo(r, v) { v = String(v || '').trim(); if (!v) return ''; return new RegExp('^' + r + '\\b', 'i').test(v) ? v : r + ': ' + v; }
+
+  // ---------- Word (.docx) feito à mão: XML do Office Open num zip sem compressão ----------
+  var CRC = (function () { var t = new Uint32Array(256); for (var n = 0; n < 256; n++) { var c = n; for (var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  function crc32(u) { var c = 0xFFFFFFFF; for (var i = 0; i < u.length; i++) c = CRC[(c ^ u[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+  function zip(arquivos) {
+    var enc = new TextEncoder(), partes = [], central = [], off = 0;
+    arquivos.forEach(function (a) {
+      var nome = enc.encode(a.nome), dados = typeof a.dados === 'string' ? enc.encode(a.dados) : a.dados, crc = crc32(dados);
+      var lh = new DataView(new ArrayBuffer(30));
+      lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true);
+      lh.setUint16(10, 0, true); lh.setUint16(12, 0x21, true); lh.setUint32(14, crc, true); lh.setUint32(18, dados.length, true); lh.setUint32(22, dados.length, true);
+      lh.setUint16(26, nome.length, true); lh.setUint16(28, 0, true);
+      partes.push(new Uint8Array(lh.buffer), nome, dados);
+      var ch = new DataView(new ArrayBuffer(46));
+      ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true);
+      ch.setUint16(12, 0, true); ch.setUint16(14, 0x21, true); ch.setUint32(16, crc, true); ch.setUint32(20, dados.length, true); ch.setUint32(24, dados.length, true);
+      ch.setUint16(28, nome.length, true); ch.setUint16(30, 0, true); ch.setUint16(32, 0, true); ch.setUint16(34, 0, true); ch.setUint16(36, 0, true); ch.setUint32(38, 0, true); ch.setUint32(42, off, true);
+      central.push(new Uint8Array(ch.buffer), nome);
+      off += 30 + nome.length + dados.length;
+    });
+    var tam = central.reduce(function (s, u) { return s + u.length; }, 0);
+    var fim = new DataView(new ArrayBuffer(22));
+    fim.setUint32(0, 0x06054b50, true); fim.setUint16(8, arquivos.length, true); fim.setUint16(10, arquivos.length, true); fim.setUint32(12, tam, true); fim.setUint32(16, off, true);
+    return new Blob(partes.concat(central, [new Uint8Array(fim.buffer)]), { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+  }
+  function x(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function run(t, o) {
+    o = o || {};
+    return '<w:r><w:rPr>' + (o.b ? '<w:b/>' : '') + (o.mono ? '<w:rFonts w:ascii="Consolas" w:hAnsi="Consolas" w:cs="Consolas"/>' : '') + (o.cor ? '<w:color w:val="' + o.cor + '"/>' : '') + (o.sz ? '<w:sz w:val="' + o.sz + '"/><w:szCs w:val="' + o.sz + '"/>' : '') + '</w:rPr><w:t xml:space="preserve">' + x(t) + '</w:t></w:r>';
+  }
+  function par(runs, o) {
+    o = o || {};
+    return '<w:p><w:pPr>' + (o.borda ? '<w:pBdr><w:bottom w:val="single" w:sz="6" w:space="4" w:color="888888"/></w:pBdr>' : '') + (o.tab ? '<w:tabs><w:tab w:val="right" w:pos="' + o.tab + '"/></w:tabs>' : '') +
+      '<w:spacing w:before="' + (o.antes || 0) + '" w:after="' + (o.depois == null ? 80 : o.depois) + '"/>' + (o.al ? '<w:jc w:val="' + o.al + '"/>' : '') + (o.manter ? '<w:keepNext/>' : '') + '</w:pPr>' + runs + '</w:p>';
+  }
+  function b64bytes(dataUrl) { var b = atob(dataUrl.split(',')[1]), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+  function gerarDocx(o) {
+    var md = o.medico, LARG = 9638;   // A4 com margens de 2 cm, em twips
+    var nomeMed = md.medicoNome || md.medicoNomeCurto || '';
+    var linha2 = [md.especialidade, rotulo('CRM', md.crm), rotulo('RQE', md.rqe)].filter(Boolean).join(' | ');
+    var b = '';
+    if (nomeMed) b += par(run(nomeMed, { b: true, sz: 28 }), { al: 'center', depois: 20 });
+    if (linha2) b += par(run(linha2, { sz: 19, cor: '444444' }), { al: 'center', depois: 0 });
+    b += par('', { borda: true, depois: 240 });
+    b += par(run('SOLICITAÇÃO DE EXAMES', { b: true, sz: 24 }), { al: 'center', depois: 280 });
+    b += par(run('Paciente: ', { b: true }) + run(o.paciente || '') + '<w:r><w:tab/></w:r>' + run('Data: ', { b: true }) + run(o.data), { tab: LARG, depois: 120 });
+    if (o.indicacao) b += par(run('Indicação clínica: ', { b: true }) + run(o.indicacao), { depois: 60 });
+    if (o.cid) b += par(run('CID-10: ', { b: true }) + run(o.cid), { depois: 60 });
+    b += par(run('Solicito:'), { antes: 160, depois: 120 });
+    var comCod = o.itens.some(function (i) { return i.tuss; });
+    if (comCod) {
+      var W = [520, 1400, LARG - 1920];
+      var cel = function (w, conteudo, cab) { return '<w:tc><w:tcPr><w:tcW w:w="' + w + '" w:type="dxa"/>' + (cab ? '<w:tcBorders><w:bottom w:val="single" w:sz="6" w:color="999999"/></w:tcBorders>' : '') + '</w:tcPr>' + conteudo + '</w:tc>'; };
+      var pc = function (r) { return '<w:p><w:pPr><w:spacing w:before="50" w:after="50"/></w:pPr>' + r + '</w:p>'; };
+      b += '<w:tbl><w:tblPr><w:tblW w:w="' + LARG + '" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblBorders><w:insideH w:val="single" w:sz="4" w:color="E2E2E2"/><w:bottom w:val="single" w:sz="4" w:color="E2E2E2"/></w:tblBorders><w:tblCellMar><w:left w:w="40" w:type="dxa"/><w:right w:w="40" w:type="dxa"/></w:tblCellMar></w:tblPr>' +
+        '<w:tblGrid>' + W.map(function (w) { return '<w:gridCol w:w="' + w + '"/>'; }).join('') + '</w:tblGrid>' +
+        '<w:tr><w:trPr><w:tblHeader/></w:trPr>' + cel(W[0], pc(''), true) + cel(W[1], pc(run('TUSS', { b: true, sz: 18, cor: '555555' })), true) + cel(W[2], pc(run('Exame', { b: true, sz: 18, cor: '555555' })), true) + '</w:tr>' +
+        o.itens.map(function (it, i) { return '<w:tr><w:trPr><w:cantSplit/></w:trPr>' + cel(W[0], pc(run((i + 1) + '.'))) + cel(W[1], pc(it.tuss ? run(it.tuss, { b: true, mono: true, sz: 20 }) : '')) + cel(W[2], pc(run(it.nome))) + '</w:tr>'; }).join('') + '</w:tbl>';
+    } else {
+      o.itens.forEach(function (it, i) { b += par(run((i + 1) + '. ') + run(it.nome), { depois: 80 }); });
+    }
+    var rels = '', midia = null;
+    if (o.carimbo) {
+      var c = o.carimbo, emu = 360000, largCm = 5.2, altCm = largCm * c.h / c.w;
+      if (altCm > 3.4) { altCm = 3.4; largCm = altCm * c.w / c.h; }
+      var cxE = Math.round(largCm * emu), cyE = Math.round(altCm * emu), png = /^data:image\/png/.test(c.src);
+      midia = { nome: 'word/media/carimbo.' + (png ? 'png' : 'jpeg'), dados: b64bytes(c.src) };
+      rels += '<Relationship Id="rIdImg" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/carimbo.' + (png ? 'png' : 'jpeg') + '"/>';
+      b += par('', { antes: 480, depois: 0, manter: true });
+      b += par('<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="' + cxE + '" cy="' + cyE + '"/><wp:docPr id="1" name="Carimbo"/>' +
+        '<wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr>' +
+        '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+        '<pic:nvPicPr><pic:cNvPr id="0" name="carimbo"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rIdImg"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>' +
+        '<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + cxE + '" cy="' + cyE + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>', { al: 'center', depois: 0 });
+    } else {
+      b += par('', { antes: 720, depois: 0, manter: true });
+      b += par(run('_______________________________________', { cor: '444444' }), { al: 'center', depois: 40, manter: true });
+      if (nomeMed) b += par(run(nomeMed, { sz: 19, cor: '444444' }), { al: 'center', depois: 0, manter: true });
+      if (linha2) b += par(run(linha2, { sz: 19, cor: '444444' }), { al: 'center', depois: 0 });
+    }
+    var rod = [md.endereco, [md.cidade, md.uf].filter(Boolean).join(' (') + (md.cidade && md.uf ? ')' : ''), md.telefone ? 'Tel. ' + md.telefone : ''].filter(Boolean).join(' | ');
+    var doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">' +
+      '<w:body>' + b + '<w:sectPr><w:footerReference w:type="default" r:id="rIdRod"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="900" w:right="1134" w:bottom="1300" w:left="1134" w:header="500" w:footer="560" w:gutter="0"/></w:sectPr></w:body></w:document>';
+    var rodape = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:pPr><w:pBdr><w:top w:val="single" w:sz="4" w:space="4" w:color="999999"/></w:pBdr><w:jc w:val="center"/><w:spacing w:after="0"/></w:pPr>' + run(rod, { sz: 15, cor: '555555' }) + '</w:p></w:ftr>';
+    var estilos = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:sz w:val="22"/><w:szCs w:val="22"/><w:lang w:val="pt-BR"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="80" w:line="264" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style></w:styles>';
+    var tipos = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Default Extension="jpeg" ContentType="image/jpeg"/>' +
+      '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>';
+    var relsRaiz = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>';
+    var relsDoc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdEst" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rIdRod" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>' + rels + '</Relationships>';
+    var agora = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
+    var core = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>' + x('Pedido de exames' + (o.paciente ? ' - ' + o.paciente : '')) + '</dc:title><dc:creator>' + x(nomeMed || 'Neurotools') + '</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">' + agora + '</dcterms:created></cp:coreProperties>';
+    var arqs = [{ nome: '[Content_Types].xml', dados: tipos }, { nome: '_rels/.rels', dados: relsRaiz }, { nome: 'docProps/core.xml', dados: core }, { nome: 'word/document.xml', dados: doc },
+      { nome: 'word/styles.xml', dados: estilos }, { nome: 'word/footer1.xml', dados: rodape }, { nome: 'word/_rels/document.xml.rels', dados: relsDoc }];
+    if (midia) arqs.push(midia);
+    return zip(arqs);
+  }
+  window.NTEX_docx = gerarDocx;   // usado nos testes
+  $('bDocx').addEventListener('click', function () {
+    var it = itensAtuais(); if (!it.length) return;
+    var nome = $('pNome').value.trim();
+    if (!nome) { avisar('Preencha o nome do paciente.'); $('pNome').focus(); return; }
+    var com = S.carimbo === 'com', c = carimbo();
+    if (com && !c) { desenharCarimbo(); avisar('Envie a foto do carimbo ou escolha "sem carimbo".'); var bt = $('cEnviar'); if (bt) bt.focus(); return; }
+    var blob = gerarDocx({ medico: medico(), paciente: nome, data: isoBr($('pData').value || hojeIso()), indicacao: $('pInd').value.trim(), cid: $('pCid').value.trim(), itens: it, carimbo: com ? c : null });
+    var arq = 'Pedido_exames_' + nome.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 50) + (com ? '' : '_sem_carimbo') + '.docx';
+    if (host && host.salvar) host.salvar(arq, blob);
+    else { var u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = arq; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(u); a.remove(); }, 1500); }
+  });
+
+  // ================= modos =================
+  function atualizar() {
+    if (S.modo === 'rapido') desenharRapido();
+    if (S.modo === 'detalhado') desenharDet();
+    if (S.modo === 'modelos') desenharModelos();
+    desenharPrevia();
+  }
+  function modo(m) {
+    if (!TIT[m]) m = 'livre';
+    S.modo = m; guardar();
+    document.querySelectorAll('.aba').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-modo') === m)); });
+    document.querySelectorAll('.modo').forEach(function (s) { s.hidden = s.getAttribute('data-m') !== m; });
+    $('cPedido').hidden = m === 'modelos'; $('cPac').hidden = m === 'modelos';
+    $('fModelo').hidden = true;
+    $('tit').textContent = TIT[m]; $('sub').textContent = SUB[m];
+    nomeDaBarra(); atualizar();
+  }
+  document.querySelector('.abas').addEventListener('click', function (e) { var b = e.target.closest('[data-modo]'); if (b) modo(b.getAttribute('data-modo')); });
+
+  $('tLivre').value = S.livre || ''; $('tRapido').value = S.rapido || ''; $('pData').value = hojeIso();
+  desenharCarimbo();
+  window.addEventListener('focus', desenharCarimbo);
+  window.NTEX = { modo: modo, modoAtual: function () { return S.modo; }, buscar: buscar, itens: itensAtuais };
+  modo(S.modo);
+})();
+</script>
+</body>
+</html>
