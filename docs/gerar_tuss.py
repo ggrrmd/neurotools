@@ -69,7 +69,8 @@ A = {
  '40306950': ['anti hbc', 'anti hbc igg', 'anti hbc total'],
  '40307026': ['anti hcv', 'hepatite c', 'hcv', 'sorologia hepatite c'],
  '40311210': ['urina 1', 'urina tipo 1', 'eas', 'urina rotina', 'parcial de urina', 'exame de urina', 'u1', 'sumario de urina'],
- '40310213': ['urocultura', 'urocultura com antibiograma', 'cultura de urina'],
+ '40310213': ['urocultura', 'cultura de urina'],
+ '40310426': ['antibiograma', 'tsa', 'teste de sensibilidade a antimicrobianos'],
  # líquor
  '40309169': ['puncao lombar', 'pl', 'puncao lombar com manometria', 'pressao de abertura'],
  '40309100': ['liquor', 'lcr', 'liquor rotina', 'lcr rotina', 'liquor ambulatorial', 'exame de liquor', 'liquor completo', 'lcr completo', 'liquido cefalorraquidiano'],

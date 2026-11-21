@@ -2,6 +2,10 @@
 
 Numeração: **1.x** para entregas com novidades (novas escalas, critérios, relatórios ou seções); **1.x.y** para correções pequenas; **2.0** reservado para mudança grande de estrutura.
 
+## 1.3.1 (21 de novembro de 2026)
+
+- Pedido de exames: acrescentado o antibiograma automatizado (TUSS 40310426) ao recorte, em Laboratório geral > Urina; "urocultura com antibiograma" sai como os dois exames. Exame repetido no mesmo pedido sai uma vez só.
+
 ## 1.3.0 (21 de novembro de 2026)
 
 - Nova seção **Pedido de exames**, entre Relatórios e CID-10, com quatro modos:

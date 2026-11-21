@@ -236,7 +236,8 @@ var TUSS = [
 ["40306950", "Hepatite B - HBCAC - IgG (anti-core IgG ou Acoreg) - pesquisa e/ou dosagem", 0, 4, ["anti hbc", "anti hbc igg", "anti hbc total"]],
 ["40307026", "Hepatite C - anti-HCV - pesquisa e/ou dosagem", 0, 4, ["anti hcv", "hepatite c", "hcv", "sorologia hepatite c"]],
 ["40311210", "Rotina de urina (caracteres físicos, elementos anormais e sedimentoscopia)", 0, 5, ["urina 1", "urina tipo 1", "eas", "urina rotina", "parcial de urina", "exame de urina", "u1", "sumario de urina"]],
-["40310213", "Cultura, urina com contagem de colônias", 0, 5, ["urocultura", "urocultura com antibiograma", "cultura de urina"]],
+["40310213", "Cultura, urina com contagem de colônias", 0, 5, ["urocultura", "cultura de urina"]],
+["40310426", "Antibiograma automatizado", 0, 5, ["antibiograma", "tsa", "teste de sensibilidade a antimicrobianos"]],
 ["40309169", "Punção lombar com manometria para coleta de líquido cefalorraqueano", 1, 6, ["puncao lombar", "pl", "puncao lombar com manometria", "pressao de abertura"]],
 ["40309100", "LCR ambulatorial rotina (aspectos cor + índice de cor + contagem global e específica de leucócitos e hemácias + citologia oncótica + proteína + glicose + cloro + eletroforese com concentração + IgG + reações para neurocisticercose (2) + reações para neuroles (2)).", 1, 6, ["liquor", "lcr", "liquor rotina", "lcr rotina", "liquor ambulatorial", "exame de liquor", "liquor completo", "lcr completo", "liquido cefalorraquidiano"]],
 ["40309118", "LCR hospitalar neurologia (aspectos cor + índices de cor + contagem global e específica de leucócitos e hemácias + proteína + glicose + cloro + reações para neurocisticercose (2) + reações para neurolues (2) + bacterioscopia + cultura + látex para bactérias).", 1, 6, ["liquor hospitalar", "lcr hospitalar", "liquor com cultura"]],
@@ -547,7 +548,8 @@ var TUSS = [
     [['miastenia', 'anticorpos de miastenia', 'painel de miastenia'], ['40323030', '40324729']],
     [['gamopatia', 'pesquisa de gamopatia', 'pesquisa de gamopatia monoclonal', 'gamopatia monoclonal', 'proteinograma e imunofixacao'], ['40302717', '40302725', '40324265']],
     [['vitaminas b1 b6 e b12', 'complexo b', 'vitaminas do complexo b'], ['40302784', '40302814', '40316572']],
-    [['urina', 'urina 1 e urocultura'], ['40311210', '40310213']]
+    [['urina', 'urina 1 e urocultura'], ['40311210', '40310213']],
+    [['urocultura com antibiograma', 'urocultura e antibiograma', 'cultura de urina com antibiograma'], ['40310213', '40310426']]
   ];
   var PAC = {}; PACOTES.forEach(function (p) { p[0].forEach(function (k) { PAC[canon(k)] = p[1]; }); });
 
@@ -620,7 +622,7 @@ var TUSS = [
   function itensRapido() {
     var out = [], vistos = {};
     resolverRapido().forEach(function (o) {
-      if (o.pacote) { o.pacote.forEach(function (x) { if (!vistos[x.c]) { vistos[x.c] = 1; out.push({ tuss: x.c, nome: x.d }); } }); return; }
+      if (o.pacote) { o.pacote.forEach(function (x) { if (!vistos[x.c + '|']) { vistos[x.c + '|'] = 1; out.push({ tuss: x.c, nome: x.d }); } }); return; }
       if (o.x) { var nome = o.x.d + (o.compl ? ' (' + o.compl + ')' : ''); var k = o.x.c + '|' + o.compl; if (!vistos[k]) { vistos[k] = 1; out.push({ tuss: o.x.c, nome: nome }); } }
       else out.push({ tuss: '', nome: cap(o.texto) });
     });
