@@ -229,6 +229,18 @@ body:not(.sem-ferr) .titulo-topo{display:none}
 .ressalva svg.ic{margin-top:1px}
 .ressalva p{margin:0}
 .ressalva a{color:inherit;font-weight:700}
+.faq{max-width:820px}
+.faq-it{border:1px solid var(--rule);border-radius:12px;background:var(--card);margin:0 0 8px}
+.faq-it summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 16px;font-weight:600;font-size:14.5px;color:var(--ink)}
+.faq-it summary::-webkit-details-marker{display:none}
+.faq-it summary svg.ic{flex:none;width:16px;height:16px;transition:transform .15s;color:var(--ink45)}
+.faq-it[open] summary svg.ic{transform:rotate(90deg)}
+.faq-it summary:focus-visible{outline:3px solid var(--sage);outline-offset:2px;border-radius:12px}
+.faq-it p{margin:0;padding:0 16px 14px;font-size:14px;line-height:1.6;color:var(--ink70)}
+.faq-it a{color:var(--pine);font-weight:600}
+.contato .acoes-ct{display:flex;gap:8px;flex-wrap:wrap}
+.contato .btn-l{display:inline-flex;align-items:center;gap:7px;text-decoration:none}
+.contato .btn-l svg.ic{width:16px;height:16px}
 .breve-box{border:1px dashed var(--rule);border-radius:14px;padding:22px;max-width:720px;color:var(--ink70);font-size:14.5px;line-height:1.6}
 .breve-box h2{font:700 19px/1.3 var(--serif);color:var(--ink);margin:0 0 8px}
 .breve-box ul{margin:8px 0 0;padding-left:20px}
@@ -422,6 +434,7 @@ dialog .campo input{background:var(--paper)}
     <symbol id="i-pasta" viewBox="0 0 24 24"><path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V6.5Z"/><path d="M8 13h8"/></symbol>
     <symbol id="i-alerta" viewBox="0 0 24 24"><path d="M12 3.5 2.5 20h19L12 3.5Z"/><path d="M12 10v4.5M12 17.2v.3"/></symbol>
     <symbol id="i-codigo" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 4.5l-3 15"/></symbol>
+    <symbol id="i-duvida" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.8"/><path d="M12 17.2v.3"/></symbol>
     <symbol id="i-cadeado" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></symbol>
     <symbol id="i-escudo" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.1 8.2 7.5 9.5 4.4-1.3 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="M9 12h6M12 9v6"/></symbol>
     <symbol id="i-mente" viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.5"/><path d="M9 21v-3.5a3 3 0 0 1 6 0V21"/><path d="M10 9h4"/></symbol>
@@ -561,7 +574,7 @@ dialog .campo input{background:var(--paper)}
 <script>
 (function () {
   'use strict';
-  var NT_VERSAO = '1.3.1';
+  var NT_VERSAO = '1.3.2';
   var RODAPE = '<b>Neurotools ' + NT_VERSAO + ' é um projeto de código aberto, sob licença MIT.</b> Cabe ao julgamento médico conferir a acurácia das informações obtidas e decidir criteriosamente o que fazer com elas. <a href="privacidade.html" target="_blank" rel="noopener">Privacidade e termos de uso</a>.';
   document.getElementById('rodape').innerHTML = RODAPE;
 
@@ -824,6 +837,7 @@ dialog .campo input{background:var(--paper)}
     ['alsfrs', 'ALSFRS-R e ΔFS', 'Neuromuscular', 'ela als alsfrs progressao'],
     ['elacrit', 'Gold Coast e El Escorial (Awaji)', 'Neuromuscular', 'ela esclerose lateral amiotrofica gold coast el escorial awaji'],
     ['facedrops', 'FACE DROPS (paralisia facial)', 'Neuromuscular', 'paralisia facial bell lyme'],
+    ['egris', 'EGRIS (insuficiência respiratória)', 'Neuromuscular', 'egris guillain-barre sgb gbs insuficiencia respiratoria ventilacao mecanica intubacao'],
     ['sgb', 'NINDS 1990 e Brighton 2014', 'Neuromuscular', 'guillain-barre sgb gbs polirradiculoneuropatia aguda'],
     ['pidc', 'EAN/PNS 2021 (PIDC)', 'Neuromuscular', 'pidc cidp polirradiculoneuropatia inflamatoria desmielinizante cronica'],
     ['nmm', 'EFNS/PNS 2010 (NMM)', 'Neuromuscular', 'neuropatia motora multifocal nmm mmn bloqueio conducao'],
@@ -924,14 +938,14 @@ dialog .campo input{background:var(--paper)}
     'exames-modelos': 'Pedidos que você salvou para usar de novo, como rotinas por doença.'
   };
   var REL_PREVISTOS = [];
-  var SUBG = { mgadl: 'Miastenia', qmg: 'Miastenia', mgfa: 'Miastenia', alsfrs: 'ELA', facedrops: 'Nervos cranianos',
+  var SUBG = { mgadl: 'Miastenia', qmg: 'Miastenia', mgfa: 'Miastenia', alsfrs: 'ELA', egris: 'Guillain-Barré', facedrops: 'Nervos cranianos',
     psprs: 'Parkinsonismos atípicos', umsars: 'Parkinsonismos atípicos', tetras: 'Tremor, distonia e outros', twstrs: 'Tremor, distonia e outros', bfm: 'Tremor, distonia e outros', sara: 'Tremor, distonia e outros', irls: 'Tremor, distonia e outros', aims: 'Tremor, distonia e outros', antipsic: 'Fármacos e parkinsonismo',
     ledd: 'Parkinson', c521: 'Parkinson', hyse: 'Parkinson', 'parkinson-iii': 'Parkinson', 'parkinson-iv': 'Parkinson', 'parkinson-foslevodopa': 'Parkinson',
     respcgrp: 'Anti-CGRP e toxina', preempt: 'Anti-CGRP e toxina', diariocef: 'Diário', midas: 'Incapacidade e resposta', hit6: 'Incapacidade e resposta', mtoq: 'Incapacidade e resposta',
     'cognitivo-zescores': 'Testes e escalas', 'cognitivo-meem': 'Testes e escalas', 'cognitivo-conv': 'Testes e escalas', 'cognitivo-cdr': 'Testes e escalas', 'cognitivo-fast': 'Testes e escalas', 'cognitivo-pfeffer': 'Testes e escalas', 'cognitivo-madrs': 'Testes e escalas', katz: 'Testes e escalas', iqcode: 'Testes e escalas', mace: 'Testes e escalas', npiq: 'Testes e escalas',
     'cognitivo-antiamiloide': 'Terapia antiamiloide', aria: 'Terapia antiamiloide',
     nihss: 'AVC isquêmico', hints: 'AVC isquêmico', ascod: 'AVC isquêmico', rope: 'AVC isquêmico', sich: 'Hemorragia intracerebral', phases: 'Aneurisma e HSA', hunthess: 'Aneurisma e HSA', fisher: 'Aneurisma e HSA' };
-  var ORDEM_SUB = { 'Cognição': ['Testes e escalas', 'Terapia antiamiloide'], 'Movimento': ['Parkinson', 'Parkinsonismos atípicos', 'Tremor, distonia e outros', 'Fármacos e parkinsonismo'], 'Neuromuscular': ['Miastenia', 'ELA', 'Nervos cranianos'], 'Cefaleia': ['Diário', 'Incapacidade e resposta', 'Anti-CGRP e toxina'], 'Vascular': ['AVC isquêmico', 'Hemorragia intracerebral', 'Aneurisma e HSA'] };
+  var ORDEM_SUB = { 'Cognição': ['Testes e escalas', 'Terapia antiamiloide'], 'Movimento': ['Parkinson', 'Parkinsonismos atípicos', 'Tremor, distonia e outros', 'Fármacos e parkinsonismo'], 'Neuromuscular': ['Miastenia', 'ELA', 'Guillain-Barré', 'Nervos cranianos'], 'Cefaleia': ['Diário', 'Incapacidade e resposta', 'Anti-CGRP e toxina'], 'Vascular': ['AVC isquêmico', 'Hemorragia intracerebral', 'Aneurisma e HSA'] };
 
   var CAT = [], porId = {};
   ANTIGAS.forEach(function (a) { CAT.push({ id: a[0], nome: a[1], area: a[2], tool: a[3], sub: a[4], alvo: a[5], alias: a[6], acao: !!a[7] }); });
@@ -943,7 +957,7 @@ dialog .campo input{background:var(--paper)}
     { id: 'escalas', nome: 'Escalas e instrumentos', ic: 'i-regua', ds: 'Testes, escalas e calculadoras por área.' },
     { id: 'criterios', nome: 'Critérios diagnósticos', ic: 'i-check', ds: 'Critérios em uso para as principais doenças de cada área.' },
     { id: 'relatorios', nome: 'Relatórios', ic: 'i-doc', ds: 'Modelos para convênio, perícia e atestados.' },
-    { id: 'exames', nome: 'Pedido de exames', ic: 'i-tubo', ds: 'Pedido livre ou com códigos TUSS, modelos salvos e Word com ou sem carimbo.' },
+    { id: 'exames', nome: 'Pedido de exames', ic: 'i-tubo', ds: 'Pedido livre ou com códigos TUSS, modelos salvos e Word ou PDF, com ou sem carimbo.' },
     { id: 'cid', nome: 'CID-10', ic: 'i-cid', ds: 'Busca de códigos por palavra ou código.' },
     { id: 'prontuario', nome: 'Miniprontuário', ic: 'i-pasta', ds: 'Histórico por CPF: receitas, escalas e critérios.' }
   ];
@@ -1159,6 +1173,7 @@ dialog .campo input{background:var(--paper)}
     h += '<div class="sep-nav"></div>';
     h += '<button class="item" type="button" data-ir="dados">' + ic('i-cadeado') + 'Meus dados</button>';
     h += '<button class="item" type="button" data-ir="lme-medico">' + ic('i-pessoa') + 'Dados do médico</button>';
+    h += '<button class="item" type="button" data-ir="duvidas">' + ic('i-duvida') + 'Dúvidas mais comuns</button>';
     lista.innerHTML = h;
     marcar(); mostrarRenovar();
   }
@@ -1196,6 +1211,34 @@ dialog .campo input{background:var(--paper)}
   }
   function plural(n, s, p) { return n + ' ' + (n === 1 ? s : p); }
 
+  // ================= dúvidas mais comuns (respostas em HTML) =================
+  var DUVIDAS = [
+    ['Uso dos dados', [
+      ['Preciso incluir os meus dados para usar o site?', 'Caso deseje utilizar ferramentas como receituários, LME, relatórios ou pedidos de exames, os seus dados serão necessários para preencher o cabeçalho e os dados de assinatura. <a href="#lme-medico" data-ir="lme-medico">Preencher os dados do médico</a>.'],
+      ['Os dados dos meus pacientes somem quando mudo do computador para o celular ou iPad. O que pode estar acontecendo?', 'Em respeito à privacidade do paciente, os dados ficam apenas no navegador em que você os inseriu inicialmente. Não há qualquer tipo de envio de dados para servidores na internet. Caso queira usar seus dados em mais de um aparelho, faça uma cópia manual em <a href="#dados" data-ir="dados">Meus dados</a>, na área "Cópia de segurança e outro navegador". Depois, abra o Neurotools no outro aparelho e importe o arquivo na mesma tela.'],
+      ['Percebi um erro em uma medicação ou exame. O que posso fazer?', 'Você pode editar manualmente o erro e enviar uma mensagem para o Neurotools, clicando em <a href="#" data-contato>Fale conosco</a>. Informe o nome do medicamento ou exame e a página onde está o erro.']
+    ]],
+    ['Privacidade e dados', [
+      ['O Neurotools guarda dados dos meus pacientes?', 'Não. Nomes, CPFs, escalas, receitas, LMEs, pedidos de exames e o miniprontuário ficam só no armazenamento do seu navegador. O servidor guarda apenas o email, o nome e a senha da sua conta (a senha cifrada), usados só para o login.'],
+      ['Se eu limpar o histórico ou os dados de navegação, perco tudo?', 'Sim. Limpar os dados do site apaga os registros guardados no navegador. Por isso recomendamos exportar uma cópia de segurança (.json) por semana, em <a href="#dados" data-ir="dados">Meus dados</a>, e guardá-la fora do navegador (pasta do computador ou nuvem).'],
+      ['Posso usar o Neurotools numa janela anônima?', 'Pode, mas nada do que for salvo fica guardado: ao fechar a janela, os dados se perdem. Para uso no dia a dia, use uma janela normal.'],
+      ['Abri o site por outro endereço e meus dados não aparecem.', 'Os dados ficam guardados por endereço. Use sempre <b>neurotools.com.br</b>. Se houver dados num endereço antigo, o site mostra um aviso para exportar a cópia e importá-la no endereço oficial.'],
+      ['Importar uma cópia apaga o que já existe no navegador?', 'Não. A importação junta os dados da cópia aos que já estão no navegador, sem apagar nada.']
+    ]],
+    ['Receitas e documentos', [
+      ['As receitas do Neurotools valem como receita digital?', 'Não. Elas são geradas para impressão e assinatura à mão. Para prescrição eletrônica com assinatura certificada, use plataformas próprias, como Memed ou Mevo.'],
+      ['Como uso meu carimbo nos pedidos de exames?', 'Em <a href="#exames" data-ir="exames">Pedido de exames</a>, escolha "com carimbo" e envie uma foto do carimbo com a assinatura, de preferência sobre papel branco. A imagem fica guardada só no seu navegador e passa a entrar nos pedidos, em Word e em PDF. Se preferir assinar à mão, escolha "sem carimbo".'],
+      ['O exame que procuro não tem código TUSS. O que acontece?', 'O site usa um recorte da tabela TUSS com os exames mais usados em neurologia e clínica geral. Exame fora do recorte sai no pedido como foi escrito, sem código. Você também pode procurá-lo no modo TUSS detalhado ou pedir a inclusão pelo <a href="#" data-contato>Fale conosco</a>.'],
+      ['Posso editar o documento depois de gerado?', 'Sim. Os pedidos e relatórios em Word (.docx) podem ser editados antes de imprimir; o PDF sai pronto para imprimir ou enviar. Os textos para o prontuário também podem ser ajustados depois de colados.']
+    ]],
+    ['Uso geral', [
+      ['O Neurotools substitui o julgamento clínico?', 'Não. Escalas, critérios e cálculos apoiam a decisão, mas cabe ao médico conferir a acurácia dos resultados e decidir o que fazer com eles.'],
+      ['Funciona no celular e no iPad?', 'Sim, o site se adapta à tela. Lembre que cada aparelho tem seus próprios dados. Para levar os dados de um aparelho a outro, exporte a cópia num e importe no outro.'],
+      ['Quanto custa? Quem mantém o site?', 'É gratuito e de código aberto, sob licença MIT. O código pode ser consultado no GitHub em <a href="https://github.com/ggrrmd/neurotools" target="_blank" rel="noopener">github.com/ggrrmd/neurotools</a>. O responsável técnico é o Dr. Guilherme Riccioppo, CRM-SP: 107200, RQE: 35373.'],
+      ['Posso sugerir uma escala, um critério ou um relatório novo?', 'Sim, esse é um site em expansão com DNA colaborativo. Use o botão <a href="#" data-contato>Fale conosco</a> na página inicial. Não inclua dados de pacientes na mensagem.']
+    ]]
+  ];
+
   var PAGINAS = {
     inicio: function () {
       var t = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
@@ -1212,7 +1255,7 @@ dialog .campo input{background:var(--paper)}
         else if (s.id === 'exames') info = 'Recorte da TUSS 22';
         h += cardHtml({ nome: s.nome, ds: s.ds, ic: s.ic, ir: s.id, info: info, infoId: s.id === 'receituarios' ? 'infoRenovar' : (s.id === 'prontuario' ? 'infoMP' : null), dest: s.id === 'receituarios', breve: s.breve });
       });
-      h += '</div><div class="contato"><p>' + ic('i-carta') + '<span>Encontrou um problema ou tem uma sugestão para o Neurotools?</span></p><button type="button" class="btn-p" data-contato>' + ic('i-carta') + 'Fale conosco</button></div>';
+      h += '</div><div class="contato"><p>' + ic('i-carta') + '<span>Encontrou um problema ou tem uma sugestão para o Neurotools?</span></p><span class="acoes-ct"><a class="btn-l" href="#duvidas" data-ir="duvidas">' + ic('i-duvida') + 'Dúvidas mais comuns</a><button type="button" class="btn-p" data-contato>' + ic('i-carta') + 'Fale conosco</button></span></div>';
       pCorpo.innerHTML = h;
       recarregarPacientes(); avisoCopia();
     },
@@ -1247,7 +1290,7 @@ dialog .campo input{background:var(--paper)}
       pCorpo.innerHTML = h;
     },
     exames: function () {
-      cabecalho('Pedido de exames', 'i-tubo', 'Monte o pedido, copie para o prontuário ou emita em Word, com ou sem carimbo.', [['Início', 'inicio'], ['Pedido de exames', 'exames']]);
+      cabecalho('Pedido de exames', 'i-tubo', 'Monte o pedido, copie para o prontuário ou emita em Word ou PDF, com ou sem carimbo.', [['Início', 'inicio'], ['Pedido de exames', 'exames']]);
       var h = '<div class="sub-sec">Modos</div><div class="tiles largos">' + itens('exames').map(function (c) { return tile(c, true); }).join('') + '</div>';
       pCorpo.innerHTML = h;
     },
@@ -1259,6 +1302,16 @@ dialog .campo input{background:var(--paper)}
       cabecalho('Miniprontuário', 'i-pasta', 'Tudo o que foi registrado para cada paciente neste navegador.', [['Início', 'inicio'], ['Miniprontuário', 'prontuario']]);
       pCorpo.innerHTML = '<div id="mpCorpo"><p class="estado">Carregando…</p></div>';
       desenharMP();
+    },
+    duvidas: function () {
+      cabecalho('Dúvidas mais comuns', 'i-duvida', 'Respostas rápidas sobre dados, privacidade, documentos e uso do site.', [['Início', 'inicio'], ['Dúvidas mais comuns', 'duvidas']]);
+      var h = '<div class="faq">';
+      DUVIDAS.forEach(function (g) {
+        h += '<div class="sub-sec">' + esc(g[0]) + '</div>';
+        g[1].forEach(function (q) { h += '<details class="faq-it"><summary><span>' + esc(q[0]) + '</span>' + ic('i-seta') + '</summary><p>' + q[1] + '</p></details>'; });
+      });
+      h += '</div><div class="contato"><p>' + ic('i-carta') + '<span>Não encontrou a resposta?</span></p><button type="button" class="btn-p" data-contato>' + ic('i-carta') + 'Fale conosco</button></div>';
+      pCorpo.innerHTML = h;
     },
     dados: function () {
       cabecalho('Meus dados', 'i-cadeado', 'O que está guardado neste navegador e como fazer cópia, levar para outro navegador ou aparelho, ou apagar.', [['Início', 'inicio'], ['Meus dados', 'dados']]);
@@ -1872,7 +1925,7 @@ dialog .campo input{background:var(--paper)}
     var sec = secaoDaVista();
     lista.parentNode.querySelectorAll('.item[data-ir]').forEach(function (b) {
       var d = b.getAttribute('data-ir');
-      var on = atual ? d === atual.id : (d === vista || (d === sec && ['receituarios', 'relatorios', 'exames', 'cid', 'prontuario', 'dados', 'inicio'].indexOf(d) >= 0));
+      var on = atual ? d === atual.id : (d === vista || (d === sec && ['receituarios', 'relatorios', 'exames', 'cid', 'prontuario', 'dados', 'duvidas', 'inicio'].indexOf(d) >= 0));
       if (atual && atual.secao === 'receituarios' && d === 'receituarios' && favs.indexOf(atual.id) < 0) on = true;
       if (atual && atual.secao === 'relatorios' && d === 'relatorios' && favs.indexOf(atual.id) < 0) on = true;
       if (atual && atual.secao === 'exames' && d === 'exames' && favs.indexOf(atual.id) < 0) on = true;
@@ -1880,7 +1933,7 @@ dialog .campo input{background:var(--paper)}
       if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
     });
     lista.querySelectorAll('.grupo-tit').forEach(function (g) { g.classList.toggle('on', g.getAttribute('data-grupo-bt') === sec); });
-    var tit = atual ? atual.nome : (secaoPorId[vista] ? secaoPorId[vista].nome : (vista === 'dados' ? 'Meus dados' : (pTit.textContent || '')));
+    var tit = atual ? atual.nome : (secaoPorId[vista] ? secaoPorId[vista].nome : (vista === 'dados' ? 'Meus dados' : vista === 'duvidas' ? 'Dúvidas mais comuns' : (pTit.textContent || '')));
     document.title = vista === 'inicio' && !atual ? 'Neurotools' : tit + ' · Neurotools';
     marcarFav();
   }

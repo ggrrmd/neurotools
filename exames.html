@@ -156,11 +156,12 @@ button,input,select,textarea{font:inherit;color:inherit}
       <input class="txt" type="text" id="mNome" placeholder="Nome do modelo (ex.: Rastreio de demência reversível)" autocomplete="off">
       <button type="button" class="btn prim" id="mSalvar">Salvar</button><button type="button" class="btn" id="mCancelar">Cancelar</button>
     </div>
-    <div class="opc" role="radiogroup" aria-label="Carimbo no Word">
-      <b>Word (.docx):</b>
+    <div class="opc" role="radiogroup" aria-label="Carimbo no documento">
+      <b>Documento:</b>
       <label><input type="radio" name="carimbo" value="com" id="oCom"> com carimbo</label>
       <label><input type="radio" name="carimbo" value="sem" id="oSem"> sem carimbo</label>
       <button type="button" class="btn prim" id="bDocx">Emitir .docx</button>
+      <button type="button" class="btn prim" id="bPdf">Emitir .pdf</button>
     </div>
     <div id="carBox"></div>
     <div id="medBox"></div>
@@ -759,7 +760,7 @@ var TUSS = [
     $('fModelo').hidden = true; avisar(substituiu ? 'Modelo "' + nome + '" atualizado.' : 'Modelo "' + nome + '" salvo.');
   });
 
-  // ================= pedido (prévia, cópia e Word) =================
+  // ================= pedido (prévia, cópia, Word e PDF) =================
   function itensAtuais() { return itensDoModo(S.modo); }
   function textoPedido(itens) {
     var nome = $('pNome').value.trim(), ind = $('pInd').value.trim(), cid = $('pCid').value.trim();
@@ -781,7 +782,7 @@ var TUSS = [
         ($('pInd').value.trim() ? '\nIndicação clínica: ' + esc($('pInd').value.trim()) : '') + ($('pCid').value.trim() ? '\nCID-10: ' + esc($('pCid').value.trim()) : '') + '\n' +
         it.map(function (x, i) { return (i + 1) + '. ' + (x.tuss ? '<code>' + x.tuss + '</code>' : '') + esc(x.nome); }).join('\n');
     }
-    $('bCopiar').disabled = $('bDocx').disabled = $('bModelo').disabled = !it.length;
+    $('bCopiar').disabled = $('bDocx').disabled = $('bPdf').disabled = $('bModelo').disabled = !it.length;
   }
   function copiarTexto(t) {
     function sel() { var ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} ta.remove(); }
@@ -819,7 +820,7 @@ var TUSS = [
     else if (com && c) h = '<div class="caixa info"><div class="carimbo"><img src="' + esc(c.src) + '" alt="Carimbo guardado neste navegador"><div>Carimbo guardado neste navegador.<div class="acoes" style="margin-top:6px"><button type="button" class="btn peq" id="cEnviar">Trocar foto</button><button type="button" class="btn peq perigo" id="cTirar">Remover</button><label class="mini" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="cFundo" checked> fundo claro transparente na troca</label></div></div></div></div>';
     $('carBox').innerHTML = h;
     var md = medico();
-    $('medBox').innerHTML = md.medicoNome || md.medicoNomeCurto ? '' : '<div class="caixa alerta"><b>Preencha seus dados de médico</b> (nome, CRM, RQE e endereço) para o cabeçalho e o rodapé do Word. <button type="button" class="btn lnk" id="irMedico">Preencher agora</button></div>';
+    $('medBox').innerHTML = md.medicoNome || md.medicoNomeCurto ? '' : '<div class="caixa alerta"><b>Preencha seus dados de médico</b> (nome, CRM, RQE e endereço) para o cabeçalho e o rodapé do documento. <button type="button" class="btn lnk" id="irMedico">Preencher agora</button></div>';
   }
   document.querySelectorAll('input[name=carimbo]').forEach(function (r) { r.addEventListener('change', function () { S.carimbo = this.value; guardar(); desenharCarimbo(); }); });
   $('carBox').addEventListener('click', function (e) {
@@ -957,17 +958,192 @@ var TUSS = [
     return zip(arqs);
   }
   window.NTEX_docx = gerarDocx;   // usado nos testes
-  $('bDocx').addEventListener('click', function () {
-    var it = itensAtuais(); if (!it.length) return;
+
+  // ---------- PDF feito à mão: fontes padrão do PDF (Helvetica, Courier), texto em WinAnsi, carimbo em JPEG ----------
+  var LARG_H = [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584,761,556,0,222,556,333,1000,556,556,333,1000,667,333,1000,0,611,0,0,222,222,333,333,350,556,1000,333,1000,500,333,944,0,500,667,278,333,556,556,556,556,260,556,333,737,370,556,584,333,737,333,400,584,333,333,333,556,537,278,333,333,365,556,834,834,834,611,667,667,667,667,667,667,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,500,556,556,556,556,278,278,278,278,556,556,556,556,556,556,556,584,611,556,556,556,556,500,556,500], LARG_HB = [278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,333,556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,389,280,389,584,761,556,0,278,556,500,1000,556,556,333,1000,667,333,1000,0,611,0,0,278,278,500,500,350,556,1000,333,1000,556,333,944,0,500,667,278,333,556,556,556,556,280,556,333,737,370,556,584,333,737,333,400,584,333,333,333,611,556,278,333,333,365,556,834,834,834,611,722,722,722,722,722,722,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,556,556,556,556,556,278,278,278,278,611,611,611,611,611,611,611,584,611,611,611,611,611,556,611,556];
+  var W1252 = { 8364: 128, 8218: 130, 402: 131, 8222: 132, 8230: 133, 8224: 134, 8225: 135, 710: 136, 8240: 137, 352: 138, 8249: 139, 338: 140, 381: 142, 8216: 145, 8217: 146, 8220: 147, 8221: 148, 8226: 149, 8211: 150, 8212: 151, 732: 152, 8482: 153, 353: 154, 8250: 155, 339: 156, 382: 158, 376: 159 };
+  var TROCA_PDF = { 'α': 'alfa', 'β': 'beta', 'γ': 'gama', 'δ': 'delta', 'κ': 'kappa', 'λ': 'lambda', '≥': '>=', '≤': '<=', '→': '->', 'μ': 'µ', '−': '-' };
+  function cod1252(ch) { var c = ch.charCodeAt(0); if (c < 128 || (c >= 160 && c < 256)) return c; return W1252[c] || 63; }
+  function prepPdf(t) { return String(t == null ? '' : t).normalize('NFC').replace(/[αβγδκλ≥≤→μ−]/g, function (c) { return TROCA_PDF[c]; }).replace(/[\t\r\n]+/g, ' '); }
+  function largPdf(t, fonte, tam) {
+    if (fonte === 'C' || fonte === 'CB') return t.length * 600 * tam / 1000;
+    var tab = fonte === 'HB' ? LARG_HB : LARG_H, w = 0;
+    for (var i = 0; i < t.length; i++) { var c = cod1252(t[i]); w += c >= 32 ? (tab[c - 32] || 556) : 0; }
+    return w * tam / 1000;
+  }
+  function strPdf(t) {
+    var o = '(';
+    for (var i = 0; i < t.length; i++) {
+      var c = cod1252(t[i]);
+      if (c === 40 || c === 41 || c === 92) o += '\\' + t[i];
+      else if (c < 32 || c > 126) o += '\\' + ('00' + c.toString(8)).slice(-3);
+      else o += t[i];
+    }
+    return o + ')';
+  }
+  function quebrar(t, fonte, tam, larg) {
+    var pal = prepPdf(t).split(' '), linhas = [], atual = '';
+    pal.forEach(function (p) {
+      if (!p) return;
+      var tent = atual ? atual + ' ' + p : p;
+      if (largPdf(tent, fonte, tam) <= larg) { atual = tent; return; }
+      if (atual) linhas.push(atual);
+      while (largPdf(p, fonte, tam) > larg) { var k = p.length; while (k > 1 && largPdf(p.slice(0, k), fonte, tam) > larg) k--; linhas.push(p.slice(0, k)); p = p.slice(k); }
+      atual = p;
+    });
+    if (atual || !linhas.length) linhas.push(atual);
+    return linhas;
+  }
+  // carimbo: desenhado sobre fundo branco e convertido em JPEG (o PDF aceita JPEG diretamente)
+  function carimboJpeg(c) {
+    return new Promise(function (ok, falha) {
+      var im = new Image();
+      im.onload = function () {
+        var cv = document.createElement('canvas'); cv.width = im.naturalWidth; cv.height = im.naturalHeight;
+        var g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(im, 0, 0);
+        ok({ w: cv.width, h: cv.height, dados: b64bytes(cv.toDataURL('image/jpeg', 0.92)) });
+      };
+      im.onerror = function () { falha(new Error('carimbo')); };
+      im.src = c.src;
+    });
+  }
+  function gerarPdf(o, jpeg) {
+    var md = o.medico, PW = 595.28, PH = 841.89, ML = 56.7, MR = 56.7, TOPO = 45, BASE = 76, LARG = PW - ML - MR;
+    var nomeMed = prepPdf(md.medicoNome || md.medicoNomeCurto || '');
+    var linha2 = prepPdf([md.especialidade, rotulo('CRM', md.crm), rotulo('RQE', md.rqe)].filter(Boolean).join(' | '));
+    var rod = prepPdf([md.endereco, [md.cidade, md.uf].filter(Boolean).join(' (') + (md.cidade && md.uf ? ')' : ''), md.telefone ? 'Tel. ' + md.telefone : ''].filter(Boolean).join(' | '));
+    var FN = { H: '/F1', HB: '/F2', C: '/F3', CB: '/F4' };
+    var paginas = [], ops = null, y = 0;
+    function cor(c) { return c ? c + ' rg ' : '0 g '; }
+    function texto(t, x, yy, fonte, tam, c) { ops.push('BT ' + cor(c) + FN[fonte] + ' ' + tam + ' Tf ' + x.toFixed(2) + ' ' + yy.toFixed(2) + ' Td ' + strPdf(t) + ' Tj ET'); }
+    function centro(t, fonte, tam, c) { texto(t, ML + (LARG - largPdf(t, fonte, tam)) / 2, y, fonte, tam, c); }
+    function traco(x1, y1, x2, y2, c, esp) { ops.push('q ' + (c || '0.53 0.53 0.53') + ' RG ' + (esp || 0.6) + ' w ' + x1.toFixed(2) + ' ' + y1.toFixed(2) + ' m ' + x2.toFixed(2) + ' ' + y2.toFixed(2) + ' l S Q'); }
+    function novaPagina() { ops = []; paginas.push(ops); y = PH - TOPO; }
+    function cabe(h) { if (y - h < BASE) { novaPagina(); return false; } return true; }
+    novaPagina();
+    // cabeçalho
+    if (nomeMed) { y -= 14; centro(nomeMed, 'HB', 14); y -= 4; }
+    if (linha2) { y -= 11; centro(linha2, 'H', 9.5, '0.27 0.27 0.27'); }
+    y -= 8; traco(ML, y, PW - MR, y); y -= 12;
+    y -= 12; centro('SOLICITAÇÃO DE EXAMES', 'HB', 12); y -= 14;
+    // paciente e data
+    y -= 11;
+    var dt = prepPdf(o.data), wRot = largPdf('Data: ', 'HB', 11);
+    texto('Data: ', PW - MR - wRot - largPdf(dt, 'H', 11), y, 'HB', 11); texto(dt, PW - MR - largPdf(dt, 'H', 11), y, 'H', 11);
+    var larPac = LARG - wRot - largPdf(dt, 'H', 11) - 18, rp = 'Paciente: ', wp = largPdf(rp, 'HB', 11);
+    texto(rp, ML, y, 'HB', 11);
+    quebrar(o.paciente || '', 'H', 11, larPac - wp).forEach(function (l, i) { if (i) y -= 13.5; texto(l, ML + wp, y, 'H', 11); });
+    y -= 6;
+    function campoRot(rot, val) {
+      var wr = largPdf(rot, 'HB', 11);
+      y -= 13.5; texto(rot, ML, y, 'HB', 11);
+      quebrar(val, 'H', 11, LARG - wr).forEach(function (l, i) { if (i) { y -= 13.5; cabe(13.5); } texto(l, ML + wr, y, 'H', 11); });
+    }
+    if (o.indicacao) campoRot('Indicação clínica: ', o.indicacao);
+    if (o.cid) campoRot('CID-10: ', o.cid);
+    y -= 10; y -= 13.5; texto('Solicito:', ML, y, 'H', 11); y -= 8;
+    // exames (o último exame vai para a página seguinte junto com a assinatura, se ela não couber)
+    var ihS = 0; if (jpeg) { var lc0 = 5.2, ac0 = lc0 * jpeg.h / jpeg.w; if (ac0 > 3.4) ac0 = 3.4; ihS = ac0 * 28.3465; }
+    var sigH = jpeg ? 24 + ihS : 36 + (nomeMed ? 12 : 0) + (linha2 ? 12 : 0), ultimo = o.itens.length - 1;
+    var comCod = o.itens.some(function (i) { return i.tuss; });
+    if (comCod) {
+      var X1 = ML + 2, X2 = ML + 24, X3 = ML + 82, LEX = PW - MR - X3 - 2;
+      var cab = function () { y -= 11; texto('TUSS', X2, y, 'HB', 9, '0.33 0.33 0.33'); texto('Exame', X3, y, 'HB', 9, '0.33 0.33 0.33'); y -= 4; traco(ML, y, PW - MR, y, '0.6 0.6 0.6', 0.6); };
+      cab();
+      o.itens.forEach(function (it, i) {
+        var ls = quebrar(it.nome, 'H', 11, LEX), h = 6 + ls.length * 13.5;
+        if (!cabe(h + (i === ultimo ? sigH : 0))) cab();
+        y -= 3.5 + 10.5;
+        texto((i + 1) + '.', X1, y, 'H', 11);
+        if (it.tuss) texto(prepPdf(it.tuss), X2, y, 'CB', 10);
+        ls.forEach(function (l, j) { if (j) y -= 13.5; texto(l, X3, y, 'H', 11); });
+        y -= 5.5; traco(ML, y, PW - MR, y, '0.886 0.886 0.886', 0.4);
+      });
+    } else {
+      o.itens.forEach(function (it, i) {
+        var pre = (i + 1) + '. ', wpre = largPdf(pre, 'H', 11), ls = quebrar(it.nome, 'H', 11, LARG - wpre);
+        cabe(ls.length * 13.5 + 4 + (i === ultimo ? sigH : 0));
+        y -= 13.5; texto(pre, ML, y, 'H', 11);
+        ls.forEach(function (l, j) { if (j) y -= 13.5; texto(l, ML + wpre, y, 'H', 11); });
+        y -= 4;
+      });
+    }
+    // assinatura: carimbo ou linha, sempre juntos na mesma página
+    var img = null;
+    if (jpeg) {
+      var cm = 28.3465, lc = 5.2, ac = lc * jpeg.h / jpeg.w;
+      if (ac > 3.4) { ac = 3.4; lc = ac * jpeg.w / jpeg.h; }
+      var iw = lc * cm, ih = ac * cm;
+      cabe(24 + ih); y -= 24 + ih;
+      ops.push('q ' + iw.toFixed(2) + ' 0 0 ' + ih.toFixed(2) + ' ' + (ML + (LARG - iw) / 2).toFixed(2) + ' ' + y.toFixed(2) + ' cm /Im1 Do Q');
+      img = { pagina: paginas.length - 1 };
+    } else {
+      cabe(36 + 12 + 12 + 12);
+      y -= 36; traco(PW / 2 - 105, y, PW / 2 + 105, y, '0.27 0.27 0.27', 0.6);
+      if (nomeMed) { y -= 12; centro(nomeMed, 'H', 9.5, '0.27 0.27 0.27'); }
+      if (linha2) { y -= 12; centro(linha2, 'H', 9.5, '0.27 0.27 0.27'); }
+    }
+    // rodapé em todas as páginas
+    paginas.forEach(function (p) {
+      ops = p;
+      if (rod) {
+        var lsr = quebrar(rod, 'H', 7.5, LARG);
+        traco(ML, 46, PW - MR, 46, '0.6 0.6 0.6', 0.4);
+        lsr.forEach(function (l, j) { y = 36 - j * 9; centro(l, 'H', 7.5, '0.33 0.33 0.33'); });
+      }
+    });
+    // montagem do arquivo
+    var enc = function (s) { var u = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) u[i] = s.charCodeAt(i) & 255; return u; };
+    var partes = [], tam = 0, offs = [];
+    function add(u) { if (typeof u === 'string') u = enc(u); partes.push(u); tam += u.length; }
+    var nObj = 0, objs = [];
+    function reserva() { return ++nObj; }
+    var idCat = reserva(), idPags = reserva(), idF = [reserva(), reserva(), reserva(), reserva()], idImg = jpeg ? reserva() : 0, idInfo = reserva();
+    var idPg = paginas.map(function () { return [reserva(), reserva()]; });
+    var fontes = ['Helvetica', 'Helvetica-Bold', 'Courier', 'Courier-Bold'];
+    objs[idCat] = '<< /Type /Catalog /Pages ' + idPags + ' 0 R >>';
+    objs[idPags] = '<< /Type /Pages /Count ' + paginas.length + ' /Kids [' + idPg.map(function (p) { return p[0] + ' 0 R'; }).join(' ') + '] >>';
+    idF.forEach(function (id, i) { objs[id] = '<< /Type /Font /Subtype /Type1 /BaseFont /' + fontes[i] + ' /Encoding /WinAnsiEncoding >>'; });
+    var titulo = 'Pedido de exames' + (o.paciente ? ' - ' + prepPdf(o.paciente) : '');
+    objs[idInfo] = '<< /Title ' + strPdf(titulo) + ' /Author ' + strPdf(nomeMed || 'Neurotools') + ' /Creator (Neurotools) >>';
+    paginas.forEach(function (p, i) {
+      var cont = p.join('\n');
+      objs[idPg[i][0]] = '<< /Type /Page /Parent ' + idPags + ' 0 R /MediaBox [0 0 ' + PW + ' ' + PH + '] /Resources << /Font << /F1 ' + idF[0] + ' 0 R /F2 ' + idF[1] + ' 0 R /F3 ' + idF[2] + ' 0 R /F4 ' + idF[3] + ' 0 R >>' + (img && img.pagina === i ? ' /XObject << /Im1 ' + idImg + ' 0 R >>' : '') + ' >> /Contents ' + idPg[i][1] + ' 0 R >>';
+      objs[idPg[i][1]] = { dic: '<< /Length ' + cont.length + ' >>', dados: enc(cont) };
+    });
+    if (jpeg) objs[idImg] = { dic: '<< /Type /XObject /Subtype /Image /Width ' + jpeg.w + ' /Height ' + jpeg.h + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + jpeg.dados.length + ' >>', dados: jpeg.dados };
+    add('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+    for (var k = 1; k <= nObj; k++) {
+      offs[k] = tam; var ob = objs[k];
+      add(k + ' 0 obj\n');
+      if (typeof ob === 'string') add(ob + '\n');
+      else { add(ob.dic + '\nstream\n'); add(ob.dados); add('\nendstream\n'); }
+      add('endobj\n');
+    }
+    var xref = tam, xr = 'xref\n0 ' + (nObj + 1) + '\n0000000000 65535 f \n';
+    for (k = 1; k <= nObj; k++) xr += ('0000000000' + offs[k]).slice(-10) + ' 00000 n \n';
+    add(xr + 'trailer\n<< /Size ' + (nObj + 1) + ' /Root ' + idCat + ' 0 R /Info ' + idInfo + ' 0 R >>\nstartxref\n' + xref + '\n%%EOF\n');
+    return new Blob(partes, { type: 'application/pdf' });
+  }
+  window.NTEX_pdf = gerarPdf;   // usado nos testes
+
+  function emitir(formato) {
+    var it = itensAtuais(); if (!it.length) { avisar('Inclua ao menos um exame.'); return; }
     var nome = $('pNome').value.trim();
     if (!nome) { avisar('Preencha o nome do paciente.'); $('pNome').focus(); return; }
     var com = S.carimbo === 'com', c = carimbo();
     if (com && !c) { desenharCarimbo(); avisar('Envie a foto do carimbo ou escolha "sem carimbo".'); var bt = $('cEnviar'); if (bt) bt.focus(); return; }
-    var blob = gerarDocx({ medico: medico(), paciente: nome, data: isoBr($('pData').value || hojeIso()), indicacao: $('pInd').value.trim(), cid: $('pCid').value.trim(), itens: it, carimbo: com ? c : null });
-    var arq = 'Pedido_exames_' + nome.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 50) + (com ? '' : '_sem_carimbo') + '.docx';
-    if (host && host.salvar) host.salvar(arq, blob);
-    else { var u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = arq; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(u); a.remove(); }, 1500); }
-  });
+    var dados = { medico: medico(), paciente: nome, data: isoBr($('pData').value || hojeIso()), indicacao: $('pInd').value.trim(), cid: $('pCid').value.trim(), itens: it, carimbo: com ? c : null };
+    var arq = 'Pedido_exames_' + nome.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 50) + (com ? '' : '_sem_carimbo') + '.' + formato;
+    function baixar(blob) {
+      if (host && host.salvar) host.salvar(arq, blob);
+      else { var u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = arq; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(u); a.remove(); }, 1500); }
+    }
+    if (formato === 'docx') { baixar(gerarDocx(dados)); return; }
+    (com ? carimboJpeg(c) : Promise.resolve(null)).then(function (jpeg) { baixar(gerarPdf(dados, jpeg)); }, function () { avisar('Não foi possível ler a foto do carimbo. Envie a foto de novo.'); });
+  }
+  $('bDocx').addEventListener('click', function () { emitir('docx'); });
+  $('bPdf').addEventListener('click', function () { emitir('pdf'); });
 
   // ================= modos =================
   function atualizar() {

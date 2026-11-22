@@ -1833,6 +1833,27 @@ function rotuloReg(r, v) { v = String(v || '').trim(); if (!v) return ''; return
     nota: 'Derivado em área endêmica nos Estados Unidos; no Brasil, considerar a epidemiologia local (síndrome de Baggio-Yoshinari).',
     refs: ['McEntire C, Chung S, Chang B, et al. FACE DROPS: a clinical risk assessment tool for differentiation of acute Lyme disease-associated facial palsy from Bell palsy. Neurol Clin Pract. 2025;15(3):e200476.']
   });
+
+  // ---------- EGRIS ----------
+  NT.def({
+    id: 'egris', area: A, nome: 'EGRIS (insuficiência respiratória na síndrome de Guillain-Barré)', sigla: 'EGRIS',
+    alias: 'egris erasmus gbs respiratory insufficiency score guillain-barre sgb ventilacao mecanica intubacao uti',
+    sub: 'Walgaard e cols., 2010. Estima, na admissão, o risco de ventilação mecânica na primeira semana de internação. Total de 0 a 7.',
+    tipo: 'pontos', max: 7, exigeTodos: true, copia: 'completa',
+    itens: NT.numerar([
+      I('d', 'Dias entre o início da fraqueza e a admissão', [[0, 'Mais de 7 dias'], [1, '4 a 7 dias'], [2, '3 dias ou menos']], { c: 'Início da fraqueza até a admissão', compacto: false }),
+      I('f', 'Fraqueza facial e/ou bulbar na admissão', [[1, 'Presente'], [0, 'Ausente']], { c: 'Fraqueza facial e/ou bulbar' }),
+      I('m', 'Escore MRC somado na admissão (0 a 60)', [[0, '51 a 60'], [1, '41 a 50'], [2, '31 a 40'], [3, '21 a 30'], [4, '20 ou menos']], { c: 'MRC somado',
+        ajuda: 'Força de 0 a 5, dos dois lados, em seis grupos: abdução do ombro, flexão do cotovelo, extensão do punho, flexão do quadril, extensão do joelho e dorsiflexão do pé.' })
+    ]),
+    interp: function (t) {
+      return t <= 2 ? { rotulo: 'Risco baixo', classe: 'g1', frase: 'EGRIS de 0 a 2: risco aproximado de 4% de ventilação mecânica na primeira semana.' }
+        : t <= 4 ? { rotulo: 'Risco intermediário', classe: 'g3', frase: 'EGRIS de 3 a 4: risco aproximado de 24% de ventilação mecânica na primeira semana.' }
+          : { rotulo: 'Risco alto', classe: 'g4', frase: 'EGRIS de 5 a 7: risco aproximado de 65% de ventilação mecânica na primeira semana' + (t === 7 ? ' (acima de 80% com escore 7).' : '.') };
+    },
+    nota: 'O EGRIS não substitui a monitorização seriada da capacidade vital, da PImáx/PEmáx e da função bulbar: escore baixo não dispensa vigilância se o quadro progride rapidamente. Há uma versão modificada, o mEGRIS (coorte IGOS), com MRC reduzido e validação fora da Europa. Não confundir com o EGOS/mEGOS, que prediz a incapacidade de andar sem ajuda aos 6 meses.',
+    refs: ['Walgaard C, Lingsma HF, Ruts L, Drenthen J, van Koningsveld R, Garssen MJ, et al. Prediction of respiratory insufficiency in Guillain-Barré syndrome. Ann Neurol. 2010;67(6):781-7.']
+  });
 })();
 
 /* ===================== CEFALEIA ===================== */
