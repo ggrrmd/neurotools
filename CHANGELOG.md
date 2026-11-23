@@ -2,6 +2,10 @@
 
 Numeração: **1.x** para entregas com novidades (novas escalas, critérios, relatórios ou seções); **1.x.y** para correções pequenas; **2.0** reservado para mudança grande de estrutura.
 
+## 1.3.3 (23 de novembro de 2026)
+
+- Relatório de terapia antiamiloide (Cognição > Terapia antiamiloide): nome comercial do donanemab corrigido de "Kinsula" para **Kisunla**, no texto do relatório em Word e no cronograma de ressonâncias.
+
 ## 1.3.2 (22 de novembro de 2026)
 
 - Escalas e instrumentos, Neuromuscular: nova escala **EGRIS** (Erasmus GBS Respiratory Insufficiency Score), no subgrupo novo Guillain-Barré. Estima na admissão o risco de ventilação mecânica na primeira semana.
